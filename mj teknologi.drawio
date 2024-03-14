@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2024-03-14T03:25:20.348Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36" etag="vANu2uZ5ZUExFNpsxchV" version="23.1.7" type="github">
+<mxfile host="app.diagrams.net" modified="2024-03-14T03:26:20.835Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36" etag="Klzaiejy5boFMwJbRoqg" version="23.1.7" type="github">
   <diagram name="Skema Sistem Pembelian PC" id="LTwTWlUESocyVN-O_0bX">
     <mxGraphModel dx="1834" dy="822" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
@@ -8,7 +8,7 @@
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="Oldoorq-WCMmPgYF-nSC-1" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;Pelanggan&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;" parent="1" vertex="1">
-          <mxGeometry x="-360" y="9" width="147" height="134" as="geometry" />
+          <mxGeometry x="-396" y="9" width="147" height="134" as="geometry" />
         </mxCell>
         <mxCell id="ectNz7tGimnN0HGEFkve-9" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;startArrow=classic;startFill=1;" edge="1" parent="1" source="Oldoorq-WCMmPgYF-nSC-2" target="Oldoorq-WCMmPgYF-nSC-19">
           <mxGeometry relative="1" as="geometry" />
@@ -20,10 +20,10 @@
           <mxGeometry x="134" y="9" width="142" height="134" as="geometry" />
         </mxCell>
         <mxCell id="Oldoorq-WCMmPgYF-nSC-12" value="Mengirimkan bukti pembayaran,&lt;br&gt;menerima status pemesanan dan perakitan" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=16;" parent="1" vertex="1">
-          <mxGeometry x="-189" y="75" width="326" height="50" as="geometry" />
+          <mxGeometry x="-220" y="80" width="326" height="50" as="geometry" />
         </mxCell>
         <mxCell id="Oldoorq-WCMmPgYF-nSC-13" value="&lt;font style=&quot;font-size: 16px;&quot;&gt;Mencari&amp;nbsp; komponen komputer yang ingin &lt;br&gt;dibeli, melakukan simulasi rakit komputer,&lt;br&gt;dan pemesanan Part PC/Hasil simulasi rakitan&lt;br&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=16;" parent="1" vertex="1">
-          <mxGeometry x="-211" y="6" width="348" height="70" as="geometry" />
+          <mxGeometry x="-227" y="6" width="348" height="70" as="geometry" />
         </mxCell>
         <mxCell id="Oldoorq-WCMmPgYF-nSC-19" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;Admin MJ Teknologi Semarang&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;" parent="1" vertex="1">
           <mxGeometry x="699" y="9" width="147" height="134" as="geometry" />
