@@ -1,19 +1,19 @@
-<mxfile host="app.diagrams.net" modified="2024-03-14T03:26:20.835Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36" etag="Klzaiejy5boFMwJbRoqg" version="23.1.7" type="github">
+<mxfile host="app.diagrams.net" modified="2024-03-15T01:04:34.340Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36" etag="5j7OGVPE3pQT0o5x5O39" version="24.0.6" type="github">
   <diagram name="Skema Sistem Pembelian PC" id="LTwTWlUESocyVN-O_0bX">
     <mxGraphModel dx="1834" dy="822" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="ectNz7tGimnN0HGEFkve-7" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;startArrow=classic;startFill=1;" edge="1" parent="1" source="Oldoorq-WCMmPgYF-nSC-1" target="Oldoorq-WCMmPgYF-nSC-2">
+        <mxCell id="ectNz7tGimnN0HGEFkve-7" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;startArrow=classic;startFill=1;" parent="1" source="Oldoorq-WCMmPgYF-nSC-1" target="Oldoorq-WCMmPgYF-nSC-2" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="Oldoorq-WCMmPgYF-nSC-1" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;Pelanggan&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;" parent="1" vertex="1">
           <mxGeometry x="-396" y="9" width="147" height="134" as="geometry" />
         </mxCell>
-        <mxCell id="ectNz7tGimnN0HGEFkve-9" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;startArrow=classic;startFill=1;" edge="1" parent="1" source="Oldoorq-WCMmPgYF-nSC-2" target="Oldoorq-WCMmPgYF-nSC-19">
+        <mxCell id="ectNz7tGimnN0HGEFkve-9" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;startArrow=classic;startFill=1;" parent="1" source="Oldoorq-WCMmPgYF-nSC-2" target="Oldoorq-WCMmPgYF-nSC-19" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="ectNz7tGimnN0HGEFkve-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;startArrow=classic;startFill=1;" edge="1" parent="1" source="Oldoorq-WCMmPgYF-nSC-2" target="ectNz7tGimnN0HGEFkve-1">
+        <mxCell id="ectNz7tGimnN0HGEFkve-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;startArrow=classic;startFill=1;" parent="1" source="Oldoorq-WCMmPgYF-nSC-2" target="ectNz7tGimnN0HGEFkve-1" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="Oldoorq-WCMmPgYF-nSC-2" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;Sistem Jual Beli Part PC MJTeknologi&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;" parent="1" vertex="1">
@@ -28,19 +28,19 @@
         <mxCell id="Oldoorq-WCMmPgYF-nSC-19" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;Admin MJ Teknologi Semarang&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;" parent="1" vertex="1">
           <mxGeometry x="699" y="9" width="147" height="134" as="geometry" />
         </mxCell>
-        <mxCell id="Oldoorq-WCMmPgYF-nSC-23" value="Mengecek pemesanan pelanggan,&amp;nbsp;&lt;br&gt;mengkonfirmasi pemesanan pelanggan" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=16;" parent="1" vertex="1">
-          <mxGeometry x="347" y="26" width="298" height="50" as="geometry" />
+        <mxCell id="Oldoorq-WCMmPgYF-nSC-23" value="Mengecek pemesanan pelanggan,&amp;nbsp;&lt;br&gt;mengkonfirmasi pemesanan dan pembayaran pelanggan" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="277" y="26" width="423" height="50" as="geometry" />
         </mxCell>
         <mxCell id="Oldoorq-WCMmPgYF-nSC-24" value="Menyiapkan part komputer yang sudah dikonfirmasi,&lt;br&gt;Mengelola ketersediaan komponen komputer, dan&lt;br&gt;Merakit komputer yang sudah dipesan" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=16;" parent="1" vertex="1">
           <mxGeometry x="294" y="73" width="389" height="70" as="geometry" />
         </mxCell>
-        <mxCell id="ectNz7tGimnN0HGEFkve-1" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;Pemilik MJ Teknologi Semarang&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;" vertex="1" parent="1">
+        <mxCell id="ectNz7tGimnN0HGEFkve-1" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;Pemilik MJ Teknologi Semarang&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;" parent="1" vertex="1">
           <mxGeometry x="699" y="213" width="147" height="134" as="geometry" />
         </mxCell>
-        <mxCell id="ectNz7tGimnN0HGEFkve-4" value="Mengecek hasil penjualan" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=16;" vertex="1" parent="1">
+        <mxCell id="ectNz7tGimnN0HGEFkve-4" value="Mengecek hasil penjualan" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=16;" parent="1" vertex="1">
           <mxGeometry x="378" y="281" width="203" height="31" as="geometry" />
         </mxCell>
-        <mxCell id="ectNz7tGimnN0HGEFkve-11" value="mengkonfirmasi pembayaran" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=16;" vertex="1" parent="1">
+        <mxCell id="ectNz7tGimnN0HGEFkve-11" value="mengkonfirmasi pembayaran" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=16;" parent="1" vertex="1">
           <mxGeometry x="370" y="250" width="224" height="31" as="geometry" />
         </mxCell>
       </root>
