@@ -20,9 +20,10 @@ model Produk {
   id_brand        Int
   nama_produk     String
   harga           Decimal @db.Decimal(10, 2)
-  deskripsi       String
+  deskripsi       String? @db.Text
   est_berat       Decimal @db.Decimal(10, 2)
   stok            Int
+  isDeleted       Boolean @default(false)
 
   Kategori          Kategori             @relation(fields: [id_kategori], references: [id_kategori])
   SubKategori       SubKategori?         @relation(fields: [id_sub_kategori], references: [id_sub_kategori])
@@ -33,6 +34,8 @@ model Produk {
   DetailSimulasi    Detail_Simulasi[]
   DetailTransaksi   Detail_Transaksi[]
   Keranjang         Keranjang[]
+  Favorit           Favorit[]
+  Media             Media[]
 
   @@index([id_kategori])
   @@index([id_sub_kategori])
@@ -130,16 +133,22 @@ model Detail_Simulasi {
 }
 
 model User {
-  id_user   Int         @id @default(autoincrement())
-  user_nama String
-  email     String      @unique(map: "unique_email")
-  alamat    String
-  no_hp     String
-  Simulasi  Simulasi[]
-  Transaksi Transaksi[]
-  Keranjang Keranjang[]
+  id_user      Int             @id @default(autoincrement())
+  id_role      Int
+  username     String
+  email        String          @unique(map: "unique_email")
+  password     String
+  alamat       String
+  no_hp        String
+  Simulasi     Simulasi[]
+  Transaksi    Transaksi[]
+  Keranjang    Keranjang[]
+  Favorit      Favorit[]
+  LogTransaksi Log_Transaksi[]
 
-  @@unique([email])
+  Roles Roles @relation(fields: [id_role], references: [id_role])
+
+  @@unique([email], map: "unique_email_constraint")
 }
 
 model Keranjang {
@@ -157,13 +166,12 @@ model Keranjang {
 model Transaksi {
   id_transaksi    Int                @id @default(autoincrement())
   id_user         Int
-  tanggal         DateTime
-  status_pesanan  Int
   total_barang    Int
   harga_total     Decimal            @db.Decimal(10, 2)
   deskripsi       String
   User            User               @relation(fields: [id_user], references: [id_user])
   DetailTransaksi Detail_Transaksi[]
+  LogTransaksi    Log_Transaksi[]
 
   @@index([id_user])
 }
@@ -179,20 +187,36 @@ model Detail_Transaksi {
   @@id([id_produk, id_transaksi])
 }
 
-model Admin {
-  id_admin Int    @id @default(autoincrement())
-  nama     String
-  email    String @unique(map: "unique_email")
-  no_hp    String
-
-  @@unique([email])
+model Favorit {
+  id_favorit Int    @id @default(autoincrement())
+  id_produk  Int
+  id_user    Int
+  Produk     Produk @relation(fields: [id_produk], references: [id_produk])
+  User       User   @relation(fields: [id_user], references: [id_user])
 }
 
-model PemilikToko {
-  id_pemilik Int    @id @default(autoincrement())
-  nama       String
-  email      String @unique(map: "unique_email")
-  no_hp      String
+model Media {
+  id_media  Int    @id @default(autoincrement())
+  id_produk Int
+  sumber    String
+  tipe_file String
+  Produk    Produk @relation(fields: [id_produk], references: [id_produk])
+}
 
-  @@unique([email])
+model Roles {
+  id_role  Int    @id @default(autoincrement())
+  nama     String
+  deskrips String
+  User     User[]
+}
+
+model Log_Transaksi {
+  id_log_transaksi Int      @id @default(autoincrement())
+  id_transaksi     Int
+  id_user          Int
+  status_pesanan   Int
+  waktu            DateTime
+
+  Transaksi Transaksi @relation(fields: [id_transaksi], references: [id_transaksi])
+  User      User      @relation(fields: [id_user], references: [id_user])
 }

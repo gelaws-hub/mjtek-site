@@ -1,7 +1,10 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import produkRoutes from './routes/produkRoutes'; // Ensure the path is correct
+import produkRoutes from './routes/produkRoutes';
+import produkDetailRoutes from './routes/produkDetailRoutes'; 
+import simulationRoutes from './routes/simulationRoutes';
+
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -12,7 +15,9 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Register routes
-app.use('/', produkRoutes); // Prefix all routes with /api
+app.use('/', produkRoutes);
+app.use('/', produkDetailRoutes);
+app.use('/', simulationRoutes);
 
 // Root route
 app.get('/', (req, res) => {
