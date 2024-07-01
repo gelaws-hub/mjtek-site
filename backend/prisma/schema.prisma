@@ -92,14 +92,15 @@ model Detail_CPU {
 }
 
 model Detail_Motherboard {
-  id_produk   Int
-  id_socket   Int
-  id_tipe_ram Int
-  Produk      Produk   @relation(fields: [id_produk], references: [id_produk])
-  Socket      Socket   @relation(fields: [id_socket], references: [id_socket])
-  TipeRAM     Tipe_RAM @relation(fields: [id_tipe_ram], references: [id_tipe_ram])
+  id_detail_motherboard Int      @id @default(autoincrement())
+  id_produk             Int
+  id_socket             Int
+  id_tipe_ram           Int
+  Produk                Produk   @relation(fields: [id_produk], references: [id_produk])
+  Socket                Socket   @relation(fields: [id_socket], references: [id_socket])
+  TipeRAM               Tipe_RAM @relation(fields: [id_tipe_ram], references: [id_tipe_ram])
 
-  @@id([id_produk, id_socket, id_tipe_ram])
+  @@index([id_produk, id_socket, id_tipe_ram])
 }
 
 model Tipe_RAM {

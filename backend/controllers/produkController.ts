@@ -6,6 +6,7 @@ const formatProduk = (produk: any) => {
     // Flatten DetailCPU, DetailMotherboard, and DetailRAM
     const cpuSockets = item.DetailCPU.map((cpu: any) => cpu.Socket.nama_socket).join(', ');
     const motherboardSockets = item.DetailMotherboard.map((mb: any) => mb.Socket.nama_socket).join(', ');
+    const motherboardRAM = item.DetailMotherboard.map((mb: any) => mb.TipeRAM.tipe_ram).join(', ');
     const ramTypes = item.DetailRAM.map((ram: any) => ram.TipeRAM.tipe_ram).join(', ');
 
     return {
@@ -15,9 +16,11 @@ const formatProduk = (produk: any) => {
       est_berat: parseFloat(item.est_berat),
       deskripsi: item.deskripsi,
       stok: item.stok,
-      nama_kategori: item.Kategori?.nama_kategori || null,
+      kategori: item.Kategori?.nama_kategori || null,
+      subkategori: item.SubKategori?.nama_sub_kategori || null,
+      brand: item.Brand?.nama_brand || null,
       nama_socket: cpuSockets || motherboardSockets || null,
-      tipe_ram: ramTypes || null,
+      tipe_ram: ramTypes || motherboardRAM || null,
     };
   });
 

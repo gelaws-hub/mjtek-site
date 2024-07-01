@@ -2,53 +2,72 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+const produkSelect = {
+  id_produk: true,
+  nama_produk: true,
+  harga: true,
+  est_berat: true,
+  deskripsi: true,
+  stok: true,
+  Kategori: {
+    select: {
+      nama_kategori: true,
+    },
+  },
+  SubKategori: {
+    select: {
+      nama_sub_kategori: true,
+    },
+  },
+  Brand: {
+    select: {
+      nama_brand: true,
+    },
+  },
+  DetailCPU: {
+    select: {
+      Socket: {
+        select: {
+          nama_socket: true,
+        },
+      },
+    },
+  },
+  DetailMotherboard: {
+    select: {
+      Socket: {
+        select: {
+          nama_socket: true,
+        },
+      },
+      TipeRAM: {
+        select: {
+          tipe_ram: true,
+        },
+      },
+    },
+  },
+  DetailRAM: {
+    select: {
+      TipeRAM: {
+        select: {
+          tipe_ram: true,
+        },
+      },
+    },
+  },
+};
+
 export const getAllProduk = async () => {
   try {
     const produk = await prisma.produk.findMany({
       where: {
         isDeleted: false,
       },
-      select: {
-        id_produk: true,
-        nama_produk: true,
-        harga: true,
-        est_berat: true,
-        deskripsi: true,
-        stok: true,
-        Kategori: {
-          select: {
-            nama_kategori: true,
-          },
-        },
-        DetailCPU: {
-          select: {
-            Socket: {
-              select: {
-                nama_socket: true,
-              },
-            },
-          },
-        },
-        DetailMotherboard: {
-          select: {
-            Socket: {
-              select: {
-                nama_socket: true,
-              },
-            },
-          },
-        },
-        DetailRAM: {
-          select: {
-            TipeRAM: {
-              select: {
-                tipe_ram: true,
-              },
-            },
-          },
-        },
-      },
+      select: produkSelect,
     });
+
+    console.log(JSON.stringify(produk, null, 2));
 
     return produk.map((item) => ({
       ...item,
@@ -62,13 +81,17 @@ export const getAllProduk = async () => {
 
 export const getProdukById = async (id: number) => {
   try {
-    return await prisma.produk.findUnique({
+    const produk = await prisma.produk.findUnique({
       where: {
         id_produk: id,
       },
+      select: produkSelect,
     });
+
+    return produk; 
   } catch (error) {
-    throw new Error("Failed to fetch produk by ID");
+    console.error('Failed to fetch produk by ID:', error);
+    throw new Error('Failed to fetch produk by ID');
   }
 };
 
