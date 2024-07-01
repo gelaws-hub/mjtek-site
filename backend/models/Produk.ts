@@ -57,6 +57,11 @@ const produkSelect = {
     },
   },
   isDeleted: true,
+  Media: {
+    select: {
+      sumber: true,
+    }
+  }, 
 };
 
 export const getAllProduk = async () => {

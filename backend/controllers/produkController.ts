@@ -8,6 +8,7 @@ const formatProduk = (produk: any) => {
     const motherboardSockets = item.DetailMotherboard.map((mb: any) => mb.Socket.nama_socket).join(', ');
     const motherboardRAM = item.DetailMotherboard.map((mb: any) => mb.TipeRAM.tipe_ram).join(', ');
     const ramTypes = item.DetailRAM.map((ram: any) => ram.TipeRAM.tipe_ram).join(', ');
+    const mediaProduk = item.Media.map((med: any) => med.sumber).join(', ');
 
     return {
       id_produk: item.id_produk,
@@ -21,6 +22,7 @@ const formatProduk = (produk: any) => {
       brand: item.Brand?.nama_brand || null,
       nama_socket: cpuSockets || motherboardSockets || null,
       tipe_ram: ramTypes || motherboardRAM || null,
+      media: mediaProduk || null,
       isDeleted: item.isDeleted,
     };
   });

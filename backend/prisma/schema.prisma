@@ -74,21 +74,21 @@ model Socket {
 }
 
 model Detail_RAM {
-  id_detail_ram Int  @id @default(autoincrement())
-  id_produk   Int
-  id_tipe_ram Int
-  Produk      Produk   @relation(fields: [id_produk], references: [id_produk])
-  TipeRAM     Tipe_RAM @relation(fields: [id_tipe_ram], references: [id_tipe_ram])
+  id_detail_ram Int      @id @default(autoincrement())
+  id_produk     Int
+  id_tipe_ram   Int
+  Produk        Produk   @relation(fields: [id_produk], references: [id_produk])
+  TipeRAM       Tipe_RAM @relation(fields: [id_tipe_ram], references: [id_tipe_ram])
 
   @@index([id_produk, id_tipe_ram])
 }
 
 model Detail_CPU {
-  id_detail_cpu Int @id @default(autoincrement())
-  id_produk Int
-  id_socket Int
-  Produk    Produk @relation(fields: [id_produk], references: [id_produk])
-  Socket    Socket @relation(fields: [id_socket], references: [id_socket])
+  id_detail_cpu Int    @id @default(autoincrement())
+  id_produk     Int
+  id_socket     Int
+  Produk        Produk @relation(fields: [id_produk], references: [id_produk])
+  Socket        Socket @relation(fields: [id_socket], references: [id_socket])
 
   @@index([id_produk, id_socket])
 }
@@ -127,11 +127,11 @@ model Simulasi {
 }
 
 model Detail_Simulasi {
-  id_detail_simulasi Int @id @default(autoincrement())
-  id_simulasi Int
-  id_produk   Int
-  Simulasi    Simulasi @relation(fields: [id_simulasi], references: [id_simulasi])
-  Produk      Produk   @relation(fields: [id_produk], references: [id_produk])
+  id_detail_simulasi Int      @id @default(autoincrement())
+  id_simulasi        Int
+  id_produk          Int
+  Simulasi           Simulasi @relation(fields: [id_simulasi], references: [id_simulasi])
+  Produk             Produk   @relation(fields: [id_produk], references: [id_produk])
 
   @@index([id_simulasi, id_produk])
 }
@@ -181,13 +181,13 @@ model Transaksi {
 }
 
 model Detail_Transaksi {
-  id_detail_transaksi Int @id @default(autoincrement())
-  id_produk     Int
-  id_transaksi  Int
-  jumlah_produk Int
-  jumlah_harga  Decimal   @db.Decimal(10, 2)
-  Produk        Produk    @relation(fields: [id_produk], references: [id_produk])
-  Transaksi     Transaksi @relation(fields: [id_transaksi], references: [id_transaksi])
+  id_detail_transaksi Int       @id @default(autoincrement())
+  id_produk           Int
+  id_transaksi        Int
+  jumlah_produk       Int
+  jumlah_harga        Decimal   @db.Decimal(10, 2)
+  Produk              Produk    @relation(fields: [id_produk], references: [id_produk])
+  Transaksi           Transaksi @relation(fields: [id_transaksi], references: [id_transaksi])
 
   @@index([id_produk, id_transaksi])
 }
