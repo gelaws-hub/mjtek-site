@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import * as SocketModel from '../../models/sim_compatibility/Socket';
+import * as SocketModel from '../../models/simulation/Socket';
 
 export const getAllSockets = async (req: Request, res: Response) => {
   try {

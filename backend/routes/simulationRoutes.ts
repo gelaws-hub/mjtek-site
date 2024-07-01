@@ -5,7 +5,7 @@ import {
   createSocket,
   updateSocket,
   deleteSocket,
-} from "../controllers/sim_compatibility/socketController";
+} from "../controllers/simulation/socketController";
 
 import {
   getAllDetailRAM,
@@ -13,7 +13,7 @@ import {
   createDetailRAM,
   updateDetailRAM,
   deleteDetailRAM,
-} from "../controllers/sim_compatibility/detailRAMController";
+} from "../controllers/simulation/detailRAMController";
 
 import {
   getAllDetailCPU,
@@ -21,7 +21,7 @@ import {
   createDetailCPU,
   updateDetailCPU,
   deleteDetailCPU,
-} from "../controllers/sim_compatibility/detailCPUController";
+} from "../controllers/simulation/detailCPUController";
 
 import {
   getAllDetailMotherboard,
@@ -29,7 +29,7 @@ import {
   createDetailMotherboard,
   updateDetailMotherboard,
   deleteDetailMotherboard,
-} from "../controllers/sim_compatibility/detailMotherboardController";
+} from "../controllers/simulation/detailMotherboardController";
 
 import {
   getAllTipeRAM,
@@ -37,7 +37,7 @@ import {
   createTipeRAM,
   updateTipeRAM,
   deleteTipeRAM,
-} from "../controllers/sim_compatibility/TipeRAMController";
+} from "../controllers/simulation/TipeRAMController";
 
 const simulationRoutes = express.Router();
 

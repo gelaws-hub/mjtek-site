@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import * as TipeRAMModel from '../../models/sim_compatibility/TipeRAM';
+import * as TipeRAMModel from '../../models/simulation/TipeRAM';
 
 // Get all Tipe_RAM
 export const getAllTipeRAM = async (req: Request, res: Response) => {

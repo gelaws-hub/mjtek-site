@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import * as DetailCPUModel from '../../models/sim_compatibility/DetailCPU';
+import * as DetailCPUModel from '../../models/simulation/DetailCPU';
 
 export const getAllDetailCPU = async (req: Request, res: Response) => {
   try {

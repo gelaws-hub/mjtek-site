@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import * as DetailMotherboardModel from '../../models/sim_compatibility/DetailMotherboard';
+import * as DetailMotherboardModel from '../../models/simulation/DetailMotherboard';
 
 export const getAllDetailMotherboard = async (req: Request, res: Response) => {
   try {

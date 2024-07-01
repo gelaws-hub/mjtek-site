@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import * as DetailRAMModel from '../../models/sim_compatibility/DetailRAM';
+import * as DetailRAMModel from '../../models/simulation/DetailRAM';
 
 export const getAllDetailRAM = async (req: Request, res: Response) => {
   try {
