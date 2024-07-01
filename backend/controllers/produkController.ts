@@ -21,6 +21,7 @@ const formatProduk = (produk: any) => {
       brand: item.Brand?.nama_brand || null,
       nama_socket: cpuSockets || motherboardSockets || null,
       tipe_ram: ramTypes || motherboardRAM || null,
+      isDeleted: item.isDeleted,
     };
   });
 

@@ -56,6 +56,7 @@ const produkSelect = {
       },
     },
   },
+  isDeleted: true,
 };
 
 export const getAllProduk = async () => {
