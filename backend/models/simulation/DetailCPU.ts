@@ -6,9 +6,9 @@ export const getAllDetailCPU = async () => {
   return await prisma.detail_CPU.findMany();
 };
 
-export const getDetailCPUById = async (id_produk: number, id_socket: number) => {
+export const getDetailCPUById = async (id_detail_cpu: number) => {
   return await prisma.detail_CPU.findUnique({
-    where: { id_produk_id_socket: { id_produk, id_socket } },
+    where: { id_detail_cpu },
     include: {
       Produk: true,
       Socket: true,
@@ -16,21 +16,21 @@ export const getDetailCPUById = async (id_produk: number, id_socket: number) => 
   });
 };
 
-export const createDetailCPU = async (data: Detail_CPU) => {
+export const createDetailCPU = async (data: Omit<Detail_CPU, 'id_detail_cpu'>) => {
   return await prisma.detail_CPU.create({
     data,
   });
 };
 
-export const updateDetailCPU = async (id_produk: number, id_socket: number, data: Detail_CPU) => {
+export const updateDetailCPU = async (id_detail_cpu: number, data: Partial<Detail_CPU>) => {
   return await prisma.detail_CPU.update({
-    where: { id_produk_id_socket: { id_produk, id_socket } },
+    where: { id_detail_cpu },
     data,
   });
 };
 
-export const deleteDetailCPU = async (id_produk: number, id_socket: number) => {
+export const deleteDetailCPU = async (id_detail_cpu: number) => {
   return await prisma.detail_CPU.delete({
-    where: { id_produk_id_socket: { id_produk, id_socket } },
+    where: { id_detail_cpu },
   });
 };

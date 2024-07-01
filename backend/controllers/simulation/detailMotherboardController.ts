@@ -12,9 +12,9 @@ export const getAllDetailMotherboard = async (req: Request, res: Response) => {
 };
 
 export const getDetailMotherboardById = async (req: Request, res: Response) => {
-  const { id_produk, id_socket, id_tipe_ram } = req.params;
+  const { id_detail_motherboard } = req.params;
   try {
-    const detailMotherboard = await DetailMotherboardModel.getDetailMotherboardById(parseInt(id_produk), parseInt(id_socket), parseInt(id_tipe_ram));
+    const detailMotherboard = await DetailMotherboardModel.getDetailMotherboardById(parseInt(id_detail_motherboard));
     if (!detailMotherboard) {
       res.status(404).json({ error: "Detail motherboard not found" });
     } else {
@@ -38,10 +38,10 @@ export const createDetailMotherboard = async (req: Request, res: Response) => {
 };
 
 export const updateDetailMotherboard = async (req: Request, res: Response) => {
-  const { id_produk, id_socket, id_tipe_ram } = req.params;
-  const { data } = req.body;
+  const { id_detail_motherboard } = req.params;
+  const data = req.body;
   try {
-    const updatedDetailMotherboard = await DetailMotherboardModel.updateDetailMotherboard(parseInt(id_produk), parseInt(id_socket), parseInt(id_tipe_ram), data);
+    const updatedDetailMotherboard = await DetailMotherboardModel.updateDetailMotherboard(parseInt(id_detail_motherboard), data);
     res.status(200).json(updatedDetailMotherboard);
   } catch (error: any) {
     console.error("Error updating detail motherboard:", error.message);
@@ -50,9 +50,9 @@ export const updateDetailMotherboard = async (req: Request, res: Response) => {
 };
 
 export const deleteDetailMotherboard = async (req: Request, res: Response) => {
-  const { id_produk, id_socket, id_tipe_ram } = req.params;
+  const { id_detail_motherboard } = req.params;
   try {
-    await DetailMotherboardModel.deleteDetailMotherboard(parseInt(id_produk), parseInt(id_socket), parseInt(id_tipe_ram));
+    await DetailMotherboardModel.deleteDetailMotherboard(parseInt(id_detail_motherboard));
     res.status(204).end();
   } catch (error: any) {
     console.error("Error deleting detail motherboard:", error.message);

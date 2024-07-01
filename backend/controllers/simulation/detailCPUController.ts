@@ -12,9 +12,9 @@ export const getAllDetailCPU = async (req: Request, res: Response) => {
 };
 
 export const getDetailCPUById = async (req: Request, res: Response) => {
-  const { id_produk, id_socket } = req.params;
+  const { id_detail_cpu } = req.params;
   try {
-    const detailCPU = await DetailCPUModel.getDetailCPUById(parseInt(id_produk), parseInt(id_socket));
+    const detailCPU = await DetailCPUModel.getDetailCPUById(parseInt(id_detail_cpu));
     if (!detailCPU) {
       res.status(404).json({ error: "Detail CPU not found" });
     } else {
@@ -38,10 +38,10 @@ export const createDetailCPU = async (req: Request, res: Response) => {
 };
 
 export const updateDetailCPU = async (req: Request, res: Response) => {
-  const { id_produk, id_socket } = req.params;
-  const { data } = req.body;
+  const { id_detail_cpu } = req.params;
+  const data = req.body;
   try {
-    const updatedDetailCPU = await DetailCPUModel.updateDetailCPU(parseInt(id_produk), parseInt(id_socket), data);
+    const updatedDetailCPU = await DetailCPUModel.updateDetailCPU(parseInt(id_detail_cpu), data);
     res.status(200).json(updatedDetailCPU);
   } catch (error: any) {
     console.error("Error updating detail CPU:", error.message);
@@ -50,9 +50,9 @@ export const updateDetailCPU = async (req: Request, res: Response) => {
 };
 
 export const deleteDetailCPU = async (req: Request, res: Response) => {
-  const { id_produk, id_socket } = req.params;
+  const { id_detail_cpu } = req.params;
   try {
-    await DetailCPUModel.deleteDetailCPU(parseInt(id_produk), parseInt(id_socket));
+    await DetailCPUModel.deleteDetailCPU(parseInt(id_detail_cpu));
     res.status(204).end();
   } catch (error: any) {
     console.error("Error deleting detail CPU:", error.message);
