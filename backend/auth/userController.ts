@@ -78,6 +78,13 @@ export const Login = async (req: Request, res: Response) => {
             where: {
                 email: email,
             },
+            select: {
+                id_user: true,
+                username: true,
+                email: true,
+                refresh_token: true, // Memastikan memilih refresh_token jika ada dalam skema
+                password: true,
+            },
         });
 
         // Pemeriksaan apakah pengguna ditemukan
@@ -141,32 +148,39 @@ export const Login = async (req: Request, res: Response) => {
     }
 };
 
-export const Logout = async(req: Request, res: Response) => {
+
+export const Logout = async (req: Request, res: Response) => {
     const refreshToken = req.cookies.refreshToken;
-    if(!refreshToken) return res.sendStatus(204);
+    if (!refreshToken) return res.sendStatus(204);
     
-    const user = await prisma.user.findUnique({
-        where: {
-            refresh_token: refreshToken
-        }
-    });
-    
-    if(!user) return res.sendStatus(204);
-    
-    const userId = user.id_user;
-    
-    await prisma.user.update({
-        where: {
-            id_user: userId
-        },
-        data: {
-            refresh_token: null
-        }
-    });
-    
-    res.clearCookie('refreshToken');
-    return res.sendStatus(200);
+    try {
+        const user = await prisma.user.findUnique({
+            where: {
+                refresh_token: refreshToken
+            }
+        });
+
+        if (!user) return res.sendStatus(204);
+
+        const userId = user.id_user;
+
+        await prisma.user.update({
+            where: {
+                id_user: userId
+            },
+            data: {
+                refresh_token: null
+            }
+        });
+
+        res.clearCookie('refreshToken');
+        return res.sendStatus(200);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
 };
+
 
 export const getUsers = async(req: Request, res: Response) => {
     try {
@@ -200,7 +214,14 @@ export const getUser = async (req: Request, res: Response) => {
         if (user) {
             res.json({
                 error: false,
-                userData: user
+                userData: {
+                    id_user: user.id_user,
+                    username: user.username,
+                    email: user.email,
+                    alamat: user.alamat,
+                    no_hp: user.no_hp,
+                    // tambahkan properti lainnya sesuai kebutuhan
+                }
             });
         } else {
             // Jika pengguna tidak ditemukan, kirim respons dengan status 404
@@ -218,6 +239,7 @@ export const getUser = async (req: Request, res: Response) => {
         });
     }
 };
+
 
 export const editProfile = async (req: Request, res: Response) => {
     try {
