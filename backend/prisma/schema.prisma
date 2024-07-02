@@ -138,12 +138,13 @@ model Detail_Simulasi {
 
 model User {
   id_user      Int             @id @default(autoincrement())
-  id_role      Int
+  id_role      Int             @default(1)
   username     String
   email        String          @unique(map: "unique_email")
   password     String
   alamat       String
   no_hp        String
+  refresh_token String?
   Simulasi     Simulasi[]
   Transaksi    Transaksi[]
   Keranjang    Keranjang[]
@@ -217,7 +218,7 @@ model Roles {
 
 model Log_Transaksi {
   id_log_transaksi Int      @id @default(autoincrement())
-  id_transaksi     Int
+  id_transaksi     Int      
   id_user          Int
   status_pesanan   Int
   waktu            DateTime

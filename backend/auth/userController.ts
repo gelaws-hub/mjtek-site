@@ -1,15 +1,16 @@
-import Users from "../models/UserModel.js";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-
+import { PrismaClient, User } from '@prisma/client';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import { Request, Response } from 'express';
 
+const prisma = new PrismaClient();
+
 export const Welcome = (req: Request, res: Response) => {
-    res.send("Welcome to NutriZen API!");
+    res.send("Welcome to MJ Tek API!");
 };
 
 export const Register = async (req: Request, res: Response) => {
-    const { name, email, password, confPassword } = req.body;
+    const { username, email, password, confPassword, alamat, no_hp } = req.body;
 
     // Memeriksa apakah password sesuai
     if (password !== confPassword) {
@@ -20,13 +21,13 @@ export const Register = async (req: Request, res: Response) => {
     }
 
     try {
-      // Memeriksa apakah email sudah dipakai sebelumnya
-        const existingUser = await Users.findOne({
+        // Memeriksa apakah email sudah dipakai sebelumnya
+        const existingUser = await prisma.user.findUnique({
             where: {
                 email: email,
             },
         });
-    
+
         if (existingUser) {
             return res.status(400).json({
                 error: true,
@@ -34,27 +35,32 @@ export const Register = async (req: Request, res: Response) => {
             });
         }
 
-      // Jika email belum dipakai, lanjutkan dengan proses registrasi
+        // Jika email belum dipakai, lanjutkan dengan proses registrasi
         const salt = await bcrypt.genSalt();
         const hashPassword = await bcrypt.hash(password, salt);
-    
-        await Users.create({
-            name: name,
-            email: email,
-            password: hashPassword,
+
+        await prisma.user.create({
+            data: {
+                username: username,
+                email: email,
+                password: hashPassword,
+                alamat: alamat,
+                no_hp: no_hp,
+                id_role: 1 // Default role (user)
+            },
         });
 
         res.json({
             error: false,
             message: "Register Succeed!",
         });
-        } catch (error) {
+    } catch (error) {
         console.log(error);
         res.status(500).json({
             error: true,
             message: "Internal Server Error",
         });
-        }
+    }
 };
 
 export const Login = async (req: Request, res: Response) => {
@@ -68,11 +74,10 @@ export const Login = async (req: Request, res: Response) => {
             });
         }
 
-        const user = await Users.findOne({
+        const user = await prisma.user.findUnique({
             where: {
                 email: email,
             },
-            attributes: ['id', 'name', 'email', 'password', 'photoUrl', 'birthDate', 'age', 'gender', 'weight', 'height', 'activity', 'goal', 'isDataCompleted'],
         });
 
         // Pemeriksaan apakah pengguna ditemukan
@@ -93,30 +98,24 @@ export const Login = async (req: Request, res: Response) => {
             });
         }
 
-        const userId = user.id;
-        const name = user.name;
-        const photoUrl = user.photoUrl;
-        const birthDate = user.birthDate;
-        const age = user.age;
-        const gender = user.gender;
-        const weight = user.weight;
-        const height = user.height;
-        const activity = user.activity;
-        const goal = user.goal;
-        const isDataCompleted = user.isDataCompleted;
+        const userId = user.id_user;
+        const username = user.username;
 
-        const accessToken = jwt.sign({ name, email }, process.env.ACCESS_TOKEN_SECRET, {
-            expiresIn: '180d',
+        const accessToken = jwt.sign({ userId, username, email }, process.env.ACCESS_TOKEN_SECRET!, {
+            expiresIn: '1h',
         });
 
-        const refreshToken = jwt.sign({ name, email }, process.env.REFRESH_TOKEN_SECRET, {
+        const refreshToken = jwt.sign({ userId, username, email }, process.env.REFRESH_TOKEN_SECRET!, {
             expiresIn: '180d',
         });
 
         // Update refreshToken pada database
-        await Users.update({ refresh_token: refreshToken }, {
+        await prisma.user.update({
             where: {
-                id: userId
+                id_user: userId
+            },
+            data: {
+                refresh_token: refreshToken
             }
         });
 
@@ -131,16 +130,7 @@ export const Login = async (req: Request, res: Response) => {
             loginResult: {
                 userId,
                 email,
-                name,
-                photoUrl,
-                birthDate,
-                age,
-                gender,
-                weight,
-                height,
-                activity,
-                goal,
-                isDataCompleted,
+                username,
                 token: accessToken
             }
         });
@@ -153,41 +143,58 @@ export const Login = async (req: Request, res: Response) => {
 
 export const Logout = async(req: Request, res: Response) => {
     const refreshToken = req.cookies.refreshToken;
-        if(!refreshToken) return res.sendStatus(204);
-        const user = await Users.findAll({
-            where:{
-                refresh_token: refreshToken
-            }
-        });
-        if(!user[0]) return res.sendStatus(204);
-        const userId = user[0].id;
-        await Users.update({refresh_token: null},{
-            where:{
-                id: userId
-            }
-        });
-        res.clearCookie('refreshToken');
-        return res.sendStatus(200);
-}
+    if(!refreshToken) return res.sendStatus(204);
+    
+    const user = await prisma.user.findUnique({
+        where: {
+            refresh_token: refreshToken
+        }
+    });
+    
+    if(!user) return res.sendStatus(204);
+    
+    const userId = user.id_user;
+    
+    await prisma.user.update({
+        where: {
+            id_user: userId
+        },
+        data: {
+            refresh_token: null
+        }
+    });
+    
+    res.clearCookie('refreshToken');
+    return res.sendStatus(200);
+};
 
 export const getUsers = async(req: Request, res: Response) => {
     try {
-        const users = await Users.findAll();
+        const users = await prisma.user.findMany();
         res.json({
             error: false,
-            users: users});
+            users: users
+        });
     } catch (error) {
         console.log(error);
+        res.status(500).json({
+            error: true,
+            message: "Internal Server Error"
+        });
     }
-}
+};
 
 export const getUser = async (req: Request, res: Response) => {
     try {
         // Mengambil ID pengguna dari parameter permintaan
-        const userId = req.params.id;
+        const userId = parseInt(req.params.id);
 
         // Mencari pengguna berdasarkan ID
-        const user = await Users.findByPk(userId);
+        const user = await prisma.user.findUnique({
+            where: {
+                id_user: userId
+            },
+        });
 
         // Jika pengguna ditemukan, kirimkan data pengguna sebagai respons JSON
         if (user) {
@@ -214,35 +221,26 @@ export const getUser = async (req: Request, res: Response) => {
 
 export const editProfile = async (req: Request, res: Response) => {
     try {
-        const userId = req.params.id;
+        const userId = parseInt(req.params.id);
 
-        const user = await Users.findOne({
+        const user = await prisma.user.findUnique({
             where: {
-                id: userId
+                id_user: userId
             }
         });
 
         if (user) {
-            const { photoUrl, birthDate, age, gender, weight, height, activity, goal } = req.body;
+            const { alamat, no_hp } = req.body;
 
-            await Users.update(
-                {
-                    photoUrl,
-                    birthDate,
-                    age,
-                    gender,
-                    weight,
-                    height,
-                    activity,
-                    goal,
-                    isDataCompleted: true
+            await prisma.user.update({
+                where: {
+                    id_user: userId
                 },
-                {
-                    where: {
-                        id: userId
-                    }
+                data: {
+                    alamat: alamat,
+                    no_hp: no_hp
                 }
-            );
+            });
 
             res.json({
                 error: false,
@@ -268,13 +266,17 @@ export const deleteAccount = async (req: Request, res: Response) => {
         const { userId } = req.body;
 
         // Mencari pengguna berdasarkan ID
-        const user = await Users.findByPk(userId);
+        const user = await prisma.user.findUnique({
+            where: {
+                id_user: userId
+            }
+        });
 
         // Jika pengguna ditemukan, hapus akunnya
         if (user) {
-            await Users.destroy({
+            await prisma.user.delete({
                 where: {
-                    id: userId,
+                    id_user: userId,
                 },
             });
 
