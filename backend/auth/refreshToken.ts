@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import jwt from "jsonwebtoken";
+import jwt, { VerifyErrors } from 'jsonwebtoken';
 import { Request, Response } from 'express';
 
 const prisma = new PrismaClient();
@@ -17,7 +17,7 @@ export const refreshToken = async (req: Request, res: Response) => {
 
         if (!user) return res.sendStatus(403);
 
-        jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET!, (err, decoded) => {
+        jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET!, (err: VerifyErrors | null, decoded: any) => {
             if (err) return res.sendStatus(403);
 
             const { username, email } = user;
