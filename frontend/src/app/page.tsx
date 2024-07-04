@@ -16,8 +16,13 @@ interface Produk {
   brand: string | null;
   nama_socket: string[] | null;
   tipe_ram: string[] | null;
-  media: string[];
+  media: Media[];
   isDeleted: boolean;
+}
+
+interface Media {
+  sumber: string;
+  tipe_file: string;
 }
 
 const Home: React.FC = () => {
@@ -45,10 +50,11 @@ const Home: React.FC = () => {
           <div key={product.id_produk} className="bg-white shadow-md rounded-lg overflow-hidden">
             {product.media && product.media.length > 0 && (
               <div className="flex overflow-x-scroll">
-                {product.media.map((url, index) => (
+                {product.media.map((media, index) => (
+                  console.log(media.sumber),
                   <Image
                     key={index}
-                    src={url}
+                    src={media.sumber}
                     alt={product.nama_produk}
                     width={300}
                     height={200}
