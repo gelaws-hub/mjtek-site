@@ -1,14 +1,18 @@
 import { Request, Response } from "express";
 import * as ProdukModel from "../models/Produk";
+import prisma from "../utils/database";
 
-const formatProduk = (produk: any) => {
+const formatProduk = (produk: Array<any>) => {
   const formattedProduk = produk.map((item: any) => {
-    // Flatten DetailCPU, DetailMotherboard, and DetailRAM
-    const cpuSockets = item.DetailCPU.map((cpu: any) => cpu.Socket.nama_socket).join(', ');
-    const motherboardSockets = item.DetailMotherboard.map((mb: any) => mb.Socket.nama_socket).join(', ');
-    const motherboardRAM = item.DetailMotherboard.map((mb: any) => mb.TipeRAM.tipe_ram).join(', ');
-    const ramTypes = item.DetailRAM.map((ram: any) => ram.TipeRAM.tipe_ram).join(', ');
-    const mediaProduk = item.Media.map((med: any) => med.sumber).join(', ');
+    const cpuSockets = item.DetailCPU.map((cpu: any) => cpu.Socket.nama_socket);
+    const motherboardSockets = item.DetailMotherboard.map(
+      (mb: any) => mb.Socket.nama_socket
+    );
+    const motherboardRAM = item.DetailMotherboard.map(
+      (mb: any) => mb.TipeRAM.tipe_ram
+    );
+    const ramTypes = item.DetailRAM.map((ram: any) => ram.TipeRAM.tipe_ram);
+    const mediaProduk = item.Media.map((med: any) => med.sumber);
 
     return {
       id_produk: item.id_produk,
@@ -20,9 +24,19 @@ const formatProduk = (produk: any) => {
       kategori: item.Kategori?.nama_kategori || null,
       subkategori: item.SubKategori?.nama_sub_kategori || null,
       brand: item.Brand?.nama_brand || null,
-      nama_socket: cpuSockets || motherboardSockets || null,
-      tipe_ram: ramTypes || motherboardRAM || null,
-      media: mediaProduk || null,
+      nama_socket:
+        cpuSockets.length > 0
+          ? cpuSockets
+          : motherboardSockets.length > 0
+          ? motherboardSockets
+          : null,
+      tipe_ram:
+        ramTypes.length > 0
+          ? ramTypes
+          : motherboardRAM.length > 0
+          ? motherboardRAM
+          : null,
+      media: mediaProduk.length > 0 ? mediaProduk : null,
       isDeleted: item.isDeleted,
     };
   });
@@ -36,8 +50,8 @@ export const getAllProduk = async (req: Request, res: Response) => {
     const formattedProduk = formatProduk(produk);
     res.status(200).json(formattedProduk);
   } catch (error: any) {
-    console.error('Error fetching produk:', error.message);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error("Error fetching produk:", error.message);
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
@@ -46,14 +60,14 @@ export const getProdukById = async (req: Request, res: Response) => {
   try {
     const produk = await ProdukModel.getProdukById(parseInt(id));
     if (!produk) {
-      res.status(404).json({ error: 'Produk not found' });
+      res.status(404).json({ error: "Produk not found" });
     } else {
       const formattedProduk = formatProduk([produk]);
       res.status(200).json(formattedProduk[0]);
     }
   } catch (error: any) {
-    console.error('Error fetching produk by ID:', error.message);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error("Error fetching produk by ID:", error.message);
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
@@ -68,9 +82,11 @@ export const createProduk = async (req: Request, res: Response) => {
     est_berat,
     stok,
     isDeleted = false,
+    media,
   } = req.body;
+
   try {
-    const newProduk = await ProdukModel.createProduk({
+    const data: any = {
       id_kategori,
       id_sub_kategori,
       id_brand,
@@ -80,8 +96,20 @@ export const createProduk = async (req: Request, res: Response) => {
       est_berat,
       stok,
       isDeleted,
-    });
-    res.status(201).json(newProduk);
+    };
+
+    if (media && media.length > 0) {
+      data.Media = {
+        create: media.map((med: any) => ({
+          sumber: med.sumber,
+          tipe_file: med.tipe_file,
+        })),
+      };
+    }
+
+    const newProduk = await ProdukModel.createProduk(data);
+    const formattedProduk = formatProduk([newProduk]);
+    res.status(201).json(formattedProduk[0]);
   } catch (error: any) {
     console.error("Error creating new produk:", error.message);
     res.status(500).json({ error: "Internal server error" });
@@ -99,9 +127,12 @@ export const updateProduk = async (req: Request, res: Response) => {
     deskripsi,
     est_berat,
     stok,
+    isDeleted = false,
+    media,
   } = req.body;
+
   try {
-    const updatedProduk = await ProdukModel.updateProduk(parseInt(id), {
+    const data: any = {
       id_kategori,
       id_sub_kategori,
       id_brand,
@@ -110,13 +141,48 @@ export const updateProduk = async (req: Request, res: Response) => {
       deskripsi,
       est_berat,
       stok,
-    });
-    res.status(200).json(updatedProduk);
+      isDeleted,
+    };
+
+    // Update media only if provided
+    if (media && media.length > 0) {
+      const existingMedia = await prisma.media.findMany({
+        where: { id_produk: parseInt(id) }
+      });
+
+      const mediaToDelete = existingMedia.filter(
+        (existing: any) => !media.some((m: any) => m.sumber === existing.sumber)
+      );
+      const mediaToCreate = media.filter(
+        (m: any) => !existingMedia.some((existing) => existing.sumber === m.sumber)
+      );
+
+      if (mediaToDelete.length > 0) {
+        data.Media = {
+          deleteMany: {
+            id_media: { in: mediaToDelete.map((m) => m.id_media) }
+          }
+        };
+      }
+
+      if (mediaToCreate.length > 0) {
+        data.Media.create = mediaToCreate.map((med: any) => ({
+          sumber: med.sumber,
+          tipe_file: med.tipe_file
+        }));
+      }
+    }
+
+    const updatedProduk = await ProdukModel.updateProduk(parseInt(id), data);
+    const formattedProduk = formatProduk([updatedProduk]);
+    res.status(200).json(formattedProduk[0]);
   } catch (error: any) {
     console.error("Error updating produk:", error.message);
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
+
 
 export const deleteProduk = async (req: Request, res: Response) => {
   const { id } = req.params;

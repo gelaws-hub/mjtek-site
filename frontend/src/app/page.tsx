@@ -1,26 +1,36 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import axios from "axios";
-import Image from "next/image";
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import Image from 'next/image';
 
-type Product = {
-  id_produk: string;
+interface Produk {
+  id_produk: number;
   nama_produk: string;
   harga: number;
-  media?: string;
-};
+  est_berat: number;
+  deskripsi: string;
+  stok: number;
+  kategori: string | null;
+  subkategori: string | null;
+  brand: string | null;
+  nama_socket: string[] | null;
+  tipe_ram: string[] | null;
+  media: string[];
+  isDeleted: boolean;
+}
 
-const Home = () => {
-  const [products, setProducts] = useState<Product[]>([]);
+const Home: React.FC = () => {
+  const [products, setProducts] = useState<Produk[]>([]);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/produk");
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/produk`);
         setProducts(response.data);
+        console.log(response.data);
       } catch (error) {
-        console.error("Error fetching products:", error);
+        console.error('Error fetching products:', error);
       }
     };
 
@@ -32,26 +42,25 @@ const Home = () => {
       <h1 className="text-3xl font-bold mb-6 text-center">Produk</h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {products.map((product) => (
-          <div
-            key={product.id_produk}
-            className="bg-white shadow-md rounded-lg overflow-hidden"
-          >
-            {product.media && (
-              <Image
-                src={product.media}
-                alt={product.nama_produk}
-                className="w-full h-48 object-cover"
-                width={0}
-                height={0}
-                sizes="100vw"
-                style={{ width: "100%", height: "auto" }} // optional
-              />
+          <div key={product.id_produk} className="bg-white shadow-md rounded-lg overflow-hidden">
+            {product.media && product.media.length > 0 && (
+              <div className="flex overflow-x-scroll">
+                {product.media.map((url, index) => (
+                  <Image
+                    key={index}
+                    src={url}
+                    alt={product.nama_produk}
+                    width={300}
+                    height={200}
+                    className="w-full h-48 object-cover"
+                  />
+                ))}
+              </div>
             )}
             <div className="p-4">
-              <h2 className="text-xl font-semibold mb-2">
-                {product.nama_produk}
-              </h2>
+              <h2 className="text-xl font-semibold mb-2">{product.nama_produk}</h2>
               <p className="text-gray-700 mb-4">Harga: {product.harga}</p>
+              {/* <p className="text-gray-500">{product.deskripsi}</p> */}
             </div>
           </div>
         ))}

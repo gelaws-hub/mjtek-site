@@ -107,20 +107,38 @@ export const createProduk = async (data: any) => {
       data: {
         ...data,
       },
+      include: {
+        DetailCPU: { include: { Socket: true } },
+        DetailMotherboard: { include: { Socket: true, TipeRAM: true } },
+        DetailRAM: { include: { TipeRAM: true } },
+        Media: true,
+        Kategori: true,
+        SubKategori: true,
+        Brand: true,
+      },
     });
-  } catch (error) {
+  } catch (error: any) {
+    console.error("Error in createProduk model:", error.message, error);
     throw new Error("Failed to create produk");
   }
 };
 
+
 export const updateProduk = async (id: number, data: any) => {
   try {
     return await prisma.produk.update({
-      where: {
-        id_produk: id,
-      },
+      where: { id_produk: id },
       data: {
         ...data,
+      },
+      include: {
+        DetailCPU: { include: { Socket: true } },
+        DetailMotherboard: { include: { Socket: true, TipeRAM: true } },
+        DetailRAM: { include: { TipeRAM: true } },
+        Media: true,
+        Kategori: true,
+        SubKategori: true,
+        Brand: true,
       },
     });
   } catch (error) {
