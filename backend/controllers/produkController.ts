@@ -4,14 +4,14 @@ import prisma from "../utils/database";
 
 const formatProduk = (produk: Array<any>) => {
   const formattedProduk = produk.map((item: any) => {
-    const cpuSockets = item.DetailCPU.map((cpu: any) => cpu.Socket.nama_socket);
-    const motherboardSockets = item.DetailMotherboard.map(
-      (mb: any) => mb.Socket.nama_socket
-    );
-    const motherboardRAM = item.DetailMotherboard.map(
-      (mb: any) => mb.TipeRAM.tipe_ram
-    );
-    const ramTypes = item.DetailRAM.map((ram: any) => ram.TipeRAM.tipe_ram);
+    // const cpuSockets = item.DetailCPU.map((cpu: any) => cpu.Socket.nama_socket);
+    // const motherboardSockets = item.DetailMotherboard.map(
+    //   (mb: any) => mb.Socket.nama_socket
+    // );
+    // const motherboardRAM = item.DetailMotherboard.map(
+    //   (mb: any) => mb.TipeRAM.tipe_ram
+    // );
+    // const ramTypes = item.DetailRAM.map((ram: any) => ram.TipeRAM.tipe_ram);
     const mediaProduk = item.Media.map((med: any) => med.sumber);
 
     return {
@@ -24,18 +24,18 @@ const formatProduk = (produk: Array<any>) => {
       kategori: item.Kategori?.nama_kategori || null,
       subkategori: item.SubKategori?.nama_sub_kategori || null,
       brand: item.Brand?.nama_brand || null,
-      nama_socket:
-        cpuSockets.length > 0
-          ? cpuSockets
-          : motherboardSockets.length > 0
-          ? motherboardSockets
-          : null,
-      tipe_ram:
-        ramTypes.length > 0
-          ? ramTypes
-          : motherboardRAM.length > 0
-          ? motherboardRAM
-          : null,
+      // nama_socket:
+      //   cpuSockets.length > 0
+      //     ? cpuSockets
+      //     : motherboardSockets.length > 0
+      //     ? motherboardSockets
+      //     : null,
+      // tipe_ram:
+      //   ramTypes.length > 0
+      //     ? ramTypes
+      //     : motherboardRAM.length > 0
+      //     ? motherboardRAM
+      //     : null,
       media: mediaProduk.length > 0 ? mediaProduk : null,
       isDeleted: item.isDeleted,
     };

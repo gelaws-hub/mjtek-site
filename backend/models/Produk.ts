@@ -24,38 +24,38 @@ const produkSelect = {
       nama_brand: true,
     },
   },
-  DetailCPU: {
-    select: {
-      Socket: {
-        select: {
-          nama_socket: true,
-        },
-      },
-    },
-  },
-  DetailMotherboard: {
-    select: {
-      Socket: {
-        select: {
-          nama_socket: true,
-        },
-      },
-      TipeRAM: {
-        select: {
-          tipe_ram: true,
-        },
-      },
-    },
-  },
-  DetailRAM: {
-    select: {
-      TipeRAM: {
-        select: {
-          tipe_ram: true,
-        },
-      },
-    },
-  },
+  // DetailCPU: {
+  //   select: {
+  //     Socket: {
+  //       select: {
+  //         nama_socket: true,
+  //       },
+  //     },
+  //   },
+  // },
+  // DetailMotherboard: {
+  //   select: {
+  //     Socket: {
+  //       select: {
+  //         nama_socket: true,
+  //       },
+  //     },
+  //     TipeRAM: {
+  //       select: {
+  //         tipe_ram: true,
+  //       },
+  //     },
+  //   },
+  // },
+  // DetailRAM: {
+  //   select: {
+  //     TipeRAM: {
+  //       select: {
+  //         tipe_ram: true,
+  //       },
+  //     },
+  //   },
+  // },
   isDeleted: true,
   Media: {
     select: {
@@ -108,9 +108,9 @@ export const createProduk = async (data: any) => {
         ...data,
       },
       include: {
-        DetailCPU: { include: { Socket: true } },
-        DetailMotherboard: { include: { Socket: true, TipeRAM: true } },
-        DetailRAM: { include: { TipeRAM: true } },
+        // DetailCPU: { include: { Socket: true } },
+        // DetailMotherboard: { include: { Socket: true, TipeRAM: true } },
+        // DetailRAM: { include: { TipeRAM: true } },
         Media: true,
         Kategori: true,
         SubKategori: true,
@@ -132,9 +132,9 @@ export const updateProduk = async (id: number, data: any) => {
         ...data,
       },
       include: {
-        DetailCPU: { include: { Socket: true } },
-        DetailMotherboard: { include: { Socket: true, TipeRAM: true } },
-        DetailRAM: { include: { TipeRAM: true } },
+        // DetailCPU: { include: { Socket: true } },
+        // DetailMotherboard: { include: { Socket: true, TipeRAM: true } },
+        // DetailRAM: { include: { TipeRAM: true } },
         Media: true,
         Kategori: true,
         SubKategori: true,
