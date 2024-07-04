@@ -1,62 +1,89 @@
 import { Request, Response } from 'express';
-import Kategori from '../../models/Katagori';
+import prisma from "../../utils/database";
 
-export const getAllKategori = async (req: Request, res: Response): Promise<void> => {
+// Get all Kategori sorted by id
+export const getAllKategori = async (req: Request, res: Response) => {
   try {
-    const kategori = await Kategori.findAll();
+    const kategori = await prisma.kategori.findMany({
+      orderBy: {
+        id_kategori: 'asc', // Sort by id_kategori in ascending order
+      },
+    });
     res.status(200).json(kategori);
-  } catch (error) {
-    if (error instanceof Error) {
-      res.status(500).json({ error: error.message });
-    }
+  } catch (error: any) {
+    console.error("Error fetching all Kategori:", error.message);
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
-export const getKategoriById = async (req: Request, res: Response): Promise<void> => {
+// Get Kategori by ID
+export const getKategoriById = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
-    const kategori = await Kategori.findById(parseInt(id));
-    res.status(200).json(kategori);
-  } catch (error) {
-    if (error instanceof Error) {
-      res.status(500).json({ error: error.message });
+    const kategori = await prisma.kategori.findUnique({
+      where: {
+        id_kategori: parseInt(id),
+      },
+    });
+    if (!kategori) {
+      res.status(404).json({ error: "Kategori not found" });
+    } else {
+      res.status(200).json(kategori);
     }
+  } catch (error: any) {
+    console.error("Error fetching Kategori by ID:", error.message);
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
-export const createKategori = async (req: Request, res: Response): Promise<void> => {
+// Create a new Kategori
+export const createKategori = async (req: Request, res: Response) => {
   const { nama_kategori } = req.body;
   try {
-    const kategori = await Kategori.create({ nama_kategori });
-    res.status(201).json(kategori);
-  } catch (error) {
-    if (error instanceof Error) {
-      res.status(500).json({ error: error.message });
-    }
+    const newKategori = await prisma.kategori.create({
+      data: {
+        nama_kategori,
+      },
+    });
+    res.status(201).json(newKategori);
+  } catch (error: any) {
+    console.error("Error creating new Kategori:", error.message);
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
-export const updateKategori = async (req: Request, res: Response): Promise<void> => {
+// Update a Kategori
+export const updateKategori = async (req: Request, res: Response) => {
   const { id } = req.params;
   const { nama_kategori } = req.body;
   try {
-    const kategori = await Kategori.update(parseInt(id), { nama_kategori });
-    res.status(200).json(kategori);
-  } catch (error) {
-    if (error instanceof Error) {
-      res.status(500).json({ error: error.message });
-    }
+    const updatedKategori = await prisma.kategori.update({
+      where: {
+        id_kategori: parseInt(id),
+      },
+      data: {
+        nama_kategori,
+      },
+    });
+    res.status(200).json(updatedKategori);
+  } catch (error: any) {
+    console.error("Error updating Kategori:", error.message);
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
-export const deleteKategori = async (req: Request, res: Response): Promise<void> => {
+// Delete a Kategori
+export const deleteKategori = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
-    await Kategori.delete(parseInt(id));
+    await prisma.kategori.delete({
+      where: {
+        id_kategori: parseInt(id),
+      },
+    });
     res.status(204).end();
-  } catch (error) {
-    if (error instanceof Error) {
-      res.status(500).json({ error: error.message });
-    }
+  } catch (error: any) {
+    console.error("Error deleting Kategori:", error.message);
+    res.status(500).json({ error: "Internal server error" });
   }
 };

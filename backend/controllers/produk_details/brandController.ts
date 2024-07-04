@@ -1,62 +1,79 @@
 import { Request, Response } from 'express';
-import Brand from '../../models/Brand';
+import prisma from "../../utils/database";
 
-export const getAllBrand = async (req: Request, res: Response): Promise<void> => {
+// Get all Brands
+export const getAllBrands = async (req: Request, res: Response) => {
   try {
-    const brand = await Brand.findAll();
-    res.status(200).json(brand);
-  } catch (error) {
-    if (error instanceof Error) {
-      res.status(500).json({ error: error.message });
-    }
+    const brands = await prisma.brand.findMany({
+      orderBy: {
+        id_brand: 'asc', // Sort by id in ascending order
+      },
+    });
+    res.status(200).json(brands);
+  } catch (error: any) {
+    console.error("Error fetching all Brands:", error.message);
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
-export const getBrandById = async (req: Request, res: Response): Promise<void> => {
-  const { id } = req.params;
+// Get Brand by ID
+export const getBrandById = async (req: Request, res: Response) => {
+  const { id_brand } = req.params;
   try {
-    const brand = await Brand.findById(parseInt(id));
-    res.status(200).json(brand);
-  } catch (error) {
-    if (error instanceof Error) {
-      res.status(500).json({ error: error.message });
+    const brand = await prisma.brand.findUnique({
+      where: { id_brand: parseInt(id_brand) },
+    });
+    if (!brand) {
+      res.status(404).json({ error: "Brand not found" });
+    } else {
+      res.status(200).json(brand);
     }
+  } catch (error: any) {
+    console.error("Error fetching Brand by ID:", error.message);
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
-export const createBrand = async (req: Request, res: Response): Promise<void> => {
+// Create a new Brand
+export const createBrand = async (req: Request, res: Response) => {
   const { nama_brand } = req.body;
   try {
-    const brand = await Brand.create({ nama_brand });
-    res.status(201).json(brand);
-  } catch (error) {
-    if (error instanceof Error) {
-      res.status(500).json({ error: error.message });
-    }
+    const newBrand = await prisma.brand.create({
+      data: { nama_brand },
+    });
+    res.status(201).json(newBrand);
+  } catch (error: any) {
+    console.error("Error creating new Brand:", error.message);
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
-export const updateBrand = async (req: Request, res: Response): Promise<void> => {
-  const { id } = req.params;
+// Update a Brand
+export const updateBrand = async (req: Request, res: Response) => {
+  const { id_brand } = req.params;
   const { nama_brand } = req.body;
   try {
-    const brand = await Brand.update(parseInt(id), { nama_brand });
-    res.status(200).json(brand);
-  } catch (error) {
-    if (error instanceof Error) {
-      res.status(500).json({ error: error.message });
-    }
+    const updatedBrand = await prisma.brand.update({
+      where: { id_brand: parseInt(id_brand) },
+      data: { nama_brand },
+    });
+    res.status(200).json(updatedBrand);
+  } catch (error: any) {
+    console.error("Error updating Brand:", error.message);
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
-export const deleteBrand = async (req: Request, res: Response): Promise<void> => {
-  const { id } = req.params;
+// Delete a Brand
+export const deleteBrand = async (req: Request, res: Response) => {
+  const { id_brand } = req.params;
   try {
-    await Brand.delete(parseInt(id));
+    await prisma.brand.delete({
+      where: { id_brand: parseInt(id_brand) },
+    });
     res.status(204).end();
-  } catch (error) {
-    if (error instanceof Error) {
-      res.status(500).json({ error: error.message });
-    }
+  } catch (error: any) {
+    console.error("Error deleting Brand:", error.message);
+    res.status(500).json({ error: "Internal server error" });
   }
 };

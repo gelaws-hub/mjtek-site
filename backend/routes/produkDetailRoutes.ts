@@ -16,11 +16,11 @@ import {
 } from "../controllers/produk_details/subKategoriController";
 
 import {
-  getAllBrand,
+  getAllBrands,
   getBrandById,
   createBrand,
   updateBrand,
-  deleteBrand,
+  deleteBrand
 } from "../controllers/produk_details/brandController";
 
 import {
@@ -47,7 +47,7 @@ produkDetailRoutes.put("/subkategori/:id", updateSubKategori);
 produkDetailRoutes.delete("/subkategori/:id", deleteSubKategori);
 
 // Brand routes
-produkDetailRoutes.get("/brand", getAllBrand);
+produkDetailRoutes.get("/brand", getAllBrands);
 produkDetailRoutes.get("/brand/:id", getBrandById);
 produkDetailRoutes.post("/brand", createBrand);
 produkDetailRoutes.put("/brand/:id", updateBrand);
