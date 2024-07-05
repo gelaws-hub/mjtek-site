@@ -32,7 +32,7 @@ const Home: React.FC = () => {
     const fetchProducts = async () => {
       try {
         const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/produk`);
-        setProducts(response.data);
+        setProducts(response.data.produks);
         console.log(response.data);
       } catch (error) {
         console.error('Error fetching products:', error);
