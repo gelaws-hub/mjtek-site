@@ -46,7 +46,7 @@ export const Register = async (req: Request, res: Response) => {
                 password: hashPassword,
                 alamat: alamat,
                 no_hp: no_hp,
-                id_role: 1 // Default role (user)
+                id_role: 1 // Default role (buyer)
             },
         });
 
@@ -206,7 +206,7 @@ export const getUser = async (req: Request, res: Response) => {
         // Mencari pengguna berdasarkan ID
         const user = await prisma.user.findUnique({
             where: {
-                id_user: userId
+                id_user: userId.toString()
             },
         });
 
@@ -247,7 +247,7 @@ export const editProfile = async (req: Request, res: Response) => {
 
         const user = await prisma.user.findUnique({
             where: {
-                id_user: userId
+                id_user: userId.toString()
             }
         });
 
@@ -256,7 +256,7 @@ export const editProfile = async (req: Request, res: Response) => {
 
             await prisma.user.update({
                 where: {
-                    id_user: userId
+                    id_user: userId.toString()
                 },
                 data: {
                     alamat: alamat,

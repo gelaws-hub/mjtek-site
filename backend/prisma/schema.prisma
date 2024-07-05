@@ -116,7 +116,7 @@ model Tipe_RAM {
 
 model Simulasi {
   id_simulasi    Int               @id @default(autoincrement())
-  id_user        Int
+  id_user        String
   judul          String
   deskripsi      String
   tanggal        DateTime
@@ -137,14 +137,14 @@ model Detail_Simulasi {
 }
 
 model User {
-  id_user      Int             @id @default(autoincrement())
+  id_user      String          @id @default(uuid())
   id_role      Int             @default(1)
   username     String
   email        String          @unique(map: "unique_email")
   password     String
   alamat       String
   no_hp        String
-  refresh_token String?        @unique
+  refresh_token String?        @unique @db.VarChar(500)
   createdAt    DateTime        @default(now())
   updatedAt    DateTime        @updatedAt
   Simulasi     Simulasi[]
@@ -161,7 +161,7 @@ model User {
 model Keranjang {
   id_keranjang Int      @id @default(autoincrement())
   id_produk    Int
-  id_user      Int
+  id_user      String
   tanggal      DateTime
   Produk       Produk   @relation(fields: [id_produk], references: [id_produk])
   User         User     @relation(fields: [id_user], references: [id_user])
@@ -172,7 +172,7 @@ model Keranjang {
 
 model Transaksi {
   id_transaksi    Int                @id @default(autoincrement())
-  id_user         Int
+  id_user         String
   total_barang    Int
   harga_total     Decimal            @db.Decimal(10, 2)
   deskripsi       String
@@ -198,7 +198,7 @@ model Detail_Transaksi {
 model Favorit {
   id_favorit Int    @id @default(autoincrement())
   id_produk  Int
-  id_user    Int
+  id_user    String
   Produk     Produk @relation(fields: [id_produk], references: [id_produk])
   User       User   @relation(fields: [id_user], references: [id_user])
 }
@@ -221,7 +221,7 @@ model Roles {
 model Log_Transaksi {
   id_log_transaksi Int      @id @default(autoincrement())
   id_transaksi     Int      
-  id_user          Int
+  id_user          String
   status_pesanan   Int
   waktu            DateTime
 

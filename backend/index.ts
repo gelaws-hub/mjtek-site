@@ -4,10 +4,16 @@ import cors from 'cors';
 import produkRoutes from './routes/produkRoutes';
 import produkDetailRoutes from './routes/produkDetailRoutes'; 
 import simulationRoutes from './routes/simulationRoutes';
+import userRoutes from './routes/userRoutes';
 
+import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
+
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+app.use(cookieParser());
 
 // Middleware setup
 app.use(cors());
@@ -18,6 +24,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/', produkRoutes);
 app.use('/', produkDetailRoutes);
 app.use('/', simulationRoutes);
+app.use('/', userRoutes);
 
 // Root route
 app.get('/', (req, res) => {
