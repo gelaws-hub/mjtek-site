@@ -151,8 +151,8 @@ export const Login = async (req: Request, res: Response) => {
 
 export const Logout = async (req: Request, res: Response) => {
     const refreshToken = req.cookies.refreshToken;
-    if (!refreshToken) return res.sendStatus(204);
-    
+    if (!refreshToken) return res.status(204).json({ message: "No refresh token provided" });
+
     try {
         const user = await prisma.user.findUnique({
             where: {
@@ -160,7 +160,7 @@ export const Logout = async (req: Request, res: Response) => {
             }
         });
 
-        if (!user) return res.sendStatus(204);
+        if (!user) return res.status(204).json({ message: "No user found with this token" });
 
         const userId = user.id_user;
 
@@ -173,14 +173,18 @@ export const Logout = async (req: Request, res: Response) => {
             }
         });
 
-        res.clearCookie('refreshToken');
-        return res.sendStatus(200);
+        res.clearCookie('refreshToken', {
+            httpOnly: true,
+            secure: true, // make sure to set secure to true if you're using HTTPS
+            sameSite: 'strict' // help prevent CSRF attacks
+        });
+
+        return res.status(200).json({ message: "Logout successful" });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Internal Server Error" });
     }
 };
-
 
 export const getUsers = async(req: Request, res: Response) => {
     try {
