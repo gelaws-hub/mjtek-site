@@ -4,6 +4,7 @@ import cors from 'cors';
 import produkRoutes from './routes/produkRoutes';
 import produkDetailRoutes from './routes/produkDetailRoutes'; 
 import simulationRoutes from './routes/simulationRoutes';
+import transaksiRoutes from './routes/transaksiRoutes';
 
 
 const app = express();
@@ -18,6 +19,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/', produkRoutes);
 app.use('/', produkDetailRoutes);
 app.use('/', simulationRoutes);
+app.use('/', transaksiRoutes)
 
 // Root route
 app.get('/', (req, res) => {
