@@ -137,12 +137,14 @@ model User {
 }
 
 model Keranjang {
-  id_keranjang Int      @id @default(autoincrement())
-  id_produk    Int
-  id_user      String
-  tanggal      DateTime
-  Produk       Produk   @relation(fields: [id_produk], references: [id_produk])
-  User         User     @relation(fields: [id_user], references: [id_user])
+  id_keranjang  Int      @id @default(autoincrement())
+  id_produk     Int
+  id_user       String
+  jumlah_produk Int      @default(1)
+  tanggal       DateTime
+  Produk        Produk   @relation(fields: [id_produk], references: [id_produk])
+  User          User     @relation(fields: [id_user], references: [id_user])
+  isSelected    Boolean  @default(true)
 
   @@index([id_produk])
   @@index([id_user])
