@@ -6,14 +6,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { formatCurrency, formatNumber } from "@/lib/formatters";
-import db from "@/db/db";
 
 async function getSalesData() {
-  const data = await db.order.aggregate({
-    _sum: { pricePaidInCents: true },
-    _count: true,
-  });
-  // await wait(2000);
+  const response = await fetch("http://localhost:3000/api/sales");
+  const data = await response.json();
 
   return {
     amount: (data._sum.pricePaidInCents || 0) / 100,
@@ -21,17 +17,14 @@ async function getSalesData() {
   };
 }
 
-// function wait(duration: number) {
-//   return new Promise((resolve) => setTimeout(resolve, duration));
-// }
-
 async function getUserData() {
-  const [userCount, orderData] = await Promise.all([
-    db.user.count(),
-    db.order.aggregate({
-      _sum: { pricePaidInCents: true },
-    }),
+  const [userResponse, orderResponse] = await Promise.all([
+    fetch("http://localhost:3000/api/users/count"),
+    fetch("http://localhost:3000/api/orders/aggregate"),
   ]);
+
+  const userCount = await userResponse.json();
+  const orderData = await orderResponse.json();
 
   return {
     userCount,
@@ -43,13 +36,17 @@ async function getUserData() {
 }
 
 async function getProductData() {
-  const [activeCount, inactiveCount] = await Promise.all([
-    db.product.count({ where: { isAvailableForPurchase: true } }),
-    db.product.count({ where: { isAvailableForPurchase: false } }),
+  const [activeResponse, inactiveResponse] = await Promise.all([
+    fetch("http://localhost:3000/api/products/active/count"),
+    fetch("http://localhost:3000/api/products/inactive/count"),
   ]);
+
+  const activeCount = await activeResponse.json();
+  const inactiveCount = await inactiveResponse.json();
 
   return { activeCount, inactiveCount };
 }
+
 export default async function AdminDashboard() {
   const [salesData, userData, productData] = await Promise.all([
     getSalesData(),
