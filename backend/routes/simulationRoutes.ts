@@ -13,7 +13,7 @@ import {
   createTipeRAM,
   updateTipeRAM,
   deleteTipeRAM,
-} from "../controllers/simulation/tipeRAMController";
+} from "../controllers/simulation/TipeRAMController";
 
 import {
   getAllSimulasi,
@@ -22,6 +22,7 @@ import {
   updateSimulasi,
   deleteSimulasi,
 } from "../controllers/simulation/simulasiController";
+
 import {
   getAllDetailSimulasi,
   getDetailSimulasiById,
