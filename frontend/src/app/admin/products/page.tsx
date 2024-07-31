@@ -100,7 +100,10 @@ async function ProductsTable() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                   <DropdownMenuItem asChild>
-                    <a download href={`/admin/products/${product.id}/download`}>
+                    <a
+                      download
+                      href={`/admin/products/${product.id.toString()}/download`}
+                    >
                       Download
                     </a>
                   </DropdownMenuItem>
@@ -110,12 +113,12 @@ async function ProductsTable() {
                     </Link>
                   </DropdownMenuItem>
                   <ActiveToggleDropdownItem
-                    id={product.id}
+                    id={product.id.toString()}
                     isAvailableForPurchase={product.isAvailableForPurchase}
                   />
                   <DropdownMenuSeparator />
                   <DeleteDropdownItem
-                    id={product.id}
+                    id={product.id.toString()}
                     disabled={product._count.orders > 0}
                   />
                 </DropdownMenuContent>
