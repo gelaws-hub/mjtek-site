@@ -2,7 +2,8 @@
 
 import { z } from "zod";
 import fs from "fs/promises";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 
 const fileSchema = z.instanceof(File, { message: "Required" });
 const imageSchema = fileSchema.refine(
@@ -25,4 +26,54 @@ export async function addProduct(prevState: unknown, formData: FormData) {
 
   const data = result.data;
   // ... rest of the code
+}
+
+export async function deleteProduct(id: string) {
+  try {
+    const response = await fetch(`http://localhost:3000/products/${id}`, {
+      method: "DELETE",
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to delete product");
+    }
+
+    const product = await response.json();
+
+    if (!product) return notFound();
+
+    await fs.unlink(product.filePath);
+    await fs.unlink(`public${product.imagePath}`);
+
+    revalidatePath("/");
+    revalidatePath("/products");
+  } catch (error) {
+    console.error("Error deleting product:", error);
+    throw error;
+  }
+}
+
+export async function toggleProductAvailability(
+  id: string,
+  isAvailableForPurchase: boolean
+) {
+  try {
+    const response = await fetch(`http://localhost:3000/products/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ isAvailableForPurchase }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to update product availability");
+    }
+
+    revalidatePath("/");
+    revalidatePath("/products");
+  } catch (error) {
+    console.error("Error toggling product availability:", error);
+    throw error;
+  }
 }
