@@ -11,7 +11,6 @@ export function DeleteDropDownItem({ id }: { id: string }) {
 
   return (
     <DropdownMenuItem
-      variant="destructive"
       disabled={isPending}
       onClick={() =>
         startTransition(async () => {

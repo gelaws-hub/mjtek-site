@@ -121,7 +121,7 @@ async function getSalesData() {
 
 async function getUserData() {
   // Static data for users and orders
-  const userCount = 100;
+  const userCount = 0;
   const orderData = {
     _sum: { pricePaidInCents: 2000000 },
   };
