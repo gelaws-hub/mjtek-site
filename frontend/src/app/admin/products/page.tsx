@@ -41,19 +41,59 @@ async function ProductsTable() {
   const products = [
     {
       id: 1,
-      name: "Product 1",
-      priceInCents: 1000,
+      name: "Gaming Mouse",
+      priceInCents: 4999,
+      description:
+        "A high-precision wireless gaming mouse with customizable DPI.",
+      file: "gaming_mouse_manual.pdf",
+      image: "https://via.assets.so/shoe.png?id=1&q=95&w=360&h=360&fit=fill",
       isAvailableForPurchase: true,
-      _count: { orders: 5 },
+      _count: { orders: 25 },
     },
     {
       id: 2,
-      name: "Product 2",
-      priceInCents: 2000,
+      name: "Mechanical Keyboard",
+      priceInCents: 9999,
+      description:
+        "A durable mechanical keyboard with customizable RGB lighting.",
+      file: "mechanical_keyboard_manual.pdf",
+      image: "mechanical_keyboard.jpg",
       isAvailableForPurchase: false,
-      _count: { orders: 3 },
+      _count: { orders: 18 },
     },
-    // Add more static products as needed
+    {
+      id: 3,
+      name: "4K Monitor",
+      priceInCents: 29999,
+      description:
+        "A 27-inch 4K monitor with ultra-thin bezels and HDR support.",
+      file: "4k_monitor_manual.pdf",
+      image: "4k_monitor.jpg",
+      isAvailableForPurchase: true,
+      _count: { orders: 7 },
+    },
+    {
+      id: 4,
+      name: "Gaming Chair",
+      priceInCents: 19999,
+      description:
+        "An ergonomic gaming chair with lumbar support and adjustable armrests.",
+      file: "gaming_chair_manual.pdf",
+      image: "gaming_chair.jpg",
+      isAvailableForPurchase: true,
+      _count: { orders: 12 },
+    },
+    {
+      id: 5,
+      name: "Graphics Card",
+      priceInCents: 49999,
+      description:
+        "A high-performance graphics card for gaming and video editing.",
+      file: "graphics_card_manual.pdf",
+      image: "graphics_card.jpg",
+      isAvailableForPurchase: false,
+      _count: { orders: 34 },
+    },
   ];
 
   if (products.length === 0) return <p>No products found</p>;
@@ -68,6 +108,7 @@ async function ProductsTable() {
           <TableHead>Name</TableHead>
           <TableHead>Price</TableHead>
           <TableHead>Orders</TableHead>
+          <TableHead>Picture</TableHead>
           <TableHead className="w-0">
             <span className="sr-only">Actions</span>
           </TableHead>
