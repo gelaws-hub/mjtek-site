@@ -90,7 +90,7 @@ async function ProductsTable() {
       description:
         "A high-performance graphics card for gaming and video editing.",
       file: "graphics_card_manual.pdf",
-      image: "graphics_card.jpg",
+      image: "https://picsum.photos/200/300",
       isAvailableForPurchase: false,
       _count: { orders: 34 },
     },

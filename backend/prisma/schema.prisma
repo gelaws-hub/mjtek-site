@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,197 +8,189 @@ datasource db {
 }
 
 model Produk {
-  id_produk       Int     @id @default(autoincrement())
-  id_kategori     Int
-  id_sub_kategori Int?
-  id_brand        Int
-  nama_produk     String
-  harga           Decimal @db.Decimal(10, 2)
-  deskripsi       String? @db.Text
-  est_berat       Decimal @db.Decimal(10, 2)
-  stok            Int
-  isDeleted       Boolean @default(false)
+  id            Int     @id @default(autoincrement())
+  kategoriId    Int
+  subKategoriId Int?
+  brandId       Int
+  nama          String
+  harga         Decimal @db.Decimal(10, 2)
+  deskripsi     String? @db.Text
+  estBerat      Decimal @db.Decimal(10, 2)
+  stok          Int
+  isDeleted     Boolean @default(false)
 
-  Kategori         Kategori           @relation(fields: [id_kategori], references: [id_kategori])
-  SubKategori      SubKategori?       @relation(fields: [id_sub_kategori], references: [id_sub_kategori])
-  Brand            Brand              @relation(fields: [id_brand], references: [id_brand])
-  Keranjang        Keranjang[]
-  Favorit          Favorit[]
-  Media            Media[]
-  Detail_Simulasi  Detail_Simulasi[]
-  Detail_Transaksi Detail_Transaksi[]
-  Produk_Tipe_RAM  Produk_Tipe_RAM[]
-  Produk_Socket    Produk_Socket[]
+  Kategori        Kategori          @relation(fields: [kategoriId], references: [id])
+  SubKategori     SubKategori?      @relation(fields: [subKategoriId], references: [id])
+  Brand           Brand             @relation(fields: [brandId], references: [id])
+  Keranjang       Keranjang[]
+  Favorit         Favorit[]
+  Media           Media[]
+  SimulasiDetail  SimulasiDetail[]
+  TransaksiDetail TransaksiDetail[]
+  ProdukTipeRam   ProdukTipeRam[]
+  ProdukSocket    ProdukSocket[]
 
-  @@index([id_kategori])
-  @@index([id_sub_kategori])
-  @@index([id_brand])
+  @@index([kategoriId])
+  @@index([subKategoriId])
+  @@index([brandId])
 }
 
 model Kategori {
-  id_kategori   Int      @id @default(autoincrement())
-  nama_kategori String
-  Produk        Produk[]
-
-  @@unique([nama_kategori])
+  id     Int      @id @default(autoincrement())
+  nama   String   @unique
+  Produk Produk[]
 }
 
 model SubKategori {
-  id_sub_kategori   Int      @id @default(autoincrement())
-  nama_sub_kategori String   @unique
-  Produk            Produk[]
+  id     Int      @id @default(autoincrement())
+  nama   String   @unique
+  Produk Produk[]
 }
 
 model Brand {
-  id_brand   Int      @id @default(autoincrement())
-  nama_brand String
-  Produk     Produk[]
-
-  @@unique([nama_brand])
+  id     Int      @id @default(autoincrement())
+  nama   String   @unique
+  Produk Produk[]
 }
 
 model Socket {
-  id_socket     Int             @id @default(autoincrement())
-  nama_socket   String
-  Produk_Socket Produk_Socket[]
-
-  @@unique([nama_socket])
+  id           Int            @id @default(autoincrement())
+  nama         String         @unique
+  ProdukSocket ProdukSocket[]
 }
 
-model Produk_Socket {
-  id_produk_socket Int    @id @default(autoincrement())
-  id_produk        Int
-  id_socket        Int
-  Produk           Produk @relation(fields: [id_produk], references: [id_produk])
-  nama_socket      Socket @relation(fields: [id_socket], references: [id_socket])
+model ProdukSocket {
+  id       Int    @id @default(autoincrement())
+  produkId Int
+  socketId Int
+  Produk   Produk @relation(fields: [produkId], references: [id])
+  Socket   Socket @relation(fields: [socketId], references: [id])
 }
 
-model Tipe_RAM {
-  id_tipe_ram     Int               @id @default(autoincrement())
-  tipe_ram        String
-  Produk_Tipe_RAM Produk_Tipe_RAM[]
-
-  @@unique([tipe_ram])
+model TipeRam {
+  id            Int             @id @default(autoincrement())
+  nama          String          @unique
+  ProdukTipeRam ProdukTipeRam[]
 }
 
-model Produk_Tipe_RAM {
-  id_produk_ram Int      @id @default(autoincrement())
-  id_produk     Int
-  id_tipe_ram   Int
-  Produk        Produk   @relation(fields: [id_produk], references: [id_produk])
-  Tipe_RAM      Tipe_RAM @relation(fields: [id_tipe_ram], references: [id_tipe_ram])
+model ProdukTipeRam {
+  id        Int     @id @default(autoincrement())
+  produkId  Int
+  tipeRamId Int
+  Produk    Produk  @relation(fields: [produkId], references: [id])
+  TipeRam   TipeRam @relation(fields: [tipeRamId], references: [id])
 }
 
 model Simulasi {
-  id_simulasi    Int               @id @default(autoincrement())
-  id_user        String
+  id             Int              @id @default(autoincrement())
+  userId         String
   judul          String
   deskripsi      String
   tanggal        DateTime
-  User           User              @relation(fields: [id_user], references: [id_user])
-  DetailSimulasi Detail_Simulasi[]
+  User           User             @relation(fields: [userId], references: [id])
+  SimulasiDetail SimulasiDetail[]
 
-  @@index([id_user])
+  @@index([userId])
 }
 
-model Detail_Simulasi {
-  id_detail_simulasi Int      @id @default(autoincrement())
-  id_simulasi        Int
-  id_produk          Int
-  Simulasi           Simulasi @relation(fields: [id_simulasi], references: [id_simulasi])
-  Produk             Produk   @relation(fields: [id_produk], references: [id_produk])
+model SimulasiDetail {
+  id         Int      @id @default(autoincrement())
+  simulasiId Int
+  produkId   Int
+  Simulasi   Simulasi @relation(fields: [simulasiId], references: [id])
+  Produk     Produk   @relation(fields: [produkId], references: [id])
 
-  @@index([id_simulasi, id_produk])
+  @@index([simulasiId, produkId])
 }
 
 model User {
-  id_user      String          @id @default(uuid())
-  id_role      Int
+  id           String         @id @default(uuid())
+  roleId       Int
   username     String
-  email        String          @unique(map: "unique_email")
+  email        String         @unique
   password     String
   alamat       String
-  no_hp        String
+  noHp         String
   Simulasi     Simulasi[]
   Transaksi    Transaksi[]
   Keranjang    Keranjang[]
   Favorit      Favorit[]
-  LogTransaksi Log_Transaksi[]
+  LogTransaksi LogTransaksi[]
 
-  Roles Roles @relation(fields: [id_role], references: [id_role])
+  Role Role @relation(fields: [roleId], references: [id])
 
-  @@unique([email], map: "unique_email_constraint")
+  @@unique([email])
 }
 
 model Keranjang {
-  id_keranjang  Int      @id @default(autoincrement())
-  id_produk     Int
-  id_user       String
-  jumlah_produk Int      @default(1)
-  tanggal       DateTime
-  Produk        Produk   @relation(fields: [id_produk], references: [id_produk])
-  User          User     @relation(fields: [id_user], references: [id_user])
-  isSelected    Boolean  @default(true)
+  id         Int      @id @default(autoincrement())
+  produkId   Int
+  userId     String
+  jumlah     Int      @default(1)
+  tanggal    DateTime
+  Produk     Produk   @relation(fields: [produkId], references: [id])
+  User       User     @relation(fields: [userId], references: [id])
+  isSelected Boolean  @default(true)
 
-  @@index([id_produk])
-  @@index([id_user])
+  @@index([produkId])
+  @@index([userId])
 }
 
 model Transaksi {
-  id_transaksi    Int                @id @default(autoincrement())
-  id_user         String
-  total_barang    Int
-  harga_total     Decimal            @db.Decimal(10, 2)
+  id              Int               @id @default(autoincrement())
+  userId          String
+  totalBarang     Int
+  hargaTotal      Decimal           @db.Decimal(10, 2)
   deskripsi       String
-  User            User               @relation(fields: [id_user], references: [id_user])
-  DetailTransaksi Detail_Transaksi[]
-  LogTransaksi    Log_Transaksi[]
+  User            User              @relation(fields: [userId], references: [id])
+  TransaksiDetail TransaksiDetail[]
+  LogTransaksi    LogTransaksi[]
 
-  @@index([id_user])
+  @@index([userId])
 }
 
-model Detail_Transaksi {
-  id_detail_transaksi Int       @id @default(autoincrement())
-  id_produk           Int
-  id_transaksi        Int
-  jumlah_produk       Int
-  jumlah_harga        Decimal   @db.Decimal(10, 2)
-  Produk              Produk    @relation(fields: [id_produk], references: [id_produk])
-  Transaksi           Transaksi @relation(fields: [id_transaksi], references: [id_transaksi])
+model TransaksiDetail {
+  id          Int       @id @default(autoincrement())
+  produkId    Int
+  transaksiId Int
+  jumlah      Int
+  hargaTotal  Decimal   @db.Decimal(10, 2)
+  Produk      Produk    @relation(fields: [produkId], references: [id])
+  Transaksi   Transaksi @relation(fields: [transaksiId], references: [id])
 
-  @@index([id_produk, id_transaksi])
+  @@index([produkId, transaksiId])
 }
 
 model Favorit {
-  id_favorit Int    @id @default(autoincrement())
-  id_produk  Int
-  id_user    String
-  Produk     Produk @relation(fields: [id_produk], references: [id_produk])
-  User       User   @relation(fields: [id_user], references: [id_user])
+  id       Int    @id @default(autoincrement())
+  produkId Int
+  userId   String
+  Produk   Produk @relation(fields: [produkId], references: [id])
+  User     User   @relation(fields: [userId], references: [id])
 }
 
 model Media {
-  id_media  Int    @id @default(autoincrement())
-  id_produk Int
-  sumber    String
-  tipe_file String
-  Produk    Produk @relation(fields: [id_produk], references: [id_produk])
+  id       Int    @id @default(autoincrement())
+  produkId Int
+  sumber   String
+  tipeFile String
+  Produk   Produk @relation(fields: [produkId], references: [id])
 }
 
-model Roles {
-  id_role  Int    @id @default(autoincrement())
-  nama     String
-  deskrips String
-  User     User[]
+model Role {
+  id        Int    @id @default(autoincrement())
+  nama      String
+  deskripsi String
+  User      User[]
 }
 
-model Log_Transaksi {
-  id_log_transaksi Int      @id @default(autoincrement())
-  id_transaksi     Int
-  id_user          String
-  status_pesanan   Int
-  waktu            DateTime
+model LogTransaksi {
+  id          Int      @id @default(autoincrement())
+  transaksiId Int
+  userId      String
+  status      Int
+  waktu       DateTime
 
-  Transaksi Transaksi @relation(fields: [id_transaksi], references: [id_transaksi])
-  User      User      @relation(fields: [id_user], references: [id_user])
+  Transaksi Transaksi @relation(fields: [transaksiId], references: [id])
+  User      User      @relation(fields: [userId], references: [id])
 }
