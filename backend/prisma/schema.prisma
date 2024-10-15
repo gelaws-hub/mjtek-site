@@ -107,7 +107,7 @@ model User {
   id           String         @id @default(uuid())
   roleId       Int
   username     String
-  email        String         @unique
+  email        String         @unique(map: "User_email_unique")
   password     String
   alamat       String
   noHp         String
