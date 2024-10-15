@@ -13,7 +13,7 @@ An E-Commerce Website for buying PC Components and PC Building Simulation
 **Server:** NodeJS, ExpressJS, MySQL, Prisma
 
 
-## Installation
+## Installation Guide
 
 Activate the Server with development mode using nodemon
 
