@@ -8,55 +8,55 @@ import {
 } from "../controllers/simulation/socketController";
 
 import {
-  getAllTipeRAM,
-  getTipeRAMById,
-  createTipeRAM,
-  updateTipeRAM,
-  deleteTipeRAM,
-} from "../controllers/simulation/TipeRAMController";
+  getAllRamTypes,
+  getRamTypeById,
+  createRamType,
+  updateRamType,
+  deleteRamType,
+} from "../controllers/simulation/ramTypeController";
 
 import {
-  getAllSimulasi,
-  getSimulasiById,
-  createSimulasi,
-  updateSimulasi,
-  deleteSimulasi,
-} from "../controllers/simulation/simulasiController";
+  getAllSimulations,
+  getSimulationById,
+  createSimulation,
+  updateSimulation,
+  deleteSimulation,
+} from "../controllers/simulation/simulationController";
 
 import {
-  getAllDetailSimulasi,
-  getDetailSimulasiById,
-  createDetailSimulasi,
-  deleteDetailSimulasi,
-} from "../controllers/simulation/detailSimulasiController";
+  getAllSimulationDetails,
+  getSimulationDetailById,
+  createSimulationDetail,
+  deleteSimulationDetail,
+} from "../controllers/simulation/simulationDetailController";
 
 const simulationRoutes = express.Router();
 
 // Socket routes
-simulationRoutes.get("/socket", getAllSockets);
-simulationRoutes.get("/socket/:id", getSocketById);
-simulationRoutes.post("/socket", createSocket);
-simulationRoutes.put("/socket/:id", updateSocket);
-simulationRoutes.delete("/socket/:id", deleteSocket);
+simulationRoutes.get("/sockets", getAllSockets); // Changed to plural
+simulationRoutes.get("/sockets/:id", getSocketById);
+simulationRoutes.post("/sockets", createSocket);
+simulationRoutes.put("/sockets/:id", updateSocket);
+simulationRoutes.delete("/sockets/:id", deleteSocket);
 
-// Tipe_RAM routes
-simulationRoutes.get("/tiperam", getAllTipeRAM);
-simulationRoutes.get("/tiperam/:id", getTipeRAMById);
-simulationRoutes.post("/tiperam", createTipeRAM);
-simulationRoutes.put("/tiperam/:id", updateTipeRAM);
-simulationRoutes.delete("/tiperam/:id", deleteTipeRAM);
+// RAM Type routes
+simulationRoutes.get("/ram-types", getAllRamTypes); // Changed to plural and updated naming
+simulationRoutes.get("/ram-types/:id", getRamTypeById);
+simulationRoutes.post("/ram-types", createRamType);
+simulationRoutes.put("/ram-types/:id", updateRamType);
+simulationRoutes.delete("/ram-types/:id", deleteRamType);
 
-// Simulasi routes
-simulationRoutes.get("/simulasi", getAllSimulasi);
-simulationRoutes.get("/simulasi/:id", getSimulasiById);
-simulationRoutes.post("/simulasi", createSimulasi);
-simulationRoutes.put("/simulasi/:id", updateSimulasi);
-simulationRoutes.delete("/simulasi/:id", deleteSimulasi);
+// Simulation routes
+simulationRoutes.get("/simulations", getAllSimulations); // Changed to plural
+simulationRoutes.get("/simulations/:id", getSimulationById);
+simulationRoutes.post("/simulations", createSimulation);
+simulationRoutes.put("/simulations/:id", updateSimulation);
+simulationRoutes.delete("/simulations/:id", deleteSimulation);
 
-// Detail_Simulasi routes
-simulationRoutes.get("/detailsimulasi", getAllDetailSimulasi);
-simulationRoutes.get("/detailsimulasi/:id", getDetailSimulasiById);
-simulationRoutes.post("/detailsimulasi", createDetailSimulasi);
-simulationRoutes.delete("/detailsimulasi/:id", deleteDetailSimulasi);
+// Simulation Detail routes
+simulationRoutes.get("/simulation-details", getAllSimulationDetails); // Changed to plural
+simulationRoutes.get("/simulation-details/:id", getSimulationDetailById);
+simulationRoutes.post("/simulation-details", createSimulationDetail);
+simulationRoutes.delete("/simulation-details/:id", deleteSimulationDetail);
 
 export default simulationRoutes;

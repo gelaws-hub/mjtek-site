@@ -1,26 +1,27 @@
 import { Request, Response } from "express";
 import prisma from "../../utils/database";
 
+// Get all favorites by user ID with pagination
 export const getAllFavoritesByUserId = async (req: Request, res: Response) => {
-  const { id_user } = req.params;
+  const { userId } = req.params;
   const page = parseInt(req.query.page as string) || 1;
   const limit = parseInt(req.query.limit as string) || 10;
   const skip = (page - 1) * limit;
 
   try {
     const [totalCount, favorites] = await prisma.$transaction([
-      prisma.favorit.count({
-        where: { id_user },
+      prisma.favorite.count({
+        where: { userId },
       }),
-      prisma.favorit.findMany({
-        where: { id_user },
+      prisma.favorite.findMany({
+        where: { userId },
         skip,
         take: limit,
         include: {
-          Produk: {
+          Product: {
             include: {
               Media: true,
-            }
+            },
           },
         },
       }),
@@ -41,15 +42,16 @@ export const getAllFavoritesByUserId = async (req: Request, res: Response) => {
   }
 };
 
+// Add a product to the user's favorites
 export const addToFavorites = async (req: Request, res: Response) => {
-  const { id_user, id_produk } = req.body;
+  const { userId, productId } = req.body;
 
   try {
     // Check if the product is already in favorites for the user
-    const existingFavorite = await prisma.favorit.findFirst({
+    const existingFavorite = await prisma.favorite.findFirst({
       where: {
-        id_produk: parseInt(id_produk),
-        id_user,
+        productId: parseInt(productId),
+        userId,
       },
     });
 
@@ -57,10 +59,10 @@ export const addToFavorites = async (req: Request, res: Response) => {
       res.status(400).json({ error: "Product is already in favorites" });
     } else {
       // Create a new entry in favorites if the product isn't already added
-      const newFavorite = await prisma.favorit.create({
+      const newFavorite = await prisma.favorite.create({
         data: {
-          id_produk: parseInt(id_produk),
-          id_user,
+          productId: parseInt(productId),
+          userId,
         },
       });
 
@@ -72,13 +74,14 @@ export const addToFavorites = async (req: Request, res: Response) => {
   }
 };
 
+// Remove a product from favorites
 export const removeFromFavorites = async (req: Request, res: Response) => {
-  const { id } = req.params; // id refers to id_favorit
+  const { id } = req.params; // id refers to id of the favorite
 
   try {
-    await prisma.favorit.delete({
+    await prisma.favorite.delete({
       where: {
-        id_favorit: parseInt(id),
+        id: parseInt(id),
       },
     });
 
