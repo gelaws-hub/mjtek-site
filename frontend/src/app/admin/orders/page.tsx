@@ -1,3 +1,6 @@
+"use client";
+
+import React, { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -16,53 +19,90 @@ import {
 import { MoreVertical } from "lucide-react";
 import { DeleteDropDownItem } from "./_components/OrderActions";
 
-// Static data for orders
-const ordersData = [
-  {
-    id: "1",
-    pricePaidInCents: 1000,
-    product: { name: "Laptop" },
-    user: { email: "alice@example.com" },
-  },
-  {
-    id: "2",
-    pricePaidInCents: 500,
-    product: { name: "Phone" },
-    user: { email: "bob@example.com" },
-  },
-  {
-    id: "3",
-    pricePaidInCents: 300,
-    product: { name: "Tablet" },
-    user: { email: "charlie@example.com" },
-  },
-];
+// Define interfaces based on the JSON response
+interface Transaction {
+  id: number;
+  userId: string;
+  totalItems: number;
+  totalPrice: string; // Assuming this is a string
+  description: string;
+}
 
-function getOrders() {
-  return ordersData;
+interface User {
+  id: string;
+  roleId: number;
+  username: string;
+  email: string;
+  password: string; // Consider removing this from the UI
+  address: string;
+  phoneNumber: string;
+}
+
+interface Order {
+  id: number;
+  transactionId: number;
+  userId: string;
+  orderStatus: number;
+  timestamp: string;
+  Transaction: Transaction;
+  User: User;
+}
+
+interface ApiResponse {
+  statusCode: number;
+  status: string;
+  data: Order[];
 }
 
 export default function OrdersPage() {
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch orders from the API
+  const fetchOrders = async () => {
+    try {
+      const response = await fetch(
+        "http://localhost:5000/api/transaction-logs"
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch orders");
+      }
+      const data: ApiResponse = await response.json();
+      setOrders(data.data); // Set the fetched data
+    } catch (error) {
+      setError((error as Error).message); // Set error message
+    }
+  };
+
+  // Fetch orders when the component mounts
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
   return (
     <>
       <PageHeader>Sales</PageHeader>
-      <OrdersTable />
+      {error && <p>{error}</p>}
+      <OrdersTable orders={orders} />
     </>
   );
 }
 
-async function OrdersTable() {
-  const orders = getOrders();
+interface OrdersTableProps {
+  orders: Order[];
+}
 
+const OrdersTable: React.FC<OrdersTableProps> = ({ orders }) => {
   if (orders.length === 0) return <p>No sales found</p>;
 
   return (
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Product</TableHead>
-          <TableHead>Customer</TableHead>
-          <TableHead>Price Paid</TableHead>
+          <TableHead>Product Description</TableHead>
+          <TableHead>Customer Email</TableHead>
+          <TableHead>Total Price</TableHead>
+          <TableHead>Order Status</TableHead>
           <TableHead className="w-0">
             <span className="sr-only">Actions</span>
           </TableHead>
@@ -71,10 +111,13 @@ async function OrdersTable() {
       <TableBody>
         {orders.map((order) => (
           <TableRow key={order.id}>
-            <TableCell>{order.product.name}</TableCell>
-            <TableCell>{order.user.email}</TableCell>
+            <TableCell>{order.Transaction.description}</TableCell>
+            <TableCell>{order.User.email}</TableCell>
             <TableCell>
-              {formatCurrency(order.pricePaidInCents / 100)}
+              {formatCurrency(parseFloat(order.Transaction.totalPrice))}
+            </TableCell>
+            <TableCell>
+              {order.orderStatus === 1 ? "Completed" : "Pending"}
             </TableCell>
             <TableCell className="text-center">
               <DropdownMenu>
@@ -83,7 +126,7 @@ async function OrdersTable() {
                   <span className="sr-only">Actions</span>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                  <DeleteDropDownItem id={order.id} />
+                  <DeleteDropDownItem id={order.id.toString()} />
                 </DropdownMenuContent>
               </DropdownMenu>
             </TableCell>
@@ -92,4 +135,4 @@ async function OrdersTable() {
       </TableBody>
     </Table>
   );
-}
+};

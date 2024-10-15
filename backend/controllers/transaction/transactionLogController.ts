@@ -29,7 +29,11 @@ export const getTransactionLogs = async (
     filter &&
     !["alltime", "month", "week", "day", "income"].includes(filter)
   ) {
-    return res.status(400).json({ error: "Invalid filter option" });
+    return res.status(400).json({
+      statusCode: 400,
+      status: "error",
+      error: "Invalid filter option",
+    });
   }
 
   try {
@@ -63,10 +67,18 @@ export const getTransactionLogs = async (
       },
     });
 
-    res.json(transactionLogs);
+    res.json({
+      statusCode: 200,
+      status: "success",
+      data: transactionLogs,
+    });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({
+      statusCode: 500,
+      status: "error",
+      error: "Internal server error",
+    });
   }
 };
 

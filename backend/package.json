@@ -2,10 +2,10 @@
   "name": "mjteknologi-smg",
   "version": "1.0.0",
   "main": "index.ts",
-  "type": "module",
   "scripts": {
     "start": "nodemon index.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "seed": "ts-node prisma/seed.ts"
   },
   "keywords": [],
   "author": "",
