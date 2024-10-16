@@ -3,34 +3,34 @@ import { Request, Response } from "express";
 import prisma from "../../utils/database";
 
 // Get all Keranjang by id_user
-export const getAllKeranjangByUserId = async (req: Request, res: Response) => {
+export const getAllCartByUserId = async (req: Request, res: Response) => {
   const { id_user } = req.params;
   try {
-    const keranjang = await prisma.keranjang.findMany({
+    const keranjang = await prisma.cart.findMany({
       where: {
-        id_user: id_user,
+        user_id: id_user,
       },
       include: {
-        Produk: {
+        product: {
           include: {
-            Kategori: true,
-            SubKategori: true,
-            Brand: true,
-            Produk_Tipe_RAM: {
+            category: true,
+            sub_category: true,
+            brand: true,
+            product_ram_type: {
               include: {
-                Tipe_RAM: true,
+                ram_type: true,
               },
             },
-            Produk_Socket: {
+            product_socket: {
               include: {
-                nama_socket: true,
+                socket: true,
               },
             },
-            Media: {
+            media: {
               select: {
-                id_media: true,
-                sumber: true,
-                tipe_file: true,
+                id: true,
+                source: true,
+                file_type: true,
               },
             },
           },
@@ -45,27 +45,27 @@ export const getAllKeranjangByUserId = async (req: Request, res: Response) => {
 };
 
 // Add a new item to Keranjang
-export const addToKeranjang = async (req: Request, res: Response) => {
-  const { id_user, id_produk, jumlah_produk } = req.body;
+export const addToCart = async (req: Request, res: Response) => {
+  const { user_id, id_produk, quantity } = req.body;
 
   try {
     // Check if the product is already in Keranjang for the user
-    const existingKeranjang = await prisma.keranjang.findFirst({
+    const existingKeranjang = await prisma.cart.findFirst({
       where: {
-        id_produk: parseInt(id_produk),
-        id_user,
+        product_id: parseInt(id_produk),
+        user_id,
       },
     });
 
     if (existingKeranjang) {
       // Update the existing entry to increase jumlah_produk
-      const updatedKeranjang = await prisma.keranjang.update({
+      const updatedKeranjang = await prisma.cart.update({
         where: {
-          id_keranjang: existingKeranjang.id_keranjang,
+          id: existingKeranjang.id,
         },
         data: {
-          jumlah_produk: {
-            increment: jumlah_produk, // Increment jumlah_produk by the amount provided
+          quantity: {
+            increment: quantity, // Increment jumlah_produk by the amount provided
           },
         },
       });
@@ -73,12 +73,12 @@ export const addToKeranjang = async (req: Request, res: Response) => {
       res.status(200).json(updatedKeranjang);
     } else {
       // Create a new entry in Keranjang if the product isn't already added
-      const newKeranjang = await prisma.keranjang.create({
+      const newKeranjang = await prisma.cart.create({
         data: {
-          id_produk: parseInt(id_produk),
-          id_user,
-          jumlah_produk,
-          tanggal: new Date(),
+          product_id: parseInt(id_produk),
+          user_id,
+          quantity,
+          date: new Date(),
         },
       });
 
@@ -91,12 +91,12 @@ export const addToKeranjang = async (req: Request, res: Response) => {
 };
 
 // Remove an item from Keranjang
-export const removeFromKeranjang = async (req: Request, res: Response) => {
+export const removeFromCart = async (req: Request, res: Response) => {
   const { id } = req.params; // id refers to id_keranjang
   try {
-    await prisma.keranjang.delete({
+    await prisma.cart.delete({
       where: {
-        id_keranjang: parseInt(id),
+        id: parseInt(id),
       },
     });
     res.status(204).end();
@@ -107,17 +107,17 @@ export const removeFromKeranjang = async (req: Request, res: Response) => {
 };
 
 // Update an item in Keranjang
-export const updateKeranjangItem = async (req: Request, res: Response) => {
+export const updateCartItem = async (req: Request, res: Response) => {
   const { id } = req.params; // id refers to id_keranjang
-  const { id_produk } = req.body;
+  const { product_id } = req.body;
   try {
-    const updatedKeranjang = await prisma.keranjang.update({
+    const updatedKeranjang = await prisma.cart.update({
       where: {
-        id_keranjang: parseInt(id),
+        id: parseInt(id),
       },
       data: {
-        id_produk: parseInt(id_produk),
-        tanggal: new Date(),
+        product_id: parseInt(product_id),
+        date: new Date(),
       },
     });
     res.status(200).json(updatedKeranjang);
@@ -128,12 +128,12 @@ export const updateKeranjangItem = async (req: Request, res: Response) => {
 };
 
 // Clear all items from Keranjang for a user
-export const clearKeranjang = async (req: Request, res: Response) => {
-  const { id_user } = req.params;
+export const clearCart = async (req: Request, res: Response) => {
+  const { user_id } = req.params;
   try {
-    await prisma.keranjang.deleteMany({
+    await prisma.cart.deleteMany({
       where: {
-        id_user,
+        user_id,
       },
     });
     res.status(204).end();

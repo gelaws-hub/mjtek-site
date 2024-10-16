@@ -1,10 +1,10 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import produkRoutes from './routes/produkRoutes';
-import produkDetailRoutes from './routes/produkDetailRoutes'; 
+import produkRoutes from './routes/productRoutes';
+import produkDetailRoutes from './routes/productDetailRoutes'; 
 import simulationRoutes from './routes/simulationRoutes';
-import transaksiRoutes from './routes/transaksiRoutes';
+import transaksiRoutes from './routes/transactionRoutes';
 
 
 const app = express();
