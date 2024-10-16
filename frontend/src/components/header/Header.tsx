@@ -9,7 +9,7 @@ import Link from "next/link";
 
 export default function Header() {
   return (
-    <header className="sticky top-0 border-b-2 border-b-gray-100 mb-8 bg-white z-50">
+    <header className="sticky top-0 border-b-2 border-b-gray-100 bg-white z-50">
       <div className="grid grid-cols-[70%_30%]  md:grid-cols-[25%_50%_25%] mx-auto pt-6 pb-4">
         <Link
           href="/"

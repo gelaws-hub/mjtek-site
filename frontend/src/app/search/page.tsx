@@ -27,15 +27,16 @@ export default function SearchResults() {
   const [products, setProducts] = useState<Product[]>([]);
   const [totalCount, setTotalCount] = useState<number>(0);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [selectedCategories, setSelectedCategories] = useState<number[]>([]); // State to store selected categories
+  const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
 
   useEffect(() => {
-    fetchCategories(); // Fetch categories on component mount
-  }, []);
+    fetchCategories();
+  }, [query]);
 
+  // This effect will fetch products whenever the query or selected categories change
   useEffect(() => {
     if (query) {
-      fetchProducts(query, selectedCategories); // Fetch products based on query and selected categories
+      fetchProducts(query, selectedCategories);
     }
   }, [query, selectedCategories]); // Add selectedCategories to dependencies
 
@@ -44,7 +45,7 @@ export default function SearchResults() {
       const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/product`);
       url.searchParams.append("q", encodeURIComponent(searchTerm));
       if (categoryIds.length > 0) {
-        url.searchParams.append("categories", categoryIds.join(",")); // Join selected categories
+        url.searchParams.append("categories", categoryIds.join(","));
       }
 
       const response = await fetch(url.toString());
@@ -58,9 +59,13 @@ export default function SearchResults() {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/category`);
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/product?q=${encodeURIComponent(
+          query ?? ""
+        )}`
+      );
       const data = await response.json();
-      setCategories(data.data); // Assuming data contains an array of categories
+      setCategories(data.categories);
     } catch (error) {
       console.error("Error fetching categories:", error);
     }
@@ -69,20 +74,20 @@ export default function SearchResults() {
   const handleCategoryChange = (categoryId: number) => {
     setSelectedCategories((prev) => {
       if (prev.includes(categoryId)) {
-        return prev.filter((id) => id !== categoryId); // Remove category if already selected
+        return prev.filter((id) => id !== categoryId);
       } else {
-        return [...prev, categoryId]; // Add category if not selected
+        return [...prev, categoryId];
       }
     });
   };
 
   return (
-    <div className="grid grid-cols-[15%_85%]">
-      <div className="flex flex-col ml-24">
-        <h2 className="text-2xl font-bold text-blue-900 mb-4">Filter</h2>
+    <div className="grid grid-cols-[25%_75%] mt-0">
+      <div className="flex flex-col ml-36 border-r-2 border-r-gray-200 ">
+        <h2 className="text-3xl font-bold text-blue-900 mb-4 pt-6">Filter</h2>
         <div>
-          <h3 className="text-xl font-bold">Kategori</h3>
-          <ul>
+          <h3 className="text-xl font-semibold mb-2">Kategori</h3>
+          <ul className="ml-4">
             {categories.map((category) => (
               <li key={category.id} className="flex items-center mb-2">
                 <input
@@ -93,7 +98,10 @@ export default function SearchResults() {
                   onChange={() => handleCategoryChange(category.id)}
                   className="mr-2"
                 />
-                <label htmlFor={`category-${category.id}`} className="cursor-pointer">
+                <label
+                  htmlFor={`category-${category.id}`}
+                  className="cursor-pointer"
+                >
                   {category.category_name}
                 </label>
               </li>
@@ -101,9 +109,9 @@ export default function SearchResults() {
           </ul>
         </div>
       </div>
-      <div className="container mx-auto p-4">
+      <div className="container mx-auto py-4 pl-8 pr-28">
         <h1 className="text-2xl font-bold mb-4">
-          <span className="border-x-8 border-blue-900 border-solid mx-4 rounded-sm"></span>
+          <span className="border-x-8 border-blue-900 border-solid mx-4 rounded-md"></span>
           Menampilkan {totalCount} produk untuk{" "}
           <strong className="text-blue-900">{query}</strong>
         </h1>

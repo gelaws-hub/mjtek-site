@@ -15,8 +15,11 @@ interface Product {
   product_name: string;
   price: number;
   media: Media[];
+  category: {
+    id: number;
+    category_name: string;
+  };
 }
-
 
 interface Category {
   id: number;
@@ -62,7 +65,7 @@ export default function CategoryPage() {
       );
       const data = await response.json();
       setProducts(data.products);
-      console.log(data.products)
+      console.log(data.products);
     } catch (error) {
       console.error("Error fetching products:", error);
     }

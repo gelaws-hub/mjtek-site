@@ -12,6 +12,10 @@ interface Product {
   product_name: string;
   price: number;
   media: Media[];
+  category: {
+    id: number;
+    category_name: string;
+  };
 }
 
 interface ProductCardItemProps {
@@ -21,11 +25,10 @@ interface ProductCardItemProps {
 export default function ProductCardItem({ product }: ProductCardItemProps) {
   return (
     <Link
-      href={`/product/${product.id}`}
+      href={`/${encodeURIComponent(product.category.category_name)}/${encodeURIComponent(product.product_name)}`}
       className="bg-white overflow-hidden w-full p-2"
     >
       {product.media && product.media.length > 0 && (
-        // Todo Slowly Load Image
         <div className="relative flex aspect-[1/1]">
           <Image
             src={product.media[0].source}
@@ -34,7 +37,6 @@ export default function ProductCardItem({ product }: ProductCardItemProps) {
             height={300}
             className="w-full h-full object-cover overflow-hidden"
           />
-          {/* Todo : Add Favourite */}
           <button className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md z-10">
             <FavouriteIcon width={20} height={20} />
           </button>
