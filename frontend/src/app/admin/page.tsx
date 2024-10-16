@@ -97,6 +97,8 @@
 //   );
 // }
 
+"use client";
+
 import {
   Card,
   CardContent,
@@ -105,27 +107,63 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { formatCurrency, formatNumber } from "@/lib/formatters";
+import { useState, useEffect } from "react";
 
-async function getSalesData() {
-  // Static data for sales
-  const data = {
-    _sum: { pricePaidInCents: 500000 },
-    _count: 50,
-  };
+interface ApiResponse {
+  statusCode: number;
+  status: string;
+  data: Order[];
+}
+
+interface Transaction {
+  id: number;
+  userId: string;
+  totalItems: number;
+  totalPrice: string;
+  description: string;
+}
+
+interface User {
+  id: string;
+  roleId: number;
+  username: string;
+  email: string;
+  password: string; // Consider removing this from the UI
+  address: string;
+  phoneNumber: string;
+}
+
+interface Order {
+  id: number;
+  transactionId: number;
+  userId: string;
+  orderStatus: number;
+  timestamp: string;
+  Transaction: Transaction;
+  User: User;
+}
+
+async function fetchSalesData() {
+  const response = await fetch("http://localhost:5000/api/transaction-logs");
+  if (!response.ok) {
+    throw new Error("Failed to fetch sales data");
+  }
+  const data: ApiResponse = await response.json();
+  const totalSalesAmount = data.data.reduce((sum, order) => {
+    return sum + parseFloat(order.Transaction.totalPrice);
+  }, 0);
 
   return {
-    amount: (data._sum.pricePaidInCents || 0) / 100,
-    numberOfSales: data._count,
+    amount: totalSalesAmount,
+    numberOfSales: data.data.length,
   };
 }
 
-async function getUserData() {
-  // Static data for users and orders
+async function fetchUserData() {
   const userCount = 0;
   const orderData = {
     _sum: { pricePaidInCents: 2000000 },
   };
-
   return {
     userCount,
     averageValuePerUser:
@@ -135,20 +173,53 @@ async function getUserData() {
   };
 }
 
-async function getProductData() {
-  // Static data for products
+async function fetchProductData() {
   const activeCount = 80;
   const inactiveCount = 20;
-
   return { activeCount, inactiveCount };
 }
 
-export default async function AdminDashboard() {
-  const [salesData, userData, productData] = await Promise.all([
-    getSalesData(),
-    getUserData(),
-    getProductData(),
-  ]);
+export default function AdminDashboard() {
+  const [salesData, setSalesData] = useState({ amount: 0, numberOfSales: 0 });
+  const [userData, setUserData] = useState({
+    userCount: 0,
+    averageValuePerUser: 0,
+  });
+  const [productData, setProductData] = useState({
+    activeCount: 0,
+    inactiveCount: 0,
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [sales, users, products] = await Promise.all([
+          fetchSalesData(),
+          fetchUserData(),
+          fetchProductData(),
+        ]);
+        setSalesData(sales);
+        setUserData(users);
+        setProductData(products);
+      } catch (error) {
+        setError((error as Error).message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+
+  if (error) {
+    return <p>Error: {error}</p>;
+  }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

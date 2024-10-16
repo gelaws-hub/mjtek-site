@@ -1,114 +1,67 @@
-import { Button } from "@/components/ui/button";
-import { PageHeader } from "../_components/PageHeader";
-import Link from "next/link";
+"use client";
+
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { Product } from "./types"; // Define your Product type in a separate file
 import {
   Table,
-  TableBody,
-  TableCell,
-  TableHead,
   TableHeader,
+  TableBody,
   TableRow,
-} from "@/components/ui/table";
-import { CheckCircle2, MoreVertical, XCircle } from "lucide-react";
-import { formatCurrency, formatNumber } from "@/lib/formatters";
+  TableHead,
+  TableCell,
+} from "@/components/ui/table"; // Adjust the import path as necessary
+import { PageHeader } from "../_components/PageHeader";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  ActiveToggleDropdownItem,
-  DeleteDropdownItem,
-} from "./_components/ProductActions";
+import { MoreVertical } from "lucide-react";
+import { DeleteDropDownItem } from "./_components/DeleteDropDownItem";
 
-export default function AdminProductsPage() {
+const ProductManagement: React.FC = () => {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchProducts = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/api/products");
+      setProducts(response.data.products);
+    } catch (err) {
+      setError("Failed to fetch products");
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
   return (
-    <>
-      <div className="flex justify-between items-center gap-4">
-        <PageHeader>Products</PageHeader>
-        <Button asChild>
-          <Link href="/admin/products/new">Add Product</Link>
-        </Button>
-      </div>
-      <ProductsTable />
-    </>
+    <div>
+      <PageHeader>Product Management</PageHeader>
+      {error && <p>{error}</p>}
+      <ProductsTable products={products} />
+    </div>
   );
+};
+
+export default ProductManagement;
+
+interface ProductsTableProps {
+  products: Product[];
 }
 
-async function ProductsTable() {
-  const products = [
-    {
-      id: 1,
-      name: "Gaming Mouse",
-      priceInCents: 4999,
-      description:
-        "A high-precision wireless gaming mouse with customizable DPI.",
-      file: "gaming_mouse_manual.pdf",
-      image: "https://via.assets.so/shoe.png?id=1&q=95&w=360&h=360&fit=fill",
-      isAvailableForPurchase: true,
-      _count: { orders: 25 },
-    },
-    {
-      id: 2,
-      name: "Mechanical Keyboard",
-      priceInCents: 9999,
-      description:
-        "A durable mechanical keyboard with customizable RGB lighting.",
-      file: "mechanical_keyboard_manual.pdf",
-      image: "mechanical_keyboard.jpg",
-      isAvailableForPurchase: false,
-      _count: { orders: 18 },
-    },
-    {
-      id: 3,
-      name: "4K Monitor",
-      priceInCents: 29999,
-      description:
-        "A 27-inch 4K monitor with ultra-thin bezels and HDR support.",
-      file: "4k_monitor_manual.pdf",
-      image: "4k_monitor.jpg",
-      isAvailableForPurchase: true,
-      _count: { orders: 7 },
-    },
-    {
-      id: 4,
-      name: "Gaming Chair",
-      priceInCents: 19999,
-      description:
-        "An ergonomic gaming chair with lumbar support and adjustable armrests.",
-      file: "gaming_chair_manual.pdf",
-      image: "gaming_chair.jpg",
-      isAvailableForPurchase: true,
-      _count: { orders: 12 },
-    },
-    {
-      id: 5,
-      name: "Graphics Card",
-      priceInCents: 49999,
-      description:
-        "A high-performance graphics card for gaming and video editing.",
-      file: "graphics_card_manual.pdf",
-      image: "https://picsum.photos/200/300",
-      isAvailableForPurchase: false,
-      _count: { orders: 34 },
-    },
-  ];
-
+const ProductsTable: React.FC<ProductsTableProps> = ({ products }) => {
   if (products.length === 0) return <p>No products found</p>;
 
   return (
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-0">
-            <span className="sr-only">Available For Purchase</span>
-          </TableHead>
           <TableHead>Name</TableHead>
           <TableHead>Price</TableHead>
-          <TableHead>Orders</TableHead>
-          <TableHead>Picture</TableHead>
+          <TableHead>Stock</TableHead>
           <TableHead className="w-0">
             <span className="sr-only">Actions</span>
           </TableHead>
@@ -117,51 +70,17 @@ async function ProductsTable() {
       <TableBody>
         {products.map((product) => (
           <TableRow key={product.id}>
-            <TableCell>
-              {product.isAvailableForPurchase ? (
-                <>
-                  <span className="sr-only">Available</span>
-                  <CheckCircle2 />
-                </>
-              ) : (
-                <>
-                  <span className="sr-only">Unavailable</span>
-                  <XCircle className="stroke-destructive" />
-                </>
-              )}
-            </TableCell>
-            <TableCell>{product.name}</TableCell>
-            <TableCell>{formatCurrency(product.priceInCents / 100)}</TableCell>
-            <TableCell>{formatNumber(product._count.orders)}</TableCell>
-            <TableCell>
+            <TableCell>{product.productName}</TableCell>
+            <TableCell>{product.price.toFixed(2)}</TableCell>
+            <TableCell>{product.stock}</TableCell>
+            <TableCell className="text-center">
               <DropdownMenu>
                 <DropdownMenuTrigger>
                   <MoreVertical />
                   <span className="sr-only">Actions</span>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                  <DropdownMenuItem asChild>
-                    <a
-                      download
-                      href={`/admin/products/${product.id.toString()}/download`}
-                    >
-                      Download
-                    </a>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href={`/admin/products/${product.id}/edit`}>
-                      Edit
-                    </Link>
-                  </DropdownMenuItem>
-                  <ActiveToggleDropdownItem
-                    id={product.id.toString()}
-                    isAvailableForPurchase={product.isAvailableForPurchase}
-                  />
-                  <DropdownMenuSeparator />
-                  <DeleteDropdownItem
-                    id={product.id.toString()}
-                    disabled={product._count.orders > 0}
-                  />
+                  <DeleteDropDownItem id={product.id.toString()} />
                 </DropdownMenuContent>
               </DropdownMenu>
             </TableCell>
@@ -170,4 +89,4 @@ async function ProductsTable() {
       </TableBody>
     </Table>
   );
-}
+};

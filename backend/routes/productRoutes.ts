@@ -1,4 +1,4 @@
-import express from "express";
+import { Router } from "express";
 import {
   getAllProducts,
   getProductById,
@@ -7,12 +7,12 @@ import {
   deleteProduct,
 } from "../controllers/productController";
 
-const productRoutes = express.Router();
+const router = Router();
 
-productRoutes.get("/products", getAllProducts); // Updated to plural
-productRoutes.get("/products/:id", getProductById);
-productRoutes.post("/products", createProduct);
-productRoutes.put("/products/:id", updateProduct);
-productRoutes.delete("/products/:id", deleteProduct);
+router.get("/", getAllProducts); // GET all products
+router.get("/:id", getProductById); // GET a product by ID
+router.post("/", createProduct); // Create a new product
+router.put("/:id", updateProduct); // Update a product
+router.delete("/:id", deleteProduct); // Soft delete a product
 
-export default productRoutes;
+export default router;
