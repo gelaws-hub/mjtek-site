@@ -24,7 +24,7 @@ export const getAllProducts = async (req: Request, res: Response) => {
     if (categories) {
       const categoryIds = categories.split(",").map((id) => parseInt(id));
       whereConditions.AND.push({
-        Kategori: { id_kategori: { in: categoryIds } }, // Use `in` to match any of the selected categories
+        category: { id: { in: categoryIds } }, // Use the correct relation name for category
       });
     }
 
@@ -56,8 +56,8 @@ export const getAllProducts = async (req: Request, res: Response) => {
           media: {
             select: {
               id: true,
-              source: true,
-              file_type: true,
+              source: true, // Use 'sumber' based on your model
+              file_type: true, // Use 'tipe_file' based on your model
             },
           },
         },
@@ -66,7 +66,7 @@ export const getAllProducts = async (req: Request, res: Response) => {
 
     const totalPages = Math.ceil(totalCount / limit);
 
-    const formattedproducts = products.map((produk) => ({
+    const formattedProducts = products.map((produk) => ({
       id: produk.id,
       product_name: produk.product_name,
       price: parseFloat(produk.price.toString()),
@@ -78,11 +78,11 @@ export const getAllProducts = async (req: Request, res: Response) => {
       brand: produk.brand || null,
       product_ram_type:
         produk.product_ram_type.length > 0
-          ? produk.product_ram_type.map((tipeRam: any) => tipeRam.Tipe_RAM)
+          ? produk.product_ram_type.map((tipeRam: any) => tipeRam.ram_type) // Use the correct field name
           : null,
       product_socket:
         produk.product_socket.length > 0
-          ? produk.product_socket.map((socket: any) => socket.nama_socket)
+          ? produk.product_socket.map((socket: any) => socket.socket) // Use the correct field name
           : null,
       media:
         produk.media.length > 0
@@ -98,11 +98,11 @@ export const getAllProducts = async (req: Request, res: Response) => {
       totalPages,
       currentPage: page,
       pageSize: limit,
-      products: formattedproducts,
+      products: formattedProducts,
     });
   } catch (error: any) {
     console.error(
-      "Error fetching Produk with pagination and search:",
+      "Error fetching products with pagination and search:",
       error.message
     );
     res.status(500).json({ status_code: 500, message: "Internal server error" });
