@@ -6,26 +6,27 @@ import axios from "axios";
 import ProductCardItem from "@/components/product/ProductCardItem";
 
 interface Media {
-  sumber: string;
-  tipe_file: string;
+  source: string;
+  file_type: string;
 }
 
-interface Produk {
-  id_produk: number;
-  nama_produk: string;
-  harga: number;
+interface Product {
+  id: number;
+  product_name: string;
+  price: number;
   media: Media[];
 }
 
+
 interface Category {
-  id_kategori: number;
-  nama_kategori: string;
+  id: number;
+  category_name: string;
 }
 
 export default function CategoryPage() {
   const pathname = usePathname(); // Use usePathname to get the current path
   const categoryName = pathname.split("/")[1]; // Assuming the category is the first part of the path
-  const [products, setProducts] = useState<Produk[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
@@ -35,9 +36,9 @@ export default function CategoryPage() {
   const fetchCategories = async () => {
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/kategori`
+        `${process.env.NEXT_PUBLIC_API_URL}/category`
       );
-      setCategories(response.data); // Assuming response.data contains an array of categories
+      setCategories(response.data.data); // Assuming response.data contains an array of categories
     } catch (error) {
       console.error("Error fetching categories:", error);
     }
@@ -46,8 +47,8 @@ export default function CategoryPage() {
   useEffect(() => {
     if (categoryName) {
       const categoryId = categories.find(
-        (cat) => cat.nama_kategori.toLowerCase() === categoryName.toLowerCase()
-      )?.id_kategori;
+        (cat) => cat.category_name.toLowerCase() === categoryName.toLowerCase()
+      )?.id;
       if (categoryId) {
         fetchProducts(categoryId);
       }
@@ -57,10 +58,11 @@ export default function CategoryPage() {
   const fetchProducts = async (categoryId: number) => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/produk?category=${categoryId}`
+        `${process.env.NEXT_PUBLIC_API_URL}/product?categories=${categoryId}`
       );
       const data = await response.json();
-      setProducts(data.produks);
+      setProducts(data.products);
+      console.log(data.products)
     } catch (error) {
       console.error("Error fetching products:", error);
     }
@@ -73,8 +75,8 @@ export default function CategoryPage() {
       </h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {products.length > 0 ? (
-          products.map((product: Produk) => (
-            <ProductCardItem key={product.id_produk} product={product} />
+          products.map((product: Product) => (
+            <ProductCardItem key={product.id} product={product} />
           ))
         ) : (
           <p>No products found in this category.</p>

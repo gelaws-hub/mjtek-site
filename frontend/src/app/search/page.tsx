@@ -5,26 +5,26 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 interface Media {
-  sumber: string;
-  tipe_file: string;
+  source: string;
+  file_type: string;
 }
 
-interface Produk {
-  id_produk: number;
-  nama_produk: string;
-  harga: number;
+interface Product {
+  id: number;
+  product_name: string;
+  price: number;
   media: Media[];
 }
 
 interface Category {
-  id_kategori: number;
-  nama_kategori: string;
+  id: number;
+  category_name: string;
 }
 
 export default function SearchResults() {
   const searchParams = useSearchParams();
   const query = searchParams.get("q");
-  const [products, setProducts] = useState<Produk[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [totalCount, setTotalCount] = useState<number>(0);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<number[]>([]); // State to store selected categories
@@ -41,7 +41,7 @@ export default function SearchResults() {
 
   const fetchProducts = async (searchTerm: string, categoryIds: number[]) => {
     try {
-      const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/produk`);
+      const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/product`);
       url.searchParams.append("q", encodeURIComponent(searchTerm));
       if (categoryIds.length > 0) {
         url.searchParams.append("categories", categoryIds.join(",")); // Join selected categories
@@ -49,7 +49,7 @@ export default function SearchResults() {
 
       const response = await fetch(url.toString());
       const data = await response.json();
-      setProducts(data.produks);
+      setProducts(data.products);
       setTotalCount(data.totalCount);
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -58,9 +58,9 @@ export default function SearchResults() {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/kategori`);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/category`);
       const data = await response.json();
-      setCategories(data); // Assuming data contains an array of categories
+      setCategories(data.data); // Assuming data contains an array of categories
     } catch (error) {
       console.error("Error fetching categories:", error);
     }
@@ -84,17 +84,17 @@ export default function SearchResults() {
           <h3 className="text-xl font-bold">Kategori</h3>
           <ul>
             {categories.map((category) => (
-              <li key={category.id_kategori} className="flex items-center mb-2">
+              <li key={category.id} className="flex items-center mb-2">
                 <input
                   type="checkbox"
-                  id={`category-${category.id_kategori}`}
-                  value={category.id_kategori}
-                  checked={selectedCategories.includes(category.id_kategori)}
-                  onChange={() => handleCategoryChange(category.id_kategori)}
+                  id={`category-${category.id}`}
+                  value={category.id}
+                  checked={selectedCategories.includes(category.id)}
+                  onChange={() => handleCategoryChange(category.id)}
                   className="mr-2"
                 />
-                <label htmlFor={`category-${category.id_kategori}`} className="cursor-pointer">
-                  {category.nama_kategori}
+                <label htmlFor={`category-${category.id}`} className="cursor-pointer">
+                  {category.category_name}
                 </label>
               </li>
             ))}
@@ -110,8 +110,8 @@ export default function SearchResults() {
         <div className="border-l-8"></div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {products.length > 0 ? (
-            products.map((product: Produk) => (
-              <ProductCardItem key={product.id_produk} product={product} />
+            products.map((product: Product) => (
+              <ProductCardItem key={product.id} product={product} />
             ))
           ) : (
             <p>No products found.</p>

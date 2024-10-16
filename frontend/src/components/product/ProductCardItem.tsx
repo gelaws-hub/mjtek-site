@@ -3,33 +3,33 @@ import Link from "next/link";
 import { FavouriteIcon } from "../icons/FavouriteIcon";
 
 interface Media {
-  sumber: string;
-  tipe_file: string;
+  source: string;
+  file_type: string;
 }
 
-interface Produk {
-  id_produk: number;
-  nama_produk: string;
-  harga: number;
+interface Product {
+  id: number;
+  product_name: string;
+  price: number;
   media: Media[];
 }
 
 interface ProductCardItemProps {
-  product: Produk;
+  product: Product;
 }
 
 export default function ProductCardItem({ product }: ProductCardItemProps) {
   return (
     <Link
-      href={`/product/${product.id_produk}`}
+      href={`/product/${product.id}`}
       className="bg-white overflow-hidden w-full p-2"
     >
       {product.media && product.media.length > 0 && (
         // Todo Slowly Load Image
         <div className="relative flex aspect-[1/1]">
           <Image
-            src={product.media[0].sumber}
-            alt={product.nama_produk}
+            src={product.media[0].source}
+            alt={product.product_name}
             width={300}
             height={300}
             className="w-full h-full object-cover overflow-hidden"
@@ -42,14 +42,14 @@ export default function ProductCardItem({ product }: ProductCardItemProps) {
       )}
       <div className="flex flex-col gap-2">
         <h2 className="text-md font-semibold truncate mt-2">
-          {product.nama_produk}
+          {product.product_name}
         </h2>
         <p className="text-blue-900 font-semibold mb-4">
           Rp.{" "}
           {new Intl.NumberFormat("id-ID", {
             minimumFractionDigits: 0,
             maximumFractionDigits: 0,
-          }).format(product.harga)}
+          }).format(product.price)}
         </p>
       </div>
     </Link>
