@@ -1,5 +1,6 @@
 import express from "express";
 import {
+<<<<<<< HEAD
   getAllCategories,
   getCategoryById,
   createCategory,
@@ -14,6 +15,16 @@ import {
   updateSubCategory,
   deleteSubCategory,
 } from "../controllers/productDetails/subCategoryController";
+=======
+  createCategory,
+  deleteCategory,
+  getAllCategories,
+  getCategoryById,
+  updateCategory,
+} from "../controllers/produk_details/categoriController";
+
+import { createSubCategory, deleteSubCategory, getAllSubCategories, getSubCategoryById, updateSubCategory } from "../controllers/produk_details/subCategoryController";
+>>>>>>> 3192a890fb93685c491c89f7737b2befeb0ac8bc
 
 import {
   getAllBrands,
@@ -21,13 +32,18 @@ import {
   createBrand,
   updateBrand,
   deleteBrand,
+<<<<<<< HEAD
 } from "../controllers/productDetails/brandController";
+=======
+} from "../controllers/produk_details/brandController";
+>>>>>>> 3192a890fb93685c491c89f7737b2befeb0ac8bc
 
 import {
   createMedia,
   deleteMedia,
   getAllMedia,
   getMediaById,
+<<<<<<< HEAD
 } from "../controllers/productDetails/productMediaController"; // Changed import path for media
 
 const produkDetailRoutes = express.Router();
@@ -52,6 +68,32 @@ produkDetailRoutes.get("/brands/:id", getBrandById);
 produkDetailRoutes.post("/brands", createBrand);
 produkDetailRoutes.put("/brands/:id", updateBrand);
 produkDetailRoutes.delete("/brands/:id", deleteBrand);
+=======
+} from "../controllers/produk_details/productMediaController";
+
+const produkDetailRoutes = express.Router();
+
+// Kategori routes
+produkDetailRoutes.get("/category", getAllCategories);
+produkDetailRoutes.get("/category/:id", getCategoryById);
+produkDetailRoutes.post("/category", createCategory);
+produkDetailRoutes.put("/category/:id", updateCategory);
+produkDetailRoutes.delete("/category/:id", deleteCategory);
+
+// SubKategori routes
+produkDetailRoutes.get("/sub_category", getAllSubCategories);
+produkDetailRoutes.get("/sub_category/:id", getSubCategoryById);
+produkDetailRoutes.post("/sub_category", createSubCategory);
+produkDetailRoutes.put("/sub_category/:id", updateSubCategory);
+produkDetailRoutes.delete("/sub_category/:id", deleteSubCategory);
+
+// Brand routes
+produkDetailRoutes.get("/brand", getAllBrands);
+produkDetailRoutes.get("/brand/:id", getBrandById);
+produkDetailRoutes.post("/brand", createBrand);
+produkDetailRoutes.put("/brand/:id", updateBrand);
+produkDetailRoutes.delete("/brand/:id", deleteBrand);
+>>>>>>> 3192a890fb93685c491c89f7737b2befeb0ac8bc
 
 // Media routes
 produkDetailRoutes.get("/media", getAllMedia);

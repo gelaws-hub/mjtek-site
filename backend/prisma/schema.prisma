@@ -7,6 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+<<<<<<< HEAD
 model Product {
   id              Int     @id @default(autoincrement())
   categoryId      Int
@@ -118,10 +119,124 @@ model User {
   TransactionLog TransactionLog[]
 
   Role Role @relation(fields: [roleId], references: [id])
+=======
+model product {
+  id               Int     @id @default(autoincrement())
+  category_id      Int
+  sub_category_id  Int?
+  brand_id         Int
+  product_name     String
+  price            Decimal @db.Decimal(10, 2)
+  description      String? @db.Text
+  estimated_weight Decimal @db.Decimal(10, 2)
+  stock            Int
+  is_deleted       Boolean @default(false)
+
+  category           category             @relation(fields: [category_id], references: [id])
+  sub_category       sub_category?        @relation(fields: [sub_category_id], references: [id])
+  brand              brand                @relation(fields: [brand_id], references: [id])
+  cart               cart[]
+  favorite           favorite[]
+  media              media[]
+  simulation_detail  simulation_detail[]
+  transaction_detail transaction_detail[]
+  product_ram_type   product_ram_type[]
+  product_socket     product_socket[]
+
+  @@index([category_id])
+  @@index([sub_category_id])
+  @@index([brand_id])
+}
+
+model category {
+  id            Int       @id @default(autoincrement())
+  category_name String    @unique
+  product       product[]
+}
+
+model sub_category {
+  id                Int       @id @default(autoincrement())
+  sub_category_name String    @unique
+  product           product[]
+}
+
+model brand {
+  id         Int       @id @default(autoincrement())
+  brand_name String    @unique
+  product    product[]
+}
+
+model socket {
+  id             Int              @id @default(autoincrement())
+  socket_name    String           @unique
+  product_socket product_socket[]
+}
+
+model product_socket {
+  id         Int     @id @default(autoincrement())
+  product_id Int
+  socket_id  Int
+  product    product @relation(fields: [product_id], references: [id])
+  socket     socket  @relation(fields: [socket_id], references: [id])
+}
+
+model ram_type {
+  id               Int                @id @default(autoincrement())
+  ram_type_name    String             @unique
+  product_ram_type product_ram_type[]
+}
+
+model product_ram_type {
+  id          Int      @id @default(autoincrement())
+  product_id  Int
+  ram_type_id Int
+  product     product  @relation(fields: [product_id], references: [id])
+  ram_type    ram_type @relation(fields: [ram_type_id], references: [id])
+}
+
+model simulation {
+  id                Int                 @id @default(autoincrement())
+  user_id           String
+  title             String
+  description       String
+  date              DateTime
+  user              user                @relation(fields: [user_id], references: [id])
+  simulation_detail simulation_detail[]
+
+  @@index([user_id])
+}
+
+model simulation_detail {
+  id            Int        @id @default(autoincrement())
+  simulation_id Int
+  product_id    Int
+  simulation    simulation @relation(fields: [simulation_id], references: [id])
+  product       product    @relation(fields: [product_id], references: [id])
+
+  @@index([simulation_id, product_id])
+}
+
+model user {
+  id              String            @id @default(uuid())
+  role_id         Int
+  username        String
+  email           String            @unique(map: "user_email_unique")
+  password        String
+  address         String
+  phone_number    String
+  simulation      simulation[]
+  transaction     transaction[]
+  cart            cart[]
+  favorite        favorite[]
+  transaction_log transaction_log[]
+
+  role role @relation(fields: [role_id], references: [id])
+>>>>>>> 3192a890fb93685c491c89f7737b2befeb0ac8bc
 
   @@unique([email])
 }
 
+<<<<<<< HEAD
 model Cart {
   id         Int      @id @default(autoincrement())
   productId  Int
@@ -193,4 +308,77 @@ model TransactionLog {
 
   Transaction Transaction @relation(fields: [transactionId], references: [id])
   User        User        @relation(fields: [userId], references: [id])
+=======
+model cart {
+  id          Int      @id @default(autoincrement())
+  product_id  Int
+  user_id     String
+  quantity    Int      @default(1)
+  date        DateTime
+  product     product  @relation(fields: [product_id], references: [id])
+  user        user     @relation(fields: [user_id], references: [id])
+  is_selected Boolean  @default(true)
+
+  @@index([product_id])
+  @@index([user_id])
+}
+
+model transaction {
+  id                 Int                  @id @default(autoincrement())
+  user_id            String
+  total_items        Int
+  total_price        Decimal              @db.Decimal(10, 2)
+  description        String
+  user               user                 @relation(fields: [user_id], references: [id])
+  transaction_detail transaction_detail[]
+  transaction_log    transaction_log[]
+
+  @@index([user_id])
+}
+
+model transaction_detail {
+  id             Int         @id @default(autoincrement())
+  product_id     Int
+  transaction_id Int
+  quantity       Int
+  total_price    Decimal     @db.Decimal(10, 2)
+  product        product     @relation(fields: [product_id], references: [id])
+  transaction    transaction @relation(fields: [transaction_id], references: [id])
+
+  @@index([product_id, transaction_id])
+}
+
+model favorite {
+  id         Int     @id @default(autoincrement())
+  product_id Int
+  user_id    String
+  product    product @relation(fields: [product_id], references: [id])
+  user       user    @relation(fields: [user_id], references: [id])
+}
+
+model media {
+  id         Int     @id @default(autoincrement())
+  product_id Int
+  source     String
+  file_type  String
+  product    product @relation(fields: [product_id], references: [id])
+}
+
+model role {
+  id          Int    @id @default(autoincrement())
+  role_name   String
+  description String
+  user        user[]
+}
+
+model transaction_log {
+  id             Int      @id @default(autoincrement())
+  transaction_id Int
+  user_id        String
+  order_status   Int
+  timestamp      DateTime
+
+  transaction transaction @relation(fields: [transaction_id], references: [id])
+  user        user        @relation(fields: [user_id], references: [id])
+>>>>>>> 3192a890fb93685c491c89f7737b2befeb0ac8bc
 }

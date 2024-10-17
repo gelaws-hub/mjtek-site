@@ -28,6 +28,7 @@ export const getSocketById = async (req: Request, res: Response) => {
 };
 
 export const createSocket = async (req: Request, res: Response) => {
+<<<<<<< HEAD
   const { socketName } = req.body; // Update variable name for consistency
   if (!socketName) {
     return res.status(400).json({ error: "Socket name is required" });
@@ -35,8 +36,17 @@ export const createSocket = async (req: Request, res: Response) => {
   try {
     const newSocket = await prisma.socket.create({
       data: { socketName },
+=======
+  const { socket_name } = req.body; // Updated to underscore case
+  if (!socket_name) {
+    return res.status(400).json({ error: "Socket name is required" });
+  }
+  try {
+    const new_socket = await prisma.socket.create({
+      data: { socket_name },
+>>>>>>> 3192a890fb93685c491c89f7737b2befeb0ac8bc
     });
-    res.status(201).json({ socket: newSocket });
+    res.status(201).json({ socket: new_socket });
   } catch (error: any) {
     console.error("Error creating new socket:", error.message);
     res.status(500).json({ error: "Internal server error" });
@@ -45,6 +55,7 @@ export const createSocket = async (req: Request, res: Response) => {
 
 export const updateSocket = async (req: Request, res: Response) => {
   const { id } = req.params;
+<<<<<<< HEAD
   const { socketName } = req.body; // Update variable name for consistency
   if (!socketName) {
     return res.status(400).json({ error: "Socket name is required" });
@@ -53,11 +64,24 @@ export const updateSocket = async (req: Request, res: Response) => {
     const updatedSocket = await prisma.socket.update({
       where: { id: parseInt(id) },
       data: { socketName },
+=======
+  const { socket_name } = req.body; // Updated to underscore case
+  if (!socket_name) {
+    return res.status(400).json({ error: "Socket name is required" });
+  }
+  try {
+    const updated_socket = await prisma.socket.update({
+      where: { id: parseInt(id) },
+      data: { socket_name },
+>>>>>>> 3192a890fb93685c491c89f7737b2befeb0ac8bc
     });
-    res.status(200).json({ socket: updatedSocket });
+    res.status(200).json({ socket: updated_socket });
   } catch (error: any) {
     if (error.code === "P2025") {
+<<<<<<< HEAD
       // Prisma error code for "Record to update not found"
+=======
+>>>>>>> 3192a890fb93685c491c89f7737b2befeb0ac8bc
       return res.status(404).json({ error: "Socket not found" });
     }
     console.error("Error updating socket:", error.message);
@@ -74,7 +98,10 @@ export const deleteSocket = async (req: Request, res: Response) => {
     res.status(204).send(); // No content
   } catch (error: any) {
     if (error.code === "P2025") {
+<<<<<<< HEAD
       // Prisma error code for "Record to delete not found"
+=======
+>>>>>>> 3192a890fb93685c491c89f7737b2befeb0ac8bc
       return res.status(404).json({ error: "Socket not found" });
     }
     console.error("Error deleting socket:", error.message);

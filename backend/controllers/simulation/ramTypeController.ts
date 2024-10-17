@@ -4,7 +4,11 @@ import prisma from "../../utils/database";
 // Get all RamType
 export const getAllRamTypes = async (req: Request, res: Response) => {
   try {
+<<<<<<< HEAD
     const ramTypes = await prisma.ramType.findMany();
+=======
+    const ramTypes = await prisma.ram_type.findMany();
+>>>>>>> 3192a890fb93685c491c89f7737b2befeb0ac8bc
     res.status(200).json(ramTypes);
   } catch (error: any) {
     console.error("Error fetching all RAM types:", error.message);
@@ -16,7 +20,11 @@ export const getAllRamTypes = async (req: Request, res: Response) => {
 export const getRamTypeById = async (req: Request, res: Response) => {
   const { id } = req.params; // Assuming your schema uses "id" for primary key
   try {
+<<<<<<< HEAD
     const ramType = await prisma.ramType.findUnique({
+=======
+    const ramType = await prisma.ram_type.findUnique({
+>>>>>>> 3192a890fb93685c491c89f7737b2befeb0ac8bc
       where: { id: parseInt(id) },
     });
     if (!ramType) {
@@ -34,8 +42,13 @@ export const getRamTypeById = async (req: Request, res: Response) => {
 export const createRamType = async (req: Request, res: Response) => {
   const { name } = req.body; // Assuming 'name' is the field for RAM type name
   try {
+<<<<<<< HEAD
     const newRamType = await prisma.ramType.create({
       data: { ramTypeName: name },
+=======
+    const newRamType = await prisma.ram_type.create({
+      data: { ram_type_name: name },
+>>>>>>> 3192a890fb93685c491c89f7737b2befeb0ac8bc
     });
     res.status(201).json(newRamType);
   } catch (error: any) {
@@ -49,9 +62,15 @@ export const updateRamType = async (req: Request, res: Response) => {
   const { id } = req.params;
   const { name } = req.body;
   try {
+<<<<<<< HEAD
     const updatedRamType = await prisma.ramType.update({
       where: { id: parseInt(id) },
       data: { ramTypeName: name },
+=======
+    const updatedRamType = await prisma.ram_type.update({
+      where: { id: parseInt(id) },
+      data: { ram_type_name: name },
+>>>>>>> 3192a890fb93685c491c89f7737b2befeb0ac8bc
     });
     res.status(200).json(updatedRamType);
   } catch (error: any) {
@@ -64,7 +83,11 @@ export const updateRamType = async (req: Request, res: Response) => {
 export const deleteRamType = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
+<<<<<<< HEAD
     await prisma.ramType.delete({
+=======
+    await prisma.ram_type.delete({
+>>>>>>> 3192a890fb93685c491c89f7737b2befeb0ac8bc
       where: { id: parseInt(id) },
     });
     res.status(204).end();
