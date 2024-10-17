@@ -14,6 +14,10 @@ interface Product {
   product_name: string;
   price: number;
   media: Media[];
+  category: {
+    id: number;
+    category_name: string;
+  };
 }
 
 interface Category {
