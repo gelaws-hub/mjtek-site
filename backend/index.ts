@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
@@ -7,16 +6,6 @@ import productDetailRoutes from "./routes/productDetailRoutes"; // Renamed to 'p
 import simulationRoutes from "./routes/simulationRoutes"; // Remains the same
 import transactionRoutes from "./routes/transactionRoutes"; // Remains the same
 import transactionLogRoutes from "./routes/transactionLogRoutes"; // Remains the same
-=======
-import express from 'express';
-import bodyParser from 'body-parser';
-import cors from 'cors';
-import produkRoutes from './routes/productRoutes';
-import produkDetailRoutes from './routes/productDetailRoutes'; 
-import simulationRoutes from './routes/simulationRoutes';
-import transaksiRoutes from './routes/transactionRoutes';
-
->>>>>>> 3192a890fb93685c491c89f7737b2befeb0ac8bc
 
 const app = express();
 const PORT = process.env.PORT || 5000;

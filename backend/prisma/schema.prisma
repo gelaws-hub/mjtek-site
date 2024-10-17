@@ -7,119 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-<<<<<<< HEAD
-model Product {
-  id              Int     @id @default(autoincrement())
-  categoryId      Int
-  subCategoryId   Int?
-  brandId         Int
-  productName     String
-  price           Decimal @db.Decimal(10, 2)
-  description     String? @db.Text
-  estimatedWeight Decimal @db.Decimal(10, 2)
-  stock           Int
-  isDeleted       Boolean @default(false)
-
-  Category          Category            @relation(fields: [categoryId], references: [id])
-  SubCategory       SubCategory?        @relation(fields: [subCategoryId], references: [id])
-  Brand             Brand               @relation(fields: [brandId], references: [id])
-  Cart              Cart[]
-  Favorite          Favorite[]
-  Media             Media[]
-  SimulationDetail  SimulationDetail[]
-  TransactionDetail TransactionDetail[]
-  ProductRamType    ProductRamType[]
-  ProductSocket     ProductSocket[]
-
-  @@index([categoryId])
-  @@index([subCategoryId])
-  @@index([brandId])
-}
-
-model Category {
-  id           Int       @id @default(autoincrement())
-  categoryName String    @unique
-  Product      Product[]
-}
-
-model SubCategory {
-  id              Int       @id @default(autoincrement())
-  subCategoryName String    @unique
-  Product         Product[]
-}
-
-model Brand {
-  id        Int       @id @default(autoincrement())
-  brandName String    @unique
-  Product   Product[]
-}
-
-model Socket {
-  id            Int             @id @default(autoincrement())
-  socketName    String          @unique
-  ProductSocket ProductSocket[]
-}
-
-model ProductSocket {
-  id        Int     @id @default(autoincrement())
-  productId Int
-  socketId  Int
-  Product   Product @relation(fields: [productId], references: [id])
-  Socket    Socket  @relation(fields: [socketId], references: [id])
-}
-
-model RamType {
-  id             Int              @id @default(autoincrement())
-  ramTypeName    String           @unique
-  ProductRamType ProductRamType[]
-}
-
-model ProductRamType {
-  id        Int     @id @default(autoincrement())
-  productId Int
-  ramTypeId Int
-  Product   Product @relation(fields: [productId], references: [id])
-  RamType   RamType @relation(fields: [ramTypeId], references: [id])
-}
-
-model Simulation {
-  id               Int                @id @default(autoincrement())
-  userId           String
-  title            String
-  description      String
-  date             DateTime
-  User             User               @relation(fields: [userId], references: [id])
-  SimulationDetail SimulationDetail[]
-
-  @@index([userId])
-}
-
-model SimulationDetail {
-  id           Int        @id @default(autoincrement())
-  simulationId Int
-  productId    Int
-  Simulation   Simulation @relation(fields: [simulationId], references: [id])
-  Product      Product    @relation(fields: [productId], references: [id])
-
-  @@index([simulationId, productId])
-}
-
-model User {
-  id             String           @id @default(uuid())
-  roleId         Int
-  username       String
-  email          String           @unique(map: "User_email_unique")
-  password       String
-  address        String
-  phoneNumber    String
-  Simulation     Simulation[]
-  Transaction    Transaction[]
-  Cart           Cart[]
-  Favorite       Favorite[]
-  TransactionLog TransactionLog[]
-
-  Role Role @relation(fields: [roleId], references: [id])
-=======
 model product {
   id               Int     @id @default(autoincrement())
   category_id      Int
@@ -231,84 +118,10 @@ model user {
   transaction_log transaction_log[]
 
   role role @relation(fields: [role_id], references: [id])
->>>>>>> 3192a890fb93685c491c89f7737b2befeb0ac8bc
 
   @@unique([email])
 }
 
-<<<<<<< HEAD
-model Cart {
-  id         Int      @id @default(autoincrement())
-  productId  Int
-  userId     String
-  quantity   Int      @default(1)
-  date       DateTime
-  Product    Product  @relation(fields: [productId], references: [id])
-  User       User     @relation(fields: [userId], references: [id])
-  isSelected Boolean  @default(true)
-
-  @@index([productId])
-  @@index([userId])
-}
-
-model Transaction {
-  id                Int                 @id @default(autoincrement())
-  userId            String
-  totalItems        Int
-  totalPrice        Decimal             @db.Decimal(10, 2)
-  description       String
-  User              User                @relation(fields: [userId], references: [id])
-  TransactionDetail TransactionDetail[]
-  TransactionLog    TransactionLog[]
-
-  @@index([userId])
-}
-
-model TransactionDetail {
-  id            Int         @id @default(autoincrement())
-  productId     Int
-  transactionId Int
-  quantity      Int
-  totalPrice    Decimal     @db.Decimal(10, 2)
-  Product       Product     @relation(fields: [productId], references: [id])
-  Transaction   Transaction @relation(fields: [transactionId], references: [id])
-
-  @@index([productId, transactionId])
-}
-
-model Favorite {
-  id        Int     @id @default(autoincrement())
-  productId Int
-  userId    String
-  Product   Product @relation(fields: [productId], references: [id])
-  User      User    @relation(fields: [userId], references: [id])
-}
-
-model Media {
-  id        Int     @id @default(autoincrement())
-  productId Int
-  source    String
-  fileType  String
-  Product   Product @relation(fields: [productId], references: [id])
-}
-
-model Role {
-  id          Int    @id @default(autoincrement())
-  roleName    String
-  description String
-  User        User[]
-}
-
-model TransactionLog {
-  id            Int      @id @default(autoincrement())
-  transactionId Int
-  userId        String
-  orderStatus   Int
-  timestamp     DateTime
-
-  Transaction Transaction @relation(fields: [transactionId], references: [id])
-  User        User        @relation(fields: [userId], references: [id])
-=======
 model cart {
   id          Int      @id @default(autoincrement())
   product_id  Int
@@ -380,5 +193,4 @@ model transaction_log {
 
   transaction transaction @relation(fields: [transaction_id], references: [id])
   user        user        @relation(fields: [user_id], references: [id])
->>>>>>> 3192a890fb93685c491c89f7737b2befeb0ac8bc
 }
