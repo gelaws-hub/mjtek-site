@@ -1,328 +1,205 @@
-import { PrismaClient, User } from '@prisma/client';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
 import { Request, Response } from 'express';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import { PrismaClient } from '@prisma/client';
+import { authenticator } from 'otplib';
+import crypto from 'crypto';
+import NodeCache from 'node-cache';
 
 const prisma = new PrismaClient();
+const cache = new NodeCache();
 
-export const Welcome = (req: Request, res: Response) => {
-    res.send("Welcome to MJ Tek API!");
+// Register User
+export const register = async (req: Request, res: Response) => {
+  try {
+    const { name, email, password, role } = req.body;
+
+    if (!name || !email || !password) {
+      return res.status(422).json({ message: 'Please fill in all fields (name, email, password)' });
+    }
+
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+
+    if (existingUser) {
+      return res.status(409).json({ message: 'Email already exists' });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = await prisma.user.create({
+      data: {
+        name,
+        email,
+        password: hashedPassword,
+        role: role ?? 'member',
+        faEnable: false,
+        faSecret: null,
+        address: '', // add this
+        phone_number: '', // add this
+      },
+    });
+
+    return res.status(201).json({
+      message: 'User registered successfully',
+      id: newUser.id,
+    });
+  } catch (error:any) {
+    return res.status(500).json({ message: error.message });
+  }
 };
 
-export const Register = async (req: Request, res: Response) => {
-    const { username, email, password, confPassword, alamat, no_hp } = req.body;
+// Login User
+export const login = async (req: Request, res: Response) => {
+  try {
+    const { email, password } = req.body;
 
-    // Memeriksa apakah password sesuai
-    if (password !== confPassword) {
-        return res.status(400).json({
-            error: true,
-            message: "Password tidak sesuai",
-        });
+    if (!email || !password) {
+      return res.status(422).json({ message: 'Please fill in all fields (email and password)' });
     }
 
-    try {
-        // Memeriksa apakah email sudah dipakai sebelumnya
-        const existingUser = await prisma.user.findUnique({
-            where: {
-                email: email,
-            },
-        });
+    const user = await prisma.user.findUnique({ where: { email } });
 
-        if (existingUser) {
-            return res.status(400).json({
-                error: true,
-                message: "Email has already been taken",
-            });
-        }
-
-        // Jika email belum dipakai, lanjutkan dengan proses registrasi
-        const salt = await bcrypt.genSalt();
-        const hashPassword = await bcrypt.hash(password, salt);
-
-        await prisma.user.create({
-            data: {
-                username: username,
-                email: email,
-                password: hashPassword,
-                alamat: alamat,
-                no_hp: no_hp,
-                id_role: 1 // Default role (buyer)
-            },
-        });
-
-        res.json({
-            error: false,
-            message: "Register Succeed!",
-        });
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({
-            error: true,
-            message: "Internal Server Error",
-        });
+    if (!user) {
+      return res.status(401).json({ message: 'Email or password is invalid' });
     }
+
+    const passwordMatch = await bcrypt.compare(password, user.password);
+
+    if (!passwordMatch) {
+      return res.status(401).json({ message: 'Email or password is invalid' });
+    }
+
+    if (user.faEnable) {
+      const tempToken = crypto.randomUUID();
+      cache.set(`tempToken_${tempToken}`, user.id, parseInt(process.env.CACHE_TEMP_TOKEN_EXPIRATION!));
+      return res.status(200).json({ tempToken, expiresInSeconds: process.env.CACHE_TEMP_TOKEN_EXPIRATION });
+    } else {
+      const accessToken = jwt.sign({ userId: user.id }, process.env.ACCESS_TOKEN_SECRET!, {
+        subject: 'accessApi',
+        expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN!,
+      });
+
+      const refreshToken = jwt.sign({ userId: user.id }, process.env.REFRESH_TOKEN_SECRET!, {
+        subject: 'refreshToken',
+        expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN!,
+      });
+
+      await prisma.userRefreshToken.create({
+        data: {
+          refreshToken,
+          userId: user.id,
+        },
+      });
+
+      return res.status(200).json({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        accessToken,
+        refreshToken,
+      });
+    }
+  } catch (error:any) {
+    return res.status(500).json({ message: error.message });
+  }
 };
 
-export const Login = async (req: Request, res: Response) => {
-    try {
-        const { email, password } = req.body;
+// TOTP (2FA) Login
+export const login2FA = async (req: Request, res: Response) => {
+  try {
+    const { tempToken, totp } = req.body;
 
-        // Pemeriksaan apakah email dan password diberikan
-        if (!email || !password) {
-            return res.status(400).json({
-                message: "Email dan password dibutuhkan",
-            });
-        }
-
-        const user = await prisma.user.findUnique({
-            where: {
-                email: email,
-            },
-            select: {
-                id_user: true,
-                username: true,
-                email: true,
-                refresh_token: true, // Memastikan memilih refresh_token jika ada dalam skema
-                password: true,
-            },
-        });
-
-        // Pemeriksaan apakah pengguna ditemukan
-        if (!user) {
-            return res.status(400).json({
-                error: true,
-                message: "Email tidak ditemukan",
-            });
-        }
-
-        const match = await bcrypt.compare(password, user.password);
-
-        // Pemeriksaan apakah password cocok
-        if (!match) {
-            return res.status(400).json({
-                error: true,
-                message: "Password salah!",
-            });
-        }
-
-        const userId = user.id_user;
-        const username = user.username;
-
-        const accessToken = jwt.sign({ userId, username, email }, process.env.ACCESS_TOKEN_SECRET!, {
-            expiresIn: '1h',
-        });
-
-        const refreshToken = jwt.sign({ userId, username, email }, process.env.REFRESH_TOKEN_SECRET!, {
-            expiresIn: '180d',
-        });
-
-        // Update refreshToken pada database
-        await prisma.user.update({
-            where: {
-                id_user: userId
-            },
-            data: {
-                refresh_token: refreshToken
-            }
-        });
-
-        res.cookie('refreshToken', refreshToken, {
-            httpOnly: true,
-            maxAge: 24 * 60 * 60 * 1000,
-        });
-
-        res.json({
-            error: false,
-            message: "success",
-            loginResult: {
-                userId,
-                email,
-                username,
-                token: accessToken
-            }
-        });
-
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Internal Server Error" });
+    if (!tempToken || !totp) {
+      return res.status(422).json({ message: 'Please fill in all fields (tempToken and totp)' });
     }
+
+    const userId = cache.get(`tempToken_${tempToken}`) as string;
+
+    if (!userId) {
+      return res.status(401).json({ message: 'The provided temporary token is incorrect or expired' });
+    }
+    
+    
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+
+    const verified = authenticator.check(totp, user!.faSecret!);
+
+    if (!verified) {
+      return res.status(401).json({ message: 'The provided TOTP is incorrect or expired' });
+    }
+
+    const accessToken = jwt.sign({ userId: user!.id }, process.env.ACCESS_TOKEN_SECRET!, {
+      subject: 'accessApi',
+      expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN!,
+    });
+
+    const refreshToken = jwt.sign({ userId: user!.id }, process.env.REFRESH_TOKEN_SECRET!, {
+      subject: 'refreshToken',
+      expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN!,
+    });
+
+    await prisma.userRefreshToken.create({
+      data: {
+        refreshToken,
+        userId: user!.id,
+      },
+    });
+
+    return res.status(200).json({
+      id: user!.id,
+      name: user!.name,
+      email: user!.email,
+      accessToken,
+      refreshToken,
+    });
+  } catch (error:any) {
+    return res.status(500).json({ message: error.message });
+  }
 };
 
+// Refresh Token
+export const refreshToken = async (req: Request, res: Response) => {
+  try {
+    const { refreshToken } = req.body;
 
-export const Logout = async (req: Request, res: Response) => {
-    const refreshToken = req.cookies.refreshToken;
-    if (!refreshToken) return res.status(204).json({ message: "No refresh token provided" });
-
-    try {
-        const user = await prisma.user.findUnique({
-            where: {
-                refresh_token: refreshToken
-            }
-        });
-
-        if (!user) return res.status(204).json({ message: "No user found with this token" });
-
-        const userId = user.id_user;
-
-        await prisma.user.update({
-            where: {
-                id_user: userId
-            },
-            data: {
-                refresh_token: null
-            }
-        });
-
-        res.clearCookie('refreshToken', {
-            httpOnly: true,
-            secure: true, // make sure to set secure to true if you're using HTTPS
-            sameSite: 'strict' // help prevent CSRF attacks
-        });
-
-        return res.status(200).json({ message: "Logout successful" });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Internal Server Error" });
+    if (!refreshToken) {
+      return res.status(401).json({ message: 'Refresh token not found' });
     }
-};
 
-export const getUsers = async(req: Request, res: Response) => {
-    try {
-        const users = await prisma.user.findMany();
-        res.json({
-            error: false,
-            users: users
-        });
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({
-            error: true,
-            message: "Internal Server Error"
-        });
+    const decodedRefreshToken = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET!);
+
+    const userRefreshToken = await prisma.userRefreshToken.findFirst({
+      where: { refreshToken, userId: (decodedRefreshToken as any).userId },
+    });
+
+    if (!userRefreshToken) {
+      return res.status(401).json({ message: 'Refresh token invalid or expired' });
     }
-};
 
-export const getUser = async (req: Request, res: Response) => {
-    try {
-        // Mengambil ID pengguna dari parameter permintaan
-        const userId = parseInt(req.params.id);
+    await prisma.userRefreshToken.delete({ where: { id: userRefreshToken.id } });
 
-        // Mencari pengguna berdasarkan ID
-        const user = await prisma.user.findUnique({
-            where: {
-                id_user: userId.toString()
-            },
-        });
+    const newAccessToken = jwt.sign({ userId: (decodedRefreshToken as any).userId }, process.env.ACCESS_TOKEN_SECRET!, {
+      subject: 'accessApi',
+      expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN!,
+    });
 
-        // Jika pengguna ditemukan, kirimkan data pengguna sebagai respons JSON
-        if (user) {
-            res.json({
-                error: false,
-                userData: {
-                    id_user: user.id_user,
-                    username: user.username,
-                    email: user.email,
-                    alamat: user.alamat,
-                    no_hp: user.no_hp,
-                    // tambahkan properti lainnya sesuai kebutuhan
-                }
-            });
-        } else {
-            // Jika pengguna tidak ditemukan, kirim respons dengan status 404
-            res.status(404).json({
-                error: true,
-                message: "Pengguna tidak ditemukan"
-            });
-        }
-    } catch (error) {
-        // Tangani kesalahan dan kirim respons dengan status 500
-        console.error(error);
-        res.status(500).json({
-            error: true,
-            message: "Terjadi kesalahan server"
-        });
-    }
-};
+    const newRefreshToken = jwt.sign({ userId: (decodedRefreshToken as any).userId }, process.env.REFRESH_TOKEN_SECRET!, {
+      subject: 'refreshToken',
+      expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN!,
+    });
 
+    await prisma.userRefreshToken.create({
+      data: {
+        refreshToken: newRefreshToken,
+        userId: (decodedRefreshToken as any).userId,
+      },
+    });
 
-export const editProfile = async (req: Request, res: Response) => {
-    try {
-        const userId = parseInt(req.params.id);
-
-        const user = await prisma.user.findUnique({
-            where: {
-                id_user: userId.toString()
-            }
-        });
-
-        if (user) {
-            const { alamat, no_hp } = req.body;
-
-            await prisma.user.update({
-                where: {
-                    id_user: userId.toString()
-                },
-                data: {
-                    alamat: alamat,
-                    no_hp: no_hp
-                }
-            });
-
-            res.json({
-                error: false,
-                message: "Profil berhasil diperbarui"
-            });
-        } else {
-            res.status(403).json({
-                error: true,
-                message: "Pengguna tidak ditemukan"
-            });
-        }
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({
-            error: true,
-            message: "Terjadi kesalahan server"
-        });
-    }
-};
-
-export const deleteAccount = async (req: Request, res: Response) => {
-    try {
-        const { userId } = req.body;
-
-        // Mencari pengguna berdasarkan ID
-        const user = await prisma.user.findUnique({
-            where: {
-                id_user: userId
-            }
-        });
-
-        // Jika pengguna ditemukan, hapus akunnya
-        if (user) {
-            await prisma.user.delete({
-                where: {
-                    id_user: userId,
-                },
-            });
-
-            res.json({
-                error: false,
-                message: "Akun berhasil dihapus",
-            });
-        } else {
-            // Jika pengguna tidak ditemukan, kirim respons dengan status 404
-            res.status(404).json({
-                error: true,
-                message: "Pengguna tidak ditemukan",
-            });
-        }
-    } catch (error) {
-        // Tangani kesalahan dan kirim respons dengan status 500
-        console.error(error);
-        res.status(500).json({
-            error: true,
-            message: "Terjadi kesalahan server",
-        });
-    }
+    return res.status(200).json({
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken,
+    });
+  } catch (error:any) {
+    return res.status(500).json({ message: error.message });
+  }
 };

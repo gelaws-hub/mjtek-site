@@ -106,11 +106,14 @@ model simulation_detail {
 model user {
   id              String            @id @default(uuid())
   role_id         Int
-  username        String
+  name            String
   email           String            @unique(map: "user_email_unique")
   password        String
   address         String
   phone_number    String
+  faEnable        Boolean           @default(false)  // Field untuk status 2FA (Two-Factor Authentication)
+  faSecret        String?                               // Field untuk menyimpan secret TOTP (opsional)
+  refreshTokens   userRefreshToken[]                   // Relasi ke refresh token (untuk multiple tokens)
   simulation      simulation[]
   transaction     transaction[]
   cart            cart[]
@@ -121,6 +124,15 @@ model user {
 
   @@unique([email])
 }
+
+model userRefreshToken {
+  id          String    @id @default(uuid())
+  refreshToken String
+  userId      String
+  createdAt   DateTime  @default(now())
+  user        user      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
 
 model cart {
   id          Int      @id @default(autoincrement())
