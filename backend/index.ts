@@ -1,13 +1,10 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import produkRoutes from './routes/produkRoutes';
-import produkDetailRoutes from './routes/produkDetailRoutes'; 
+import produkRoutes from './routes/productRoutes';
+import produkDetailRoutes from './routes/productDetailRoutes'; 
 import simulationRoutes from './routes/simulationRoutes';
-import userRoutes from './routes/userRoutes';
-
-import dotenv from "dotenv";
-import cookieParser from "cookie-parser";
+import transaksiRoutes from './routes/transactionRoutes';
 
 dotenv.config();
 
@@ -24,7 +21,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/', produkRoutes);
 app.use('/', produkDetailRoutes);
 app.use('/', simulationRoutes);
-app.use('/', userRoutes);
+app.use('/', transaksiRoutes)
 
 // Root route
 app.get('/', (req, res) => {

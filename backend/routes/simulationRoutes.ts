@@ -7,37 +7,16 @@ import {
   deleteSocket,
 } from "../controllers/simulation/socketController";
 
-import {
-  getAllDetailRAM,
-  getDetailRAMById,
-  createDetailRAM,
-  updateDetailRAM,
-  deleteDetailRAM,
-} from "../controllers/simulation/detailRAMController";
+import { createRamType, deleteRamType, getAllRamTypes, getRamTypeById, updateRamType } from "../controllers/simulation/ramTypeController";
 
 import {
-  getAllDetailCPU,
-  getDetailCPUById,
-  createDetailCPU,
-  updateDetailCPU,
-  deleteDetailCPU,
-} from "../controllers/simulation/detailCPUController";
-
-import {
-  getAllDetailMotherboard,
-  getDetailMotherboardById,
-  createDetailMotherboard,
-  updateDetailMotherboard,
-  deleteDetailMotherboard,
-} from "../controllers/simulation/detailMotherboardController";
-
-import {
-  getAllTipeRAM,
-  getTipeRAMById,
-  createTipeRAM,
-  updateTipeRAM,
-  deleteTipeRAM,
-} from "../controllers/simulation/TipeRAMController";
+  createSimulation,
+  deleteSimulation,
+  getAllSimulations,
+  getSimulationById,
+  updateSimulation,
+} from "../controllers/simulation/simulatioController";
+import { createSimulationDetail, deleteSimulationDetail, getAllSimulationDetails, getSimulationDetailById } from "../controllers/simulation/simulationDetailController";
 
 const simulationRoutes = express.Router();
 
@@ -48,32 +27,24 @@ simulationRoutes.post("/socket", createSocket);
 simulationRoutes.put("/socket/:id", updateSocket);
 simulationRoutes.delete("/socket/:id", deleteSocket);
 
-// Detail_RAM routes
-simulationRoutes.get("/detailram", getAllDetailRAM);
-simulationRoutes.get("/detailram/:id", getDetailRAMById);
-simulationRoutes.post("/detailram", createDetailRAM);
-simulationRoutes.put("/detailram/:id", updateDetailRAM);
-simulationRoutes.delete("/detailram/:id", deleteDetailRAM);
-
-// Detail_CPU routes
-simulationRoutes.get("/detailcpu", getAllDetailCPU);
-simulationRoutes.get("/detailcpu/:id", getDetailCPUById);
-simulationRoutes.post("/detailcpu", createDetailCPU);
-simulationRoutes.put("/detailcpu/:id", updateDetailCPU);
-simulationRoutes.delete("/detailcpu/:id", deleteDetailCPU);
-
-// Detail_Motherboard routes
-simulationRoutes.get("/detailmotherboard", getAllDetailMotherboard);
-simulationRoutes.get("/detailmotherboard/:id", getDetailMotherboardById);
-simulationRoutes.post("/detailmotherboard", createDetailMotherboard);
-simulationRoutes.put("/detailmotherboard/:id", updateDetailMotherboard);
-simulationRoutes.delete("/detailmotherboard/:id", deleteDetailMotherboard);
-
 // Tipe_RAM routes
-simulationRoutes.get("/tiperam", getAllTipeRAM);
-simulationRoutes.get("/tiperam/:id", getTipeRAMById);
-simulationRoutes.post("/tiperam", createTipeRAM);
-simulationRoutes.put("/tiperam/:id", updateTipeRAM);
-simulationRoutes.delete("/tiperam/:id", deleteTipeRAM);
+simulationRoutes.get("/tiperam", getAllRamTypes);
+simulationRoutes.get("/tiperam/:id", getRamTypeById);
+simulationRoutes.post("/tiperam", createRamType);
+simulationRoutes.put("/tiperam/:id", updateRamType);
+simulationRoutes.delete("/tiperam/:id", deleteRamType);
+
+// Simulasi routes
+simulationRoutes.get("/simulasi", getAllSimulations);
+simulationRoutes.get("/simulasi/:id", getSimulationById);
+simulationRoutes.post("/simulasi", createSimulation);
+simulationRoutes.put("/simulasi/:id", updateSimulation);
+simulationRoutes.delete("/simulasi/:id", deleteSimulation);
+
+// Detail_Simulasi routes
+simulationRoutes.get("/detailsimulasi", getAllSimulationDetails);
+simulationRoutes.get("/detailsimulasi/:id", getSimulationDetailById);
+simulationRoutes.post("/detailsimulasi", createSimulationDetail);
+simulationRoutes.delete("/detailsimulasi/:id", deleteSimulationDetail);
 
 export default simulationRoutes;

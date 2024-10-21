@@ -18,8 +18,13 @@ An E-Commerce Website for buying PC Components and PC Building Simulation
 Activate the Server with development mode using nodemon
 
 ```bash
-  cd server
+  cd backend
   npm Install
+  npx prisma migrate dev --name init
   npx nodemon
 ```
-    
+```bash
+  cd frontend
+  npm Install
+  npm start
+``` 
