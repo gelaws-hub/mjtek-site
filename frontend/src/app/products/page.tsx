@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Pencil, Trash2, Plus, Search, ChevronDown } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import Image from "next/image";
+import { useRouter } from "next/compat/router";
 
 interface Product {
   id: number;
@@ -41,6 +42,8 @@ const ProductManagementPage = () => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [alert, setAlert] = useState({ show: false, message: "", type: "" });
+
+  const router = useRouter();
 
   const initialFormData: ProductFormData = {
     product_name: "",
@@ -183,7 +186,8 @@ const ProductManagementPage = () => {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Product Management</h1>
         <button
-          onClick={() => setIsAddModalOpen(true)}
+          // onClick={() => setIsAddModalOpen(true)}
+          onClick={() => router?.push("/add-product")}
           className="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors"
         >
           <Plus />
