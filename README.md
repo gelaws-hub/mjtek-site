@@ -21,10 +21,16 @@ Activate the Server with development mode using nodemon
   cd backend
   npm Install
   npx prisma migrate dev --name init
-  npx nodemon
+  npm start
 ```
+copy paste the .env.copy in the backend and rename it to .env
+
+next go to frontend by openning up a new terminal
 ```bash
   cd frontend
   npm Install
-  npm start
-``` 
+```
+copy paste the .env.local.example and rename it to .env.local then run by using this command
+```bash
+  npm run dev
+```

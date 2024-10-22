@@ -25,8 +25,11 @@ interface ProductCardItemProps {
 export default function ProductCardItem({ product }: ProductCardItemProps) {
   return (
     <Link
-      href={`/${encodeURIComponent(product.category.category_name)}/${encodeURIComponent(product.product_name)}`}
-      className="bg-white overflow-hidden w-full p-2"
+      href={{
+        pathname: `/${encodeURIComponent(product.category.category_name)}/${encodeURIComponent(product.product_name)}`,
+        query: { id: product.id }, // Passing the product_id as a query parameter
+      }}
+      className="bg-white overflow-hidden w-full p-2 rounded-lg hover:shadow-lg hover:shadow-blue-200 transition-all duration-300 ease-in-out"  
     >
       {product.media && product.media.length > 0 && (
         <div className="relative flex aspect-[1/1]">

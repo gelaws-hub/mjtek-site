@@ -2,7 +2,8 @@
 
 import ProductCardItem from "@/components/product/ProductCardItem";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
+import ErrorBoundary from "./_components/ErrorBoundary"; // Import the ErrorBoundary component
 
 interface Media {
   source: string;
@@ -14,6 +15,10 @@ interface Product {
   product_name: string;
   price: number;
   media: Media[];
+  category: {
+    id: number;
+    category_name: string;
+  };
 }
 
 interface Category {
@@ -21,7 +26,7 @@ interface Category {
   category_name: string;
 }
 
-export default function SearchResults() {
+function SearchResultsComponent() {
   const searchParams = useSearchParams();
   const query = searchParams.get("q");
   const [products, setProducts] = useState<Product[]>([]);
@@ -30,46 +35,43 @@ export default function SearchResults() {
   const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
 
   useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/product?q=${encodeURIComponent(
+            query ?? ""
+          )}`
+        );
+        const data = await response.json();
+        setCategories(data.categories);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
     fetchCategories();
   }, [query]);
 
-  // This effect will fetch products whenever the query or selected categories change
   useEffect(() => {
+    const fetchProducts = async (searchTerm: string, categoryIds: number[]) => {
+      try {
+        const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/product`);
+        url.searchParams.append("q", encodeURIComponent(searchTerm));
+        if (categoryIds.length > 0) {
+          url.searchParams.append("categories", categoryIds.join(","));
+        }
+
+        const response = await fetch(url.toString());
+        const data = await response.json();
+        setProducts(data.products);
+        setTotalCount(data.totalCount);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
     if (query) {
       fetchProducts(query, selectedCategories);
     }
-  }, [query, selectedCategories]); // Add selectedCategories to dependencies
-
-  const fetchProducts = async (searchTerm: string, categoryIds: number[]) => {
-    try {
-      const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/product`);
-      url.searchParams.append("q", encodeURIComponent(searchTerm));
-      if (categoryIds.length > 0) {
-        url.searchParams.append("categories", categoryIds.join(","));
-      }
-
-      const response = await fetch(url.toString());
-      const data = await response.json();
-      setProducts(data.products);
-      setTotalCount(data.totalCount);
-    } catch (error) {
-      console.error("Error fetching products:", error);
-    }
-  };
-
-  const fetchCategories = async () => {
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/product?q=${encodeURIComponent(
-          query ?? ""
-        )}`
-      );
-      const data = await response.json();
-      setCategories(data.categories);
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-    }
-  };
+  }, [query, selectedCategories]);
 
   const handleCategoryChange = (categoryId: number) => {
     setSelectedCategories((prev) => {
@@ -127,5 +129,15 @@ export default function SearchResults() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SearchResults() {
+  return (
+    <ErrorBoundary>
+      <Suspense fallback={<div>Loading...</div>}>
+        <SearchResultsComponent />
+      </Suspense>
+    </ErrorBoundary>
   );
 }
