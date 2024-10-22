@@ -1,50 +1,57 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
 import { authenticator } from 'otplib';
 import crypto from 'crypto';
 import NodeCache from 'node-cache';
+import qrcode from 'qrcode';
 
 const prisma = new PrismaClient();
 const cache = new NodeCache();
 
-// Register User
-export const register = async (req: Request, res: Response) => {
+interface CustomRequest extends Request {
+  user: {
+    id: string;
+    
+    // Add other properties of the user object if needed
+  };
+}
+
+
+// REGISTER USER
+export const registerUser = async (req: Request, res: Response) => {
+  const { name, email, password, address, phone_number } = req.body;
+
   try {
-    const { name, email, password, role } = req.body;
-
-    if (!name || !email || !password) {
-      return res.status(422).json({ message: 'Please fill in all fields (name, email, password)' });
-    }
-
-    const existingUser = await prisma.user.findUnique({ where: { email } });
+    // Cek apakah user sudah ada
+    const existingUser = await prisma.user.findUnique({
+      where: { email }
+    });
 
     if (existingUser) {
-      return res.status(409).json({ message: 'Email already exists' });
+      return res.status(400).json({ message: "User already exists" });
     }
 
+    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = await prisma.user.create({
+    // Buat user
+    const user = await prisma.user.create({
       data: {
         name,
         email,
         password: hashedPassword,
-        role: role ?? 'member',
-        faEnable: false,
-        faSecret: null,
-        address: '', // add this
-        phone_number: '', // add this
-      },
+        address,
+        phone_number,
+        role_id: 2, // Set default role sebagai user biasa
+      }
     });
 
-    return res.status(201).json({
-      message: 'User registered successfully',
-      id: newUser.id,
-    });
-  } catch (error:any) {
-    return res.status(500).json({ message: error.message });
+    res.status(201).json({ message: 'User registered successfully', user });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -69,7 +76,7 @@ export const login = async (req: Request, res: Response) => {
       return res.status(401).json({ message: 'Email or password is invalid' });
     }
 
-    if (user.faEnable) {
+    if (user.fa_enable) {
       const tempToken = crypto.randomUUID();
       cache.set(`tempToken_${tempToken}`, user.id, parseInt(process.env.CACHE_TEMP_TOKEN_EXPIRATION!));
       return res.status(200).json({ tempToken, expiresInSeconds: process.env.CACHE_TEMP_TOKEN_EXPIRATION });
@@ -84,10 +91,10 @@ export const login = async (req: Request, res: Response) => {
         expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN!,
       });
 
-      await prisma.userRefreshToken.create({
+      await prisma.user_refresh_token.create({
         data: {
-          refreshToken,
-          userId: user.id,
+          refresh_token: refreshToken,
+          user_id: user.id,
         },
       });
 
@@ -122,7 +129,7 @@ export const login2FA = async (req: Request, res: Response) => {
     
     const user = await prisma.user.findUnique({ where: { id: userId } });
 
-    const verified = authenticator.check(totp, user!.faSecret!);
+    const verified = authenticator.check(totp, user!.fa_secret!);
 
     if (!verified) {
       return res.status(401).json({ message: 'The provided TOTP is incorrect or expired' });
@@ -138,10 +145,10 @@ export const login2FA = async (req: Request, res: Response) => {
       expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN!,
     });
 
-    await prisma.userRefreshToken.create({
+    await prisma.user_refresh_token.create({
       data: {
-        refreshToken,
-        userId: user!.id,
+        refresh_token: refreshToken,
+        user_id: user!.id,
       },
     });
 
@@ -168,15 +175,15 @@ export const refreshToken = async (req: Request, res: Response) => {
 
     const decodedRefreshToken = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET!);
 
-    const userRefreshToken = await prisma.userRefreshToken.findFirst({
-      where: { refreshToken, userId: (decodedRefreshToken as any).userId },
+    const userRefreshToken = await prisma.user_refresh_token.findFirst({
+      where: { refresh_token: refreshToken, user_id: (decodedRefreshToken as any).userId },
     });
 
     if (!userRefreshToken) {
       return res.status(401).json({ message: 'Refresh token invalid or expired' });
     }
 
-    await prisma.userRefreshToken.delete({ where: { id: userRefreshToken.id } });
+    await prisma.user_refresh_token.delete({ where: { id: userRefreshToken.id } });
 
     const newAccessToken = jwt.sign({ userId: (decodedRefreshToken as any).userId }, process.env.ACCESS_TOKEN_SECRET!, {
       subject: 'accessApi',
@@ -188,10 +195,10 @@ export const refreshToken = async (req: Request, res: Response) => {
       expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN!,
     });
 
-    await prisma.userRefreshToken.create({
+    await prisma.user_refresh_token.create({
       data: {
-        refreshToken: newRefreshToken,
-        userId: (decodedRefreshToken as any).userId,
+        refresh_token: newRefreshToken,
+        user_id: (decodedRefreshToken as any).userId,
       },
     });
 
@@ -200,6 +207,141 @@ export const refreshToken = async (req: Request, res: Response) => {
       refreshToken: newRefreshToken,
     });
   } catch (error:any) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+// Generate 2FA QR Code
+export const generate2FAQRCode = async (req: CustomRequest, res: Response) => {
+  try {
+    const user = await prisma.user.findUnique({ where: { id: req.user.id } });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const secret = authenticator.generateSecret();
+    const uri = authenticator.keyuri(user.email, 'yourapp.com', secret);
+
+    // Simpan 2FA secret di database user
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { fa_secret: secret }
+    });
+
+    const qrCode = await qrcode.toBuffer(uri, { type: 'png', margin: 1 });
+
+    res.setHeader('Content-Disposition', 'attachment; filename=qrcode.png');
+    return res.status(200).type('image/png').send(qrCode);
+  } catch (error: any) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+// Validate 2FA
+export const validate2FA = async (req: CustomRequest, res: Response) => {
+  try {
+    const { totp } = req.body;
+
+    if (!totp) {
+      return res.status(422).json({ message: 'TOTP is required' });
+    }
+
+    const user = await prisma.user.findUnique({ where: { id: req.user.id } });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const isValid = authenticator.check(totp, user.fa_secret!);
+
+    if (!isValid) {
+      return res.status(400).json({ message: 'Invalid or expired TOTP' });
+    }
+
+    await prisma.user.update({
+      where: { id: req.user.id },
+      data: { fa_enable: true }
+    });
+
+    return res.status(200).json({ message: 'TOTP validated successfully' });
+  } catch (error: any) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+// Get Current User
+export const getCurrentUser = async (req: CustomRequest, res: Response) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: req.user.id },
+      select: {
+        id: true,
+        name: true,
+        email: true
+      }
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    return res.status(200).json(user);
+  } catch (error: any) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+// Role-based authorization
+export const authorize = (roles: number[]) => {
+  return async (req: CustomRequest, res: Response, next: NextFunction) => {
+    const user = await prisma.user.findUnique({
+      where: { id: req.user.id }
+    });
+
+    if (!user || !roles.includes(user.role_id)) {
+      return res.status(403).json({ message: 'Access denied' });
+    }
+
+    next();
+  };
+};
+
+// Ensure authentication middleware
+export const ensureAuthenticated = async (req: CustomRequest, res: Response, next: NextFunction) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    return res.status(401).json({ message: 'Access token not found' });
+  }
+
+  const token = authHeader.split(' ')[1];
+
+  try {
+    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!);
+    req.user = { id: (decoded as any).userId };
+
+    next();
+  } catch (error:any) {
+    if (error instanceof jwt.TokenExpiredError) {
+      return res.status(401).json({ message: 'Access token expired' });
+    } else if (error instanceof jwt.JsonWebTokenError) {
+      return res.status(401).json({ message: 'Access token invalid' });
+    } else {
+      return res.status(500).json({ message: error.message });
+    }
+  }
+};
+
+// Logout User
+export const logoutUser = async (req: CustomRequest, res: Response) => {
+  try {
+    await prisma.user_refresh_token.deleteMany({
+      where: { user_id: req.user.id }
+    });
+
+    return res.status(204).send();
+  } catch (error: any) {
     return res.status(500).json({ message: error.message });
   }
 };
