@@ -1,13 +1,13 @@
 import express from "express";
-import { addToCart, clearCart, getAllCartByUserId, removeFromCart, updateCartItem } from "../controllers/transaksi/cartController";
+import { addToCart, clearCart, getAllCartByUserId, removeFromCart, updateCartItem } from "../controllers/transaction/cartController";
 
 import {
   getAllFavoritesByUserId,
   addToFavorites,
   removeFromFavorites,
-} from "../controllers/transaksi/favoriteController";
+} from "../controllers/transaction/favoriteController";
 
-import { createTransaction, deleteTransaction, getAllTransaction, getTransactionById, updateTransaction } from '../controllers/transaksi/transactionController';
+import { createTransaction, deleteTransaction, getAllTransaction, getTransactionById, updateTransaction } from '../controllers/transaction/transactionController';
 
 import {
   getAllDetailTransaksi,
@@ -15,7 +15,7 @@ import {
   createDetailTransaksi,
   updateDetailTransaksi,
   deleteDetailTransaksi,
-} from '../controllers/transaksi/transactionDetailController';
+} from '../controllers/transaction/transactionDetailController';
 
 import {
   getAllLogTransaksi,
@@ -23,7 +23,7 @@ import {
   createLogTransaksi,
   updateLogTransaksi,
   deleteLogTransaksi,
-} from '../controllers/transaksi/logTransaksiController';
+} from '../controllers/transaction/transactionLogController';
 
 const transaksiRoutes = express.Router();
 

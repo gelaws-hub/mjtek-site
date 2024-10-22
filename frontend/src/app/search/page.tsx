@@ -3,7 +3,6 @@
 import ProductCardItem from "@/components/product/ProductCardItem";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState, Suspense } from "react";
-import ErrorBoundary from "./_components/ErrorBoundary"; // Import the ErrorBoundary component
 
 interface Media {
   source: string;
@@ -134,10 +133,8 @@ function SearchResultsComponent() {
 
 export default function SearchResults() {
   return (
-    <ErrorBoundary>
       <Suspense fallback={<div>Loading...</div>}>
         <SearchResultsComponent />
       </Suspense>
-    </ErrorBoundary>
   );
 }

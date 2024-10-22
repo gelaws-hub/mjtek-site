@@ -43,13 +43,13 @@ export default function Header() {
           <div className="ml-10 hidden md:flex gap-1 items-center cursor-pointer">
             <Image
               key="profile_image"
-              src="/myImage.jpg"
+              src="/logo_mjtek.png"
               alt="profile_image"
               width={240}
               height={240}
               className="w-10 h-10 rounded-full"
             />
-            <h1 className="text-md ml-2">Ibnu Fadhil</h1>
+            <h1 className="text-md ml-2">User</h1>
           </div>
         </div>
         <div className="col-span-2 md:col-start-2 row-start-2 md:flex overflow-hidden px-4">
