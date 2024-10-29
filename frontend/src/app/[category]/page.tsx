@@ -28,7 +28,7 @@ interface Category {
 
 export default function CategoryPage() {
   const pathname = usePathname(); // Use usePathname to get the current path
-  const categoryName = pathname.split("/")[1]; // Assuming the category is the first part of the path
+  const categoryName = pathname.split("/")[1].toLowerCase(); // Convert categoryName to lowercase
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
 
@@ -50,7 +50,7 @@ export default function CategoryPage() {
   useEffect(() => {
     if (categoryName) {
       const categoryId = categories.find(
-        (cat) => cat.category_name.toLowerCase() === categoryName.toLowerCase()
+        (cat) => cat.category_name.toLowerCase() === categoryName // Compare in lowercase
       )?.id;
       if (categoryId) {
         fetchProducts(categoryId);
