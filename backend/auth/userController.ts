@@ -6,17 +6,10 @@ import { authenticator } from 'otplib';
 import crypto from 'crypto';
 import NodeCache from 'node-cache';
 import qrcode from 'qrcode';
+// import { google } from 'googleapis';
 
 const prisma = new PrismaClient();
 const cache = new NodeCache();
-
-// interface CustomRequest extends Request {
-//   user: {
-//     id: string;
-    
-//     // Add other properties of the user object if needed
-//   };
-// }
 
 interface CustomRequest extends Request {
   user: {
@@ -27,8 +20,96 @@ interface CustomRequest extends Request {
   };
 }
 
+interface ValidationRequest extends Request {
+  user?: CustomRequest['user'];
+}
 
-// REGISTER USER
+// Middleware untuk validasi token
+export const accessValidation = async (req: Request, res: Response, next: NextFunction) => {
+  const { authorization } = req.headers;
+
+  if (!authorization) {
+      return res.status(401).json({ message: 'Token diperlukan' });
+  }
+
+  const token = authorization.split(' ')[1];
+  const secret = process.env.JWT_SECRET!;
+
+  try {
+      const decoded = jwt.verify(token, secret) as CustomRequest['user'];
+      (req as CustomRequest).user = decoded;
+      next();
+  } catch (error) {
+      return res.status(401).json({ message: 'Unauthorized' });
+  }
+};
+
+export const ensureAuthenticated: RequestHandler = async (req, res, next) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    return res.status(401).json({ message: 'Access token not found' });
+  }
+
+  const token = authHeader.split(' ')[1];
+
+  try {
+    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!) as any;
+    
+    // Type assertion to match CustomRequest
+    (req as CustomRequest).user = {
+      id: decoded.userId,
+      role_id: decoded.role_id,
+      name: decoded.name,
+      email: decoded.email
+    };
+
+    next();
+  } catch (error: any) {
+    if (error instanceof jwt.TokenExpiredError) {
+      return res.status(401).json({ message: 'Access token expired' });
+    } else if (error instanceof jwt.JsonWebTokenError) {
+      return res.status(401).json({ message: 'Access token invalid' });
+    } else {
+      return res.status(500).json({ message: error.message });
+    }
+  }
+};
+
+
+// Google Login
+// export const googleLogin = (req: Request, res: Response) => {
+//   res.redirect(authorizationUrl);
+// };
+
+// Google Callback
+// export const googleCallback = async (req: Request, res: Response) => {
+//   const { code } = req.query;
+//   const { tokens } = await oauth2Client.getToken(code as string);
+//   oauth2Client.setCredentials(tokens);
+
+//   const oauth2 = google.oauth2({ auth: oauth2Client, version: 'v2' });
+//   const { data } = await oauth2.userinfo.get();
+
+//   if (!data.email || !data.name) {
+//       return res.json({ data });
+//   }
+
+//   let user = await prisma.users.findUnique({ where: { email: data.email } });
+//   if (!user) {
+//       user = await prisma.users.create({ data: { name: data.name, email: data.email, address: '-' } });
+//   }
+
+//   const payload = { id: user.id, name: user.name, address: user.address };
+//   const token = jwt.sign(payload, process.env.JWT_SECRET!, { expiresIn: '1h' });
+
+//   res.json({
+//       data: { id: user.id, name: user.name, address: user.address },
+//       token,
+//   });
+// };
+
+// Register user
 export const registerUser = async (req: Request, res: Response) => {
   const { name, email, password, address, phone_number } = req.body;
 
@@ -64,7 +145,7 @@ export const registerUser = async (req: Request, res: Response) => {
   }
 };
 
-// Login User
+// Login user
 export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
@@ -90,14 +171,14 @@ export const login = async (req: Request, res: Response) => {
       cache.set(`tempToken_${tempToken}`, user.id, parseInt(process.env.CACHE_TEMP_TOKEN_EXPIRATION!));
       return res.status(200).json({ tempToken, expiresInSeconds: process.env.CACHE_TEMP_TOKEN_EXPIRATION });
     } else {
-      const accessToken = jwt.sign({ userId: user.id }, process.env.ACCESS_TOKEN_SECRET!, {
+      const accessToken = jwt.sign({ userId: user.id, name: user.name }, process.env.ACCESS_TOKEN_SECRET!, {
         subject: 'accessApi',
-        expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN!,
+        expiresIn: '30m',
       });
 
-      const refreshToken = jwt.sign({ userId: user.id }, process.env.REFRESH_TOKEN_SECRET!, {
+      const refreshToken = jwt.sign({ userId: user.id, name: user.name}, process.env.REFRESH_TOKEN_SECRET!, {
         subject: 'refreshToken',
-        expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN!,
+        expiresIn: '1w',
       });
 
       await prisma.user_refresh_token.create({
@@ -120,60 +201,6 @@ export const login = async (req: Request, res: Response) => {
   }
 };
 
-// TOTP (2FA) Login
-export const login2FA = async (req: Request, res: Response) => {
-  try {
-    const { tempToken, totp } = req.body;
-
-    if (!tempToken || !totp) {
-      return res.status(422).json({ message: 'Please fill in all fields (tempToken and totp)' });
-    }
-
-    const userId = cache.get(`tempToken_${tempToken}`) as string;
-
-    if (!userId) {
-      return res.status(401).json({ message: 'The provided temporary token is incorrect or expired' });
-    }
-    
-    
-    const user = await prisma.user.findUnique({ where: { id: userId } });
-
-    const verified = authenticator.check(totp, user!.fa_secret!);
-
-    if (!verified) {
-      return res.status(401).json({ message: 'The provided TOTP is incorrect or expired' });
-    }
-
-    const accessToken = jwt.sign({ userId: user!.id }, process.env.ACCESS_TOKEN_SECRET!, {
-      subject: 'accessApi',
-      expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN!,
-    });
-
-    const refreshToken = jwt.sign({ userId: user!.id }, process.env.REFRESH_TOKEN_SECRET!, {
-      subject: 'refreshToken',
-      expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN!,
-    });
-
-    await prisma.user_refresh_token.create({
-      data: {
-        refresh_token: refreshToken,
-        user_id: user!.id,
-      },
-    });
-
-    return res.status(200).json({
-      id: user!.id,
-      name: user!.name,
-      email: user!.email,
-      accessToken,
-      refreshToken,
-    });
-  } catch (error:any) {
-    return res.status(500).json({ message: error.message });
-  }
-};
-
-// Refresh Token
 export const refreshToken = async (req: Request, res: Response) => {
   try {
     const { refreshToken } = req.body;
@@ -194,20 +221,26 @@ export const refreshToken = async (req: Request, res: Response) => {
 
     await prisma.user_refresh_token.delete({ where: { id: userRefreshToken.id } });
 
-    const newAccessToken = jwt.sign({ userId: (decodedRefreshToken as any).userId }, process.env.ACCESS_TOKEN_SECRET!, {
+    const user = await prisma.user.findUnique({ where: { id: (decodedRefreshToken as any).userId } });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const newAccessToken = jwt.sign({ userId: user.id, name: user.name}, process.env.ACCESS_TOKEN_SECRET!, {
       subject: 'accessApi',
-      expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN!,
+      expiresIn: '30m',
     });
 
-    const newRefreshToken = jwt.sign({ userId: (decodedRefreshToken as any).userId }, process.env.REFRESH_TOKEN_SECRET!, {
+    const newRefreshToken = jwt.sign({ userId: user.id, name: user.name}, process.env.REFRESH_TOKEN_SECRET!, {
       subject: 'refreshToken',
-      expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN!,
+      expiresIn: '1w',
     });
 
     await prisma.user_refresh_token.create({
       data: {
         refresh_token: newRefreshToken,
-        user_id: (decodedRefreshToken as any).userId,
+        user_id: user.id,
       },
     });
 
@@ -215,75 +248,24 @@ export const refreshToken = async (req: Request, res: Response) => {
       accessToken: newAccessToken,
       refreshToken: newRefreshToken,
     });
-  } catch (error:any) {
-    return res.status(500).json({ message: error.message });
-  }
-};
-
-// Generate 2FA QR Code
-export const generate2FAQRCode = async (req: CustomRequest, res: Response) => {
-  try {
-    const user = await prisma.user.findUnique({ where: { id: req.user.id } });
-
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
-    const secret = authenticator.generateSecret();
-    const uri = authenticator.keyuri(user.email, 'yourapp.com', secret);
-
-    // Simpan 2FA secret di database user
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { fa_secret: secret }
-    });
-
-    const qrCode = await qrcode.toBuffer(uri, { type: 'png', margin: 1 });
-
-    res.setHeader('Content-Disposition', 'attachment; filename=qrcode.png');
-    return res.status(200).type('image/png').send(qrCode);
   } catch (error: any) {
     return res.status(500).json({ message: error.message });
   }
 };
 
-// Validate 2FA
-export const validate2FA = async (req: CustomRequest, res: Response) => {
-  try {
-    const { totp } = req.body;
+// CRUD Operations
+// export const createUser = async (req: ValidationRequest, res: Response) => {
+//   const { name, email, address } = req.body;
+//   const result = await prisma.user.create({ data: { name, email, address } });
 
-    if (!totp) {
-      return res.status(422).json({ message: 'TOTP is required' });
-    }
-
-    const user = await prisma.user.findUnique({ where: { id: req.user.id } });
-
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
-    const isValid = authenticator.check(totp, user.fa_secret!);
-
-    if (!isValid) {
-      return res.status(400).json({ message: 'Invalid or expired TOTP' });
-    }
-
-    await prisma.user.update({
-      where: { id: req.user.id },
-      data: { fa_enable: true }
-    });
-
-    return res.status(200).json({ message: 'TOTP validated successfully' });
-  } catch (error: any) {
-    return res.status(500).json({ message: error.message });
-  }
-};
+//   res.json({ data: result, message: 'User created' });
+// };
 
 // Get Current User
-export const getCurrentUser = async (req: CustomRequest, res: Response) => {
+export const getCurrentUser = async (req: ValidationRequest, res: Response) => {
   try {
     const user = await prisma.user.findUnique({
-      where: { id: req.user.id },
+      where: { id: req.user?.id },
       select: {
         id: true,
         name: true,
@@ -301,63 +283,74 @@ export const getCurrentUser = async (req: CustomRequest, res: Response) => {
   }
 };
 
-// Role-based authorization
-export const authorize = (roles: number[]) => {
-  return async (req: CustomRequest, res: Response, next: NextFunction) => {
-    const user = await prisma.user.findUnique({
-      where: { id: req.user.id }
-    });
-
-    if (!user || !roles.includes(user.role_id)) {
-      return res.status(403).json({ message: 'Access denied' });
-    }
-
-    next();
-  };
+export const getUsers = async (_req: ValidationRequest, res: Response) => {
+  const result = await prisma.user.findMany({
+      select: { id: true, name: true, email: true, address: true },
+  });
+  res.json({ data: result, message: 'User list' });
 };
 
-// Ensure authentication middleware
-export const ensureAuthenticated: RequestHandler = async (req, res, next) => {
-  const authHeader = req.headers.authorization;
 
-  if (!authHeader) {
-    return res.status(401).json({ message: 'Access token not found' });
-  }
+// export const updateUser = async (req: ValidationRequest, res: Response) => {
+//   const { id } = req.params;
+//   const { name, email, address } = req.body;
 
-  const token = authHeader.split(' ')[1];
+//   const result = await prisma.user.update({
+//       data: { name, email, address },
+//       where: { id: Number(id) },
+//   });
+//   res.json({ data: result, message: `User ${id} updated` });
+// };
 
-  try {
-    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!) as any;
-    
-    // Type assertion to match CustomRequest
-    (req as CustomRequest).user = {
-      id: decoded.userId,
-      role_id: decoded.role_id,
-      name: decoded.name,
-      email: decoded.email
-    };
+// export const deleteUser = async (req: ValidationRequest, res: Response) => {
+//   const { id } = req.params;
 
-    next();
-  } catch (error: any) {
-    if (error instanceof jwt.TokenExpiredError) {
-      return res.status(401).json({ message: 'Access token expired' });
-    } else if (error instanceof jwt.JsonWebTokenError) {
-      return res.status(401).json({ message: 'Access token invalid' });
-    } else {
-      return res.status(500).json({ message: error.message });
-    }
-  }
-};
+//   await prisma.users.delete({ where: { id: Number(id) } });
+//   res.json({ message: `User ${id} deleted` });
+// };
 
 // Logout User
-export const logoutUser = async (req: CustomRequest, res: Response) => {
+export const logoutUser = async (req: ValidationRequest, res: Response) => {
   try {
+    const userName = req.user?.name; // Ambil nama pengguna dari req.user
+
     await prisma.user_refresh_token.deleteMany({
-      where: { user_id: req.user.id }
+      where: { user_id: req.user?.id }
     });
 
-    return res.status(204).send();
+    return res.status(200).json({ message: `User ${userName} has been logged out` });
   } catch (error: any) {
     return res.status(500).json({ message: error.message });
   }
+};
+
+
+
+export const authorize = (roles: number[]) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    // Pastikan bahwa req.user sudah terisi oleh middleware ensureAuthenticated
+    const userId = (req as any).user?.id;
+
+    if (!userId) {
+      return res.status(403).json({ message: 'Access denied' });
+    }
+
+    try {
+      // Ambil role_id dari database berdasarkan id user
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { role_id: true },
+      });
+
+      if (!user || !roles.includes(user.role_id)) {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+
+      // Jika user memiliki role yang diizinkan, lanjutkan ke endpoint berikutnya
+      next();
+    } catch (error) {
+      console.error('Authorization error:', error);
+      return res.status(500).json({ message: 'Server error' });
+    }
+  };
 };

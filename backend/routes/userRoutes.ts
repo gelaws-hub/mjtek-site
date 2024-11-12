@@ -1,15 +1,14 @@
 import express from 'express';
 import { 
     registerUser, 
-    login, 
-    login2FA, 
-    refreshToken, 
-    generate2FAQRCode, 
-    validate2FA, 
-    getCurrentUser, 
+    login,  
+    refreshToken,
+    getCurrentUser,
+    getUsers, 
     logoutUser,
+    accessValidation,
     ensureAuthenticated,
-    authorize 
+    authorize
 } from '../auth/userController';
 
 const userRoutes = express.Router();
@@ -21,19 +20,21 @@ userRoutes.post('/register', registerUser);
 userRoutes.post('/login', login);
 
 // LOGIN 2FA
-userRoutes.post('/login-2fa', login2FA);
+// userRoutes.post('/login-2fa', login2FA);
 
 // REFRESH TOKEN
 userRoutes.post('/refresh-token', refreshToken);
 
 // GENERATE 2FA QR CODE (Protected route - user must be authenticated)
-userRoutes.get('/2fa/qrcode', ensureAuthenticated, generate2FAQRCode);
+// userRoutes.get('/2fa/qrcode', ensureAuthenticated, generate2FAQRCode);
 
 // VALIDATE 2FA (Protected route - user must be authenticated)
-userRoutes.post('/2fa/validate', ensureAuthenticated, validate2FA);
+// userRoutes.post('/2fa/validate', ensureAuthenticated, validate2FA);
 
 // GET CURRENT USER (Protected route - user must be authenticated)
 userRoutes.get('/me', ensureAuthenticated, getCurrentUser);
+
+userRoutes.get('/users', ensureAuthenticated, getUsers);
 
 // LOGOUT USER (Protected route - user must be authenticated)
 userRoutes.post('/logout', ensureAuthenticated, logoutUser);
