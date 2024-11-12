@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import express from 'express';
 import { 
     registerUser, 
     login, 
@@ -12,47 +12,36 @@ import {
     authorize 
 } from '../auth/userController';
 
-import { Request, Response, NextFunction } from 'express';
-
-interface CustomRequest extends Request {
-  user: {
-    id: string;
-    name: string;
-    email: string;
-    role_id: number;
-  };
-}
-
-const router = Router();
+const userRoutes = express.Router();
 
 // REGISTER USER
-router.post('/register', registerUser);
+userRoutes.post('/register', registerUser);
 
 // LOGIN USER
-router.post('/login', login);
+userRoutes.post('/login', login);
 
 // LOGIN 2FA
-router.post('/login-2fa', login2FA);
+userRoutes.post('/login-2fa', login2FA);
 
 // REFRESH TOKEN
-router.post('/refresh-token', refreshToken);
+userRoutes.post('/refresh-token', refreshToken);
 
 // GENERATE 2FA QR CODE (Protected route - user must be authenticated)
-router.get('/2fa/qrcode', ensureAuthenticated, generate2FAQRCode);
+userRoutes.get('/2fa/qrcode', ensureAuthenticated, generate2FAQRCode);
 
 // VALIDATE 2FA (Protected route - user must be authenticated)
-router.post('/2fa/validate', ensureAuthenticated, validate2FA);
+userRoutes.post('/2fa/validate', ensureAuthenticated, validate2FA);
 
 // GET CURRENT USER (Protected route - user must be authenticated)
-router.get('/me', ensureAuthenticated, getCurrentUser);
+userRoutes.get('/me', ensureAuthenticated, getCurrentUser);
 
 // LOGOUT USER (Protected route - user must be authenticated)
-router.post('/logout', ensureAuthenticated, logoutUser);
+userRoutes.post('/logout', ensureAuthenticated, logoutUser);
 
 // EXAMPLE ROUTE WITH ROLE-BASED AUTHORIZATION (Add roles based on your app's needs)
 // Only accessible to users with role_id 1 (admin)
-router.get('/admin', ensureAuthenticated, authorize([1]), (req, res) => {
+userRoutes.get('/admin', ensureAuthenticated, authorize([1]), (req, res) => {
   res.json({ message: 'Admin route accessed!' });
 });
 
-export default router;
+export default userRoutes;

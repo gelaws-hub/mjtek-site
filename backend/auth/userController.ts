@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction, RequestHandler } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
@@ -10,11 +10,20 @@ import qrcode from 'qrcode';
 const prisma = new PrismaClient();
 const cache = new NodeCache();
 
+// interface CustomRequest extends Request {
+//   user: {
+//     id: string;
+    
+//     // Add other properties of the user object if needed
+//   };
+// }
+
 interface CustomRequest extends Request {
   user: {
     id: string;
-    
-    // Add other properties of the user object if needed
+    role_id: number;
+    name: string;
+    email: string;
   };
 }
 
@@ -308,7 +317,7 @@ export const authorize = (roles: number[]) => {
 };
 
 // Ensure authentication middleware
-export const ensureAuthenticated = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const ensureAuthenticated: RequestHandler = async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader) {
@@ -318,11 +327,18 @@ export const ensureAuthenticated = async (req: CustomRequest, res: Response, nex
   const token = authHeader.split(' ')[1];
 
   try {
-    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!);
-    req.user = { id: (decoded as any).userId };
+    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!) as any;
+    
+    // Type assertion to match CustomRequest
+    (req as CustomRequest).user = {
+      id: decoded.userId,
+      role_id: decoded.role_id,
+      name: decoded.name,
+      email: decoded.email
+    };
 
     next();
-  } catch (error:any) {
+  } catch (error: any) {
     if (error instanceof jwt.TokenExpiredError) {
       return res.status(401).json({ message: 'Access token expired' });
     } else if (error instanceof jwt.JsonWebTokenError) {

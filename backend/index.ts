@@ -7,6 +7,7 @@ import produkRoutes from './routes/productRoutes';
 import produkDetailRoutes from './routes/productDetailRoutes'; 
 import simulationRoutes from './routes/simulationRoutes';
 import transaksiRoutes from './routes/transactionRoutes';
+import userRoutes from './routes/userRoutes';
 
 dotenv.config();
 
@@ -24,6 +25,9 @@ app.use('/', produkRoutes);
 app.use('/', produkDetailRoutes);
 app.use('/', simulationRoutes);
 app.use('/', transaksiRoutes)
+
+// auth routes
+app.use('/auth', userRoutes);
 
 // Root route
 app.get('/', (req, res) => {
