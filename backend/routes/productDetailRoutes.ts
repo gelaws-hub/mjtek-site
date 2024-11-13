@@ -7,7 +7,13 @@ import {
   updateCategory,
 } from "../controllers/produk_details/categoriController";
 
-import { createSubCategory, deleteSubCategory, getAllSubCategories, getSubCategoryById, updateSubCategory } from "../controllers/produk_details/subCategoryController";
+import {
+  createSubCategory,
+  deleteSubCategory,
+  getAllSubCategories,
+  getSubCategoryById,
+  updateSubCategory,
+} from "../controllers/produk_details/subCategoryController";
 
 import {
   getAllBrands,
@@ -34,11 +40,11 @@ produkDetailRoutes.put("/category/:id", updateCategory);
 produkDetailRoutes.delete("/category/:id", deleteCategory);
 
 // SubKategori routes
-produkDetailRoutes.get("/sub_category", getAllSubCategories);
-produkDetailRoutes.get("/sub_category/:id", getSubCategoryById);
-produkDetailRoutes.post("/sub_category", createSubCategory);
-produkDetailRoutes.put("/sub_category/:id", updateSubCategory);
-produkDetailRoutes.delete("/sub_category/:id", deleteSubCategory);
+produkDetailRoutes.get("/sub-category", getAllSubCategories);
+produkDetailRoutes.get("/sub-category/:id", getSubCategoryById);
+produkDetailRoutes.post("/sub-category", createSubCategory);
+produkDetailRoutes.put("/sub-category/:id", updateSubCategory);
+produkDetailRoutes.delete("/sub-category/:id", deleteSubCategory);
 
 // Brand routes
 produkDetailRoutes.get("/brand", getAllBrands);

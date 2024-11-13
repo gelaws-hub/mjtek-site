@@ -23,13 +23,20 @@ interface ProductCardItemProps {
 }
 
 export default function ProductCardItem({ product }: ProductCardItemProps) {
+  // Function to format the URL-friendly product name
+  const formatProductNameForUrl = (productName: string) => {
+    return productName.toLowerCase().replace(/\s+/g, "-");
+  };
+
+  // Construct the URL using the formatted product name and category
+  const productUrl = `/${encodeURIComponent(
+    product.category.category_name.toLowerCase()
+  )}/${formatProductNameForUrl(product.product_name)}-${product.id}`;
+
   return (
     <Link
-      href={{
-        pathname: `/${encodeURIComponent(product.category.category_name)}/${encodeURIComponent(product.product_name)}`,
-        query: { id: product.id }, // Passing the product_id as a query parameter
-      }}
-      className="bg-white overflow-hidden w-full p-2 rounded-lg hover:shadow-lg hover:shadow-blue-200 transition-all duration-300 ease-in-out"  
+      href={productUrl}
+      className="bg-white overflow-hidden w-full p-2 rounded-lg hover:shadow-lg hover:shadow-blue-200 transition-all duration-300 ease-in-out max-w-52"
     >
       {product.media && product.media.length > 0 && (
         <div className="relative flex aspect-[1/1]">
