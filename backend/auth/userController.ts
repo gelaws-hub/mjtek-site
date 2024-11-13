@@ -25,25 +25,6 @@ interface ValidationRequest extends Request {
 }
 
 // Middleware untuk validasi token
-export const accessValidation = async (req: Request, res: Response, next: NextFunction) => {
-  const { authorization } = req.headers;
-
-  if (!authorization) {
-      return res.status(401).json({ message: 'Token diperlukan' });
-  }
-
-  const token = authorization.split(' ')[1];
-  const secret = process.env.JWT_SECRET!;
-
-  try {
-      const decoded = jwt.verify(token, secret) as CustomRequest['user'];
-      (req as CustomRequest).user = decoded;
-      next();
-  } catch (error) {
-      return res.status(401).json({ message: 'Unauthorized' });
-  }
-};
-
 export const ensureAuthenticated: RequestHandler = async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
@@ -134,7 +115,7 @@ export const registerUser = async (req: Request, res: Response) => {
         password: hashedPassword,
         address,
         phone_number,
-        role_id: 2, // Set default role sebagai user biasa
+        role_id: 2, // Set default role sebagai user biasa(pembeli)
       }
     });
 
@@ -323,8 +304,6 @@ export const logoutUser = async (req: ValidationRequest, res: Response) => {
     return res.status(500).json({ message: error.message });
   }
 };
-
-
 
 export const authorize = (roles: number[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {

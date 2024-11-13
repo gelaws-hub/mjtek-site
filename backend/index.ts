@@ -8,7 +8,6 @@ import produkDetailRoutes from './routes/productDetailRoutes';
 import simulationRoutes from './routes/simulationRoutes';
 import transaksiRoutes from './routes/transactionRoutes';
 import userRoutes from './routes/userRoutes';
-import { accessValidation } from './auth/userController';
 
 dotenv.config();
 

@@ -6,7 +6,6 @@ import {
     getCurrentUser,
     getUsers, 
     logoutUser,
-    accessValidation,
     ensureAuthenticated,
     authorize
 } from '../auth/userController';
