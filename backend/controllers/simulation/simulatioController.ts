@@ -82,7 +82,7 @@ export const getSimulationById = async (req: Request, res: Response) => {
 
 // Create a new simulation
 export const createSimulation = async (req: Request, res: Response) => {
-  const { user_id, title, description } = req.body;
+  const { user_id = 'dummy_simulation', title, description } = req.body; 
   try {
     const new_simulation = await prisma.simulation.create({
       data: {
@@ -92,12 +92,20 @@ export const createSimulation = async (req: Request, res: Response) => {
         date: new Date(),
       },
     });
-    res.status(201).json(new_simulation);
+    res.status(201).json({
+      status_code: 201,
+      message: "Simulation created successfully",
+      simulation: new_simulation,
+    });
   } catch (error: any) {
     console.error("Error creating new simulation:", error.message);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({
+      status_code: 500,
+      message: "Internal server error",
+    });
   }
 };
+
 
 // Update a simulation
 export const updateSimulation = async (req: Request, res: Response) => {

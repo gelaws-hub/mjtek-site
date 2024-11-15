@@ -5,6 +5,7 @@ import produkRoutes from './routes/productRoutes';
 import produkDetailRoutes from './routes/productDetailRoutes'; 
 import simulationRoutes from './routes/simulationRoutes';
 import transaksiRoutes from './routes/transactionRoutes';
+import dummyUserRouter from './routes/dummyUserRouter';
 
 
 const app = express();
@@ -19,7 +20,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/', produkRoutes);
 app.use('/', produkDetailRoutes);
 app.use('/', simulationRoutes);
-app.use('/', transaksiRoutes)
+app.use('/', transaksiRoutes);
+app.use('/', dummyUserRouter)
 
 // Root route
 app.get('/', (req, res) => {
