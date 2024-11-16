@@ -75,16 +75,17 @@ export const createProduct = async (req: Request, res: Response) => {
   const {
     product_name,
     category_id,
-    sub_category_id,
+    sub_category_id = null,
     brand_id,
     price,
     estimated_weight,
     description,
     stock,
-    media,
-    product_ram_type,
-    product_socket,
+    media = [],
+    product_ram_type = [], // Default to an empty array if not provided
+    product_socket = [], // Default to an empty array if not provided
   } = req.body;
+
   try {
     const newProduk = await prisma.product.create({
       data: {
@@ -98,20 +99,20 @@ export const createProduct = async (req: Request, res: Response) => {
         stock,
         media: {
           create: media.map((m: any) => ({
-            sumber: m.sumber,
-            tipe_file: m.tipe_file,
+            source: m.source,
+            file_type: m.file_type,
           })),
         },
-        product_ram_type: {
-          create: product_ram_type.map((id_tipe_ram: number) => ({
-            id_tipe_ram,
-          })),
-        },
-        product_socket: {
-          create: product_socket.map((id_socket: number) => ({
-            id_socket,
-          })),
-        },
+        product_ram_type: product_ram_type.length
+          ? {
+              create: product_ram_type.map((id: number) => ({ id })),
+            }
+          : undefined,
+        product_socket: product_socket.length
+          ? {
+              create: product_socket.map((id: number) => ({ id })),
+            }
+          : undefined,
       },
     });
 
@@ -125,6 +126,7 @@ export const createProduct = async (req: Request, res: Response) => {
     res.status(500).json({ status_code: 500, message: "Internal server error" });
   }
 };
+
 
 export const updateProduct = async (req: Request, res: Response) => {
   const { id } = req.params;
@@ -209,14 +211,14 @@ export const partialUpdateProduct = async (req: Request, res: Response) => {
     if (category_id !== undefined) updateData.category_id = category_id;
     if (sub_category_id !== undefined) updateData.sub_category_id = sub_category_id;
     if (brand_id !== undefined) updateData.brand_id = brand_id;
-    if (price !== undefined) updateData.price = price;
+    if (price !== undefined) updateData.price = price
     if (estimated_weight !== undefined) updateData.estimated_weight = estimated_weight;
     if (description !== undefined) updateData.description = description;
     if (stock !== undefined) updateData.stock = stock;
 
     if (media !== undefined) {
       updateData.media = {
-        deleteMany: {},
+        deleteMany: {}, // Remove existing media
         create: media.map((m: any) => ({
           sumber: m.sumber,
           tipe_file: m.tipe_file,
@@ -224,20 +226,22 @@ export const partialUpdateProduct = async (req: Request, res: Response) => {
       };
     }
 
+    // Updating product_ram_type relationship
     if (product_ram_type !== undefined) {
       updateData.product_ram_type = {
-        deleteMany: {},
-        create: product_ram_type.map((id_tipe_ram: number) => ({
-          id_tipe_ram,
+        deleteMany: {}, // Remove existing RAM type associations
+        create: product_ram_type.map((ramTypeId: number) => ({
+          ram_type: { connect: { id: ramTypeId } }, // Connect to the specified ram_type ID
         })),
       };
     }
 
+    // Updating product_socket relationship
     if (product_socket !== undefined) {
       updateData.product_socket = {
-        deleteMany: {},
-        create: product_socket.map((id_socket: number) => ({
-          id_socket,
+        deleteMany: {}, // Remove existing socket associations
+        create: product_socket.map((socketId: number) => ({
+          socket: { connect: { id: socketId } }, // Connect to the specified socket ID
         })),
       };
     }
@@ -245,6 +249,11 @@ export const partialUpdateProduct = async (req: Request, res: Response) => {
     const updatedProduct = await prisma.product.update({
       where: { id: Number(id) },
       data: updateData,
+      include: {
+        product_ram_type: { include: { ram_type: true } },
+        product_socket: { include: { socket: true } },
+        media: true,
+      },
     });
 
     res.json({
@@ -257,6 +266,8 @@ export const partialUpdateProduct = async (req: Request, res: Response) => {
     res.status(500).json({ status_code: 500, message: "Internal server error" });
   }
 };
+
+
 
 
 export const deleteProduct = async (req: Request, res: Response) => {

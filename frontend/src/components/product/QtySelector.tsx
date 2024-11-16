@@ -2,12 +2,14 @@ interface QuantitySelectorProps {
   qty: number;
   onQtyChange: (qty: number) => void;
   maxQty?: number;
+  className?: string;
 }
 
 export default function QuantitySelector({
   qty,
   onQtyChange,
   maxQty = 9, // Default maxQty to Infinity if not provided
+  className = "",
 }: QuantitySelectorProps) {
   const increaseQty = () => {
     if (qty < maxQty) {
@@ -32,8 +34,8 @@ export default function QuantitySelector({
   };
 
   return (
-    <form className="max-w-xs">
-      <div className="relative flex items-center max-w-[8rem] border border-gray-300 rounded-lg">
+    <form className={`max-w-xs`+` ${className}`}>
+      <div className="relative flex items-center max-w-[8rem] md:border border-gray-300 rounded-lg">
         <button
           type="button"
           id="decrement-button"
@@ -64,7 +66,7 @@ export default function QuantitySelector({
           id="quantity-input"
           data-input-counter
           aria-describedby="helper-text-explanation"
-          className="self-stretch border-x-0 border-gray-300 text-center text-gray-900 text-sm block w-full outline-none"
+          className="max-w-8 md:self-stretch border-x-0 border-gray-300 text-center text-gray-900 text-sm block w-full outline-none"
           placeholder="1"
           required
           min={1}

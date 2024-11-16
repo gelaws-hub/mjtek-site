@@ -3,7 +3,30 @@ import prisma from "../../utils/database";
 
 export const getAllSockets = async (req: Request, res: Response) => {
   try {
-    const sockets = await prisma.socket.findMany();
+    const brandId = req.query.brand_id
+      ? parseInt(req.query.brand_id as string)
+      : undefined;
+    const brandName = req.query.brand_name
+      ? (req.query.brand_name as string)
+      : undefined;
+
+    const sockets = await prisma.socket.findMany({
+      where: {
+        ...(brandId && { brand_id: brandId }),
+
+        ...(brandName && {
+          brand: { brand_name: { contains: brandName } },
+        }),
+      },
+      include: {
+        brand: {
+          select: {
+            brand_name: true,
+          },
+        },
+      },
+    });
+
     res.status(200).json({ sockets });
   } catch (error: any) {
     console.error("Error fetching sockets:", error.message);
@@ -27,25 +50,28 @@ export const getSocketById = async (req: Request, res: Response) => {
   }
 };
 
-export const createSocket = async (req: Request, res: Response) => {
-  const { socket_name } = req.body; // Updated to underscore case
-  if (!socket_name) {
-    return res.status(400).json({ error: "Socket name is required" });
-  }
+export const createMultipleSockets = async (req: Request, res: Response) => {
+  const socketsData = req.body;
+
   try {
-    const new_socket = await prisma.socket.create({
-      data: { socket_name },
+    const newSockets = await prisma.socket.createMany({
+      data: socketsData,
+      skipDuplicates: true,
     });
-    res.status(201).json({ socket: new_socket });
-  } catch (error: any) {
-    console.error("Error creating new socket:", error.message);
-    res.status(500).json({ error: "Internal server error" });
+
+    res.status(201).json({
+      message: "Sockets created successfully",
+      count: newSockets.count,
+    });
+  } catch (error) {
+    console.error("Error creating sockets:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
 export const updateSocket = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { socket_name } = req.body; // Updated to underscore case
+  const { socket_name } = req.body;
   if (!socket_name) {
     return res.status(400).json({ error: "Socket name is required" });
   }
@@ -70,7 +96,7 @@ export const deleteSocket = async (req: Request, res: Response) => {
     await prisma.socket.delete({
       where: { id: parseInt(id) },
     });
-    res.status(204).send(); // No content
+    res.status(204).send();
   } catch (error: any) {
     if (error.code === "P2025") {
       return res.status(404).json({ error: "Socket not found" });

@@ -51,12 +51,19 @@ model brand {
   id         Int       @id @default(autoincrement())
   brand_name String    @unique
   product    product[]
+  sockets    socket[]
 }
 
 model socket {
   id             Int              @id @default(autoincrement())
   socket_name    String           @unique
+  release_date   DateTime
+  description    String?
+  brand_id       Int
+  brand          brand            @relation(fields: [brand_id], references: [id])
   product_socket product_socket[]
+
+  @@index([brand_id])
 }
 
 model product_socket {
