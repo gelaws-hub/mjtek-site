@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
-import ProductCardItem from "./ProductCardItem"; // Adjust the import path as needed
+import ProductCardItem from "./ProductCardItem";
 
 
 interface Media {
@@ -28,7 +28,7 @@ export default function ProductCard() {
     const fetchProducts = async () => {
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/product`
+          `${process.env.NEXT_PUBLIC_API_URL}/product?limit=10&page=1`
         );
         setProducts(response.data.products);
       } catch (error) {
@@ -47,3 +47,4 @@ export default function ProductCard() {
     </div>
   );
 }
+

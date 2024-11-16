@@ -1,0 +1,34 @@
+{
+    "category": [
+        {
+            "name": "Simulasi Rakit PC",
+            "url": "/simulasi",
+            "icon": "/category_icons/sim_rakit_pc_icon.svg"
+        },
+        {
+            "name": "PC Ready",
+            "url": "/pc-ready",
+            "icon": "/category_icons/pc_ready_icon.svg"
+        },
+        {
+            "name": "Monitor",
+            "url": "/monitor",
+            "icon": "/category_icons/monitor_icon.svg"
+        },
+        {
+            "name": "CPU",
+            "url": "/cpu",
+            "icon": "/category_icons/cpu_icon.svg"
+        },
+        {
+            "name": "VGA",
+            "url": "/vga",
+            "icon": "/category_icons/vga_icon.svg"
+        },
+        {
+            "name": "RAM",
+            "url": "/ram",
+            "icon": "/category_icons/ram_icon.svg"
+        }
+    ]
+}

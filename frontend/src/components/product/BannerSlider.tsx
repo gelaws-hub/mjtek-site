@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
+import { useState, useEffect, useRef, useCallback } from "react";
 
 interface ProductBannersProps {
   imageUrls: string[];
@@ -13,7 +14,7 @@ interface ProductBannersProps {
 export default function BannerSlider({
   imageUrls,
   aspectRatio = "2/1",
-  imageMaxWidth = 800,
+  imageMaxWidth = 1200,
   interval = 3,
   className = "",
 }: ProductBannersProps) {
@@ -21,9 +22,9 @@ export default function BannerSlider({
   const [isHovered, setIsHovered] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const scrollNext = () => {
+  const scrollNext = useCallback(() => {
     setCurrentImage((index) => (index === imageUrls.length - 1 ? 0 : index + 1));
-  };
+  }, [setCurrentImage, imageUrls]);
 
   const scrollPrev = () => {
     setCurrentImage((index) => (index === 0 ? imageUrls.length - 1 : index - 1));
@@ -39,20 +40,20 @@ export default function BannerSlider({
         clearInterval(intervalRef.current);
       }
     };
-  }, [isHovered]);
+  }, [isHovered, interval, scrollNext]);
 
   return (
     <section
-      className={`relative mx-auto overflow-hidden rounded-md cursor-pointer focus-visible:outline-1 ${className}`}
+      className={`relative overflow-hidden rounded-md cursor-pointer focus-visible:outline-1 ${className}`}
       style={{ maxWidth: `${imageMaxWidth}px`, aspectRatio: `${aspectRatio}` }}
       onFocus={() => setIsHovered(true)}
       onBlur={() => setIsHovered(false)}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="flex mb-4 overflow-hidden scrollbar-none w-full">
+      <div className="flex mb-4 md:overflow-hidden scrollbar-none w-full">
         {imageUrls.map((imageUrl, index) => (
-          <img
+          <Image
             key={index}
             src={imageUrl}
             alt={`Banner Image ${index + 1}`}
@@ -61,6 +62,8 @@ export default function BannerSlider({
               maxWidth: `${imageMaxWidth}px`,
               translate: `${-100 * currentImage}%`,
             }}
+            width={1200}
+            height={800}
           />
         ))}
       </div>

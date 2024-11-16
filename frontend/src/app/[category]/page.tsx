@@ -65,7 +65,6 @@ export default function CategoryPage() {
       );
       const data = await response.json();
       setProducts(data.products);
-      console.log(data.products);
     } catch (error) {
       console.error("Error fetching products:", error);
     }
@@ -76,7 +75,7 @@ export default function CategoryPage() {
       <h1 className="text-2xl font-bold mb-4">
         Products in Category: {categoryName}
       </h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-[60%] mx-auto">
         {products.length > 0 ? (
           products.map((product: Product) => (
             <ProductCardItem key={product.id} product={product} />

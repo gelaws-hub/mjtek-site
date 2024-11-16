@@ -36,7 +36,7 @@ export default function ProductCardItem({ product }: ProductCardItemProps) {
   return (
     <Link
       href={productUrl}
-      className="bg-white overflow-hidden w-full p-2 rounded-lg hover:shadow-lg hover:shadow-blue-200 transition-all duration-300 ease-in-out max-w-52"
+      className="bg-white overflow-hidden w-full p-2 rounded-lg hover:shadow-lg hover:shadow-blue-200 transition-all duration-300 ease-in-out"
     >
       {product.media && product.media.length > 0 && (
         <div className="relative flex aspect-[1/1]">
@@ -52,11 +52,11 @@ export default function ProductCardItem({ product }: ProductCardItemProps) {
           </button>
         </div>
       )}
-      <div className="flex flex-col gap-2">
-        <h2 className="text-md font-semibold truncate mt-2">
+      <div className="flex flex-col gap-1">
+        <h2 className="text-sm font-medium truncate mt-2">
           {product.product_name}
         </h2>
-        <p className="text-blue-900 font-semibold mb-4">
+        <p className="text-blue-900 mb-4 text-sm font-medium">
           Rp.{" "}
           {new Intl.NumberFormat("id-ID", {
             minimumFractionDigits: 0,
