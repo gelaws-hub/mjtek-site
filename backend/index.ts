@@ -1,15 +1,21 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import dotenv from 'dotenv';
 import produkRoutes from './routes/productRoutes';
 import produkDetailRoutes from './routes/productDetailRoutes'; 
 import simulationRoutes from './routes/simulationRoutes';
 import transaksiRoutes from './routes/transactionRoutes';
-import dummyUserRouter from './routes/dummyUserRouter';
 
+import userRoutes from './routes/userRoutes';
+
+
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+app.use(cookieParser());
 
 // Middleware setup
 app.use(cors());
@@ -22,6 +28,9 @@ app.use('/', produkDetailRoutes);
 app.use('/', simulationRoutes);
 app.use('/', transaksiRoutes);
 app.use('/', dummyUserRouter)
+
+// auth routes
+app.use('/', userRoutes);
 
 // Root route
 app.get('/', (req, res) => {

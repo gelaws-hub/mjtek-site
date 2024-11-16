@@ -111,23 +111,40 @@ model simulation_detail {
 }
 
 model user {
-  id              String            @id @default(uuid())
-  role_id         Int
-  username        String
-  email           String            @unique(map: "user_email_unique")
-  password        String
-  address         String
-  phone_number    String
-  simulation      simulation[]
-  transaction     transaction[]
-  cart            cart[]
-  favorite        favorite[]
-  transaction_log transaction_log[]
+  id               String            @id @default(uuid())
+  role_id          Int
+  name             String
+  email            String            @unique(map: "user_email_unique")
+  password         String
+  address          String
+  phone_number     String
+  fa_enable        Boolean           @default(false)  
+  fa_secret        String?                               
+  refresh_tokens   user_refresh_token[]                   
+  simulation       simulation[]
+  transaction      transaction[]
+  cart             cart[]
+  favorite         favorite[]
+  transaction_log  transaction_log[]
 
   role role @relation(fields: [role_id], references: [id])
 
+  @@map("user")  // Optional: To make sure the table is named "user"
   @@unique([email])
 }
+
+
+model user_refresh_token {
+  id            String   @id @default(uuid())
+  refresh_token String   
+  user_id       String   
+  created_at    DateTime @default(now())
+  user          user     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("user_refresh_token") 
+}
+
+
 
 model cart {
   id          Int      @id @default(autoincrement())
@@ -141,7 +158,9 @@ model cart {
 
   @@index([product_id])
   @@index([user_id])
+  @@map("cart")
 }
+
 
 model transaction {
   id                 Int                  @id @default(autoincrement())
