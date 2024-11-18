@@ -1,13 +1,19 @@
+'use client';
+
 import Image from "next/image";
 import SearchBar from "./SearchBar";
 import { ShoppingCart02Icon } from "../icons/ShoppingCart02Icon";
 import { Notification03Icon } from "../icons/Notification03Icon";
 import { FavouriteIcon } from "../icons/FavouriteIcon";
 import Navbar from "./Navbar";
-import { Location05Icon } from "../icons/Location05Icon";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+const hideHeaderPaths = ["/login", "/register", "/admin"];
 
 export default function Header() {
+  const pathname = usePathname();
+  if (hideHeaderPaths.some((path) => pathname?.startsWith(path))) return null;
   return (
     <header className="sticky top-0 border-b-2 border-b-gray-100 bg-white z-50 ">
       <div className="grid grid-cols-[10%_80%_10%] md:grid-cols-[25%_50%_25%] mx-auto pt-6 md:pb-4 w-[96%]">
@@ -56,7 +62,7 @@ export default function Header() {
             </p>
           </div>
         </Link>
-        <div className="py-2 col-span-2 md:col-start-2 row-start-2 md:flex overflow-hidden px-4 md:py-0">
+        <div className="py-2 col-span-2 md:col-start-2 row-start-2 md:flex overflow-hidden px-4 md:py-0 md:mt-2">
           <Navbar />
         </div>
         {/* <div className="md:col-start-3 row-start-2 relative">
@@ -73,3 +79,5 @@ export default function Header() {
     </header>
   );
 }
+
+

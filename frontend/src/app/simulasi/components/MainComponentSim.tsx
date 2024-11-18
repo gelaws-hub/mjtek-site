@@ -9,7 +9,6 @@ import DeleteConfirmModal from "@/components/DeleteConfirmModal";
 import { DeletePutBackIcon } from "@/components/icons/DeletePutBackIcon";
 import { Share01Icon } from "@/components/icons/Share01Icon";
 import { ViewIcon } from "@/components/icons/ViewIcon";
-import { AddCircleIcon } from "@/components/icons/AddCircleIcon";
 
 interface Socket {
   id: number;

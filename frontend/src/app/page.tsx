@@ -12,7 +12,7 @@ export default function Home() {
       <div className="hidden md:flex max-h-[40%]">
         <Sidebar sidebarData={DummySidebar.DummySidebar} />
       </div>
-      <div className="max-w-[1024px] md:pl-4">
+      <div className="max-w-[1024px] md:pl-4 bg-white md:pr-4">
         <BannerSlider
           className="my-4"
           imageUrls={dummyBanner.DummyBanner}

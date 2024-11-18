@@ -41,7 +41,7 @@ export default function ProductCard() {
 
   return (
     <div className="mx-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 lg:max-w-[1024px]">
-      {products.map((product) => (
+      {products && products.map((product) => (
         <ProductCardItem key={product.id} product={product} />
       ))}
     </div>
