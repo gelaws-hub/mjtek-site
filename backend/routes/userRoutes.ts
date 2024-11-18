@@ -10,6 +10,8 @@ import {
     authorize
 } from '../auth/userController';
 
+import { createRole, getAllRoles, getRoleById, updateRole, deleteRole } from '../auth/roleController';
+
 const userRoutes = express.Router();
 
 // REGISTER USER
@@ -43,5 +45,12 @@ userRoutes.post('/logout', ensureAuthenticated, logoutUser);
 userRoutes.get('/admin', ensureAuthenticated, authorize([1]), (req, res) => {
   res.json({ message: 'Admin route accessed!' });
 });
+
+userRoutes.post('/role', createRole);
+userRoutes.get('/role', getAllRoles);
+userRoutes.get('/role/:id', getRoleById);
+userRoutes.put('/role/:id', updateRole);
+userRoutes.delete('/role/:id', deleteRole);
+
 
 export default userRoutes;

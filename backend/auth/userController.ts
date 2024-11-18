@@ -6,10 +6,12 @@ import { authenticator } from 'otplib';
 import crypto from 'crypto';
 import NodeCache from 'node-cache';
 import qrcode from 'qrcode';
+import dotenv from 'dotenv';
 // import { google } from 'googleapis';
 
 const prisma = new PrismaClient();
 const cache = new NodeCache();
+dotenv.config();
 
 interface CustomRequest extends Request {
   user: {
@@ -56,39 +58,6 @@ export const ensureAuthenticated: RequestHandler = async (req, res, next) => {
     }
   }
 };
-
-
-// Google Login
-// export const googleLogin = (req: Request, res: Response) => {
-//   res.redirect(authorizationUrl);
-// };
-
-// Google Callback
-// export const googleCallback = async (req: Request, res: Response) => {
-//   const { code } = req.query;
-//   const { tokens } = await oauth2Client.getToken(code as string);
-//   oauth2Client.setCredentials(tokens);
-
-//   const oauth2 = google.oauth2({ auth: oauth2Client, version: 'v2' });
-//   const { data } = await oauth2.userinfo.get();
-
-//   if (!data.email || !data.name) {
-//       return res.json({ data });
-//   }
-
-//   let user = await prisma.users.findUnique({ where: { email: data.email } });
-//   if (!user) {
-//       user = await prisma.users.create({ data: { name: data.name, email: data.email, address: '-' } });
-//   }
-
-//   const payload = { id: user.id, name: user.name, address: user.address };
-//   const token = jwt.sign(payload, process.env.JWT_SECRET!, { expiresIn: '1h' });
-
-//   res.json({
-//       data: { id: user.id, name: user.name, address: user.address },
-//       token,
-//   });
-// };
 
 // Register user
 export const registerUser = async (req: Request, res: Response) => {
@@ -159,7 +128,7 @@ export const login = async (req: Request, res: Response) => {
 
       const refreshToken = jwt.sign({ userId: user.id, name: user.name}, process.env.REFRESH_TOKEN_SECRET!, {
         subject: 'refreshToken',
-        expiresIn: '1w',
+        expiresIn: '1h',
       });
 
       await prisma.user_refresh_token.create({
@@ -234,14 +203,6 @@ export const refreshToken = async (req: Request, res: Response) => {
   }
 };
 
-// CRUD Operations
-// export const createUser = async (req: ValidationRequest, res: Response) => {
-//   const { name, email, address } = req.body;
-//   const result = await prisma.user.create({ data: { name, email, address } });
-
-//   res.json({ data: result, message: 'User created' });
-// };
-
 // Get Current User
 export const getCurrentUser = async (req: ValidationRequest, res: Response) => {
   try {
@@ -271,24 +232,6 @@ export const getUsers = async (_req: ValidationRequest, res: Response) => {
   res.json({ data: result, message: 'User list' });
 };
 
-
-// export const updateUser = async (req: ValidationRequest, res: Response) => {
-//   const { id } = req.params;
-//   const { name, email, address } = req.body;
-
-//   const result = await prisma.user.update({
-//       data: { name, email, address },
-//       where: { id: Number(id) },
-//   });
-//   res.json({ data: result, message: `User ${id} updated` });
-// };
-
-// export const deleteUser = async (req: ValidationRequest, res: Response) => {
-//   const { id } = req.params;
-
-//   await prisma.users.delete({ where: { id: Number(id) } });
-//   res.json({ message: `User ${id} deleted` });
-// };
 
 // Logout User
 export const logoutUser = async (req: ValidationRequest, res: Response) => {

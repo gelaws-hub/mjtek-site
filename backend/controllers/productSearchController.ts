@@ -65,7 +65,7 @@ export const getAllProducts = async (req: Request, res: Response) => {
         })),
       };
 
-      const [titleMatches, descriptionMatches] = await Promise.all([
+      const [titleMatches, descriptionMatches, totalTitleCount, totalDescriptionCount] = await Promise.all([
         prisma.product.findMany({
           where: {
             AND: [titleConditions, categoryFilter, compatibilityFilters],
@@ -103,10 +103,25 @@ export const getAllProducts = async (req: Request, res: Response) => {
             media: { select: { id: true, source: true, file_type: true } },
           },
         }),
+        prisma.product.count({
+          where: {
+            AND: [titleConditions, categoryFilter, compatibilityFilters],
+          },
+        }),
+        prisma.product.count({
+          where: {
+            AND: [
+              { ...descriptionConditions },
+              { NOT: titleConditions },
+              categoryFilter,
+              compatibilityFilters,
+            ],
+          },
+        }),
       ]);
 
       products = [...titleMatches, ...descriptionMatches];
-      totalCount = titleMatches.length + descriptionMatches.length;
+      totalCount = totalTitleCount + totalDescriptionCount;
     } else {
       products = await prisma.product.findMany({
         skip,
