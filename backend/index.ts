@@ -7,7 +7,6 @@ import produkRoutes from './routes/productRoutes';
 import produkDetailRoutes from './routes/productDetailRoutes'; 
 import simulationRoutes from './routes/simulationRoutes';
 import transaksiRoutes from './routes/transactionRoutes';
-
 import userRoutes from './routes/userRoutes';
 
 
@@ -27,7 +26,6 @@ app.use('/', produkRoutes);
 app.use('/', produkDetailRoutes);
 app.use('/', simulationRoutes);
 app.use('/', transaksiRoutes);
-app.use('/', dummyUserRouter)
 
 // auth routes
 app.use('/', userRoutes);
