@@ -4,9 +4,14 @@ const nextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'images.tokopedia.net',
-        pathname: '**',
+        protocol: "https",
+        hostname: "images.tokopedia.net",
+        pathname: "**",
+      },
+      {
+        protocol: "https",
+        hostname: "raw.githubusercontent.com",
+        pathname: "**",
       },
     ],
   },
