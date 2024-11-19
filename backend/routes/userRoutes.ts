@@ -42,7 +42,7 @@ userRoutes.post('/logout', ensureAuthenticated, logoutUser);
 
 // EXAMPLE ROUTE WITH ROLE-BASED AUTHORIZATION (Add roles based on your app's needs)
 // Only accessible to users with role_id 1 (admin)
-userRoutes.get('/admin', ensureAuthenticated, authorize([1]), (req, res) => {
+userRoutes.get('/admin', ensureAuthenticated, authorize(["admin"]), (req, res) => {
   res.json({ message: 'Admin route accessed!' });
 });
 

@@ -113,9 +113,9 @@ export default function ComponentSelection({
       {/* Display selected product details */}
       {selectedProduct && (
         <div className="relative">
-          <button
+          <div
             onClick={handleModalOpen}
-            className="pr-10 md:pr-0 w-full text-left border rounded-lg hover:border-primary transition-colors"
+            className="pr-10 md:pr-0 w-full text-left border rounded-lg hover:border-primary transition-colors cursor-pointer"
           >
             <div className="p-2 sm:p-4 flex sm:flex-row items-start gap-2 sm:gap-4">
               <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0">
@@ -126,6 +126,7 @@ export default function ComponentSelection({
                   }
                   alt={selectedProduct.product_name}
                   className="object-cover rounded-md"
+                  sizes="(max-width: 120px) 10vw, (max-width: 120px) 10vw, 10vw"
                   fill
                 />
               </div>
@@ -164,7 +165,7 @@ export default function ComponentSelection({
                 </div>
               </div>
             </div>
-          </button>
+          </div>
 
           {/* Delete Button */}
           <button

@@ -32,11 +32,11 @@ export const getAllRoles = async (_req: Request, res: Response): Promise<void> =
 
 // Get a role by ID
 export const getRoleById = async (req: Request, res: Response): Promise<void> => {
-  const { id } = req.params;
+  const { role_name } = req.params;
 
   try {
     const role = await prisma.role.findUnique({
-      where: { id: Number(id) },
+      where: { role_name: role_name },
     });
 
     if (!role) {
@@ -57,7 +57,7 @@ export const updateRole = async (req: Request, res: Response): Promise<void> => 
 
   try {
     const updatedRole = await prisma.role.update({
-      where: { id: Number(id) },
+      where: { role_name: role_name },
       data: { role_name, description },
     });
 
@@ -69,11 +69,11 @@ export const updateRole = async (req: Request, res: Response): Promise<void> => 
 
 // Delete a role by ID
 export const deleteRole = async (req: Request, res: Response): Promise<void> => {
-  const { id } = req.params;
+  const { role_name } = req.params;
 
   try {
     await prisma.role.delete({
-      where: { id: Number(id) },
+      where: { role_name: role_name },
     });
 
     res.status(200).json({ message: "Role deleted successfully" });

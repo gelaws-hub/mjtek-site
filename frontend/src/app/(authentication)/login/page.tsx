@@ -41,6 +41,7 @@ export default function Login() {
         });
         router.push("/simulasi");
         setIsLoading(false);
+        console.log(response);
       })
       .catch((error) => {
         setIsLoading(false);

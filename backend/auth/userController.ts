@@ -2,10 +2,8 @@ import { Request, Response, NextFunction, RequestHandler } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
-import { authenticator } from 'otplib';
 import crypto from 'crypto';
 import NodeCache from 'node-cache';
-import qrcode from 'qrcode';
 import dotenv from 'dotenv';
 // import { google } from 'googleapis';
 
@@ -16,7 +14,7 @@ dotenv.config();
 interface CustomRequest extends Request {
   user: {
     id: string;
-    role_id: number;
+    role_name: string;
     name: string;
     email: string;
   };
@@ -42,7 +40,7 @@ export const ensureAuthenticated: RequestHandler = async (req, res, next) => {
     // Type assertion to match CustomRequest
     (req as CustomRequest).user = {
       id: decoded.userId,
-      role_id: decoded.role_id,
+      role_name: decoded.role_name,
       name: decoded.name,
       email: decoded.email
     };
@@ -84,7 +82,8 @@ export const registerUser = async (req: Request, res: Response) => {
         password: hashedPassword,
         address,
         phone_number,
-        role_id: 2, // Set default role sebagai user biasa(pembeli)
+        role_name: "buyer", // Set default role sebagai user biasa(pembeli)
+        profile_pic: 'https://raw.githubusercontent.com/gelaws-hub/mjtek-site/refs/heads/main/frontend/public/image.png',
       }
     });
 
@@ -211,7 +210,12 @@ export const getCurrentUser = async (req: ValidationRequest, res: Response) => {
       select: {
         id: true,
         name: true,
-        email: true
+        email: true,
+        role: {
+          select: {
+            role_name: true
+          }
+        }
       }
     });
 
@@ -248,7 +252,7 @@ export const logoutUser = async (req: ValidationRequest, res: Response) => {
   }
 };
 
-export const authorize = (roles: number[]) => {
+export const authorize = (roles: string[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     // Pastikan bahwa req.user sudah terisi oleh middleware ensureAuthenticated
     const userId = (req as any).user?.id;
@@ -261,10 +265,10 @@ export const authorize = (roles: number[]) => {
       // Ambil role_id dari database berdasarkan id user
       const user = await prisma.user.findUnique({
         where: { id: userId },
-        select: { role_id: true },
+        select: { role_name: true },
       });
 
-      if (!user || !roles.includes(user.role_id)) {
+      if (!user || !roles.includes(user.role_name)) {
         return res.status(403).json({ message: 'Access denied' });
       }
 

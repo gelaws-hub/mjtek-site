@@ -112,12 +112,13 @@ model simulation_detail {
 
 model user {
   id              String               @id @default(uuid())
-  role_id         Int
+  role_name       String
   name            String
   email           String               @unique(map: "user_email_unique")
   password        String
   address         String
   phone_number    String
+  profile_pic     String
   fa_enable       Boolean              @default(false)
   fa_secret       String?
   refresh_tokens  user_refresh_token[]
@@ -127,7 +128,7 @@ model user {
   favorite        favorite[]
   transaction_log transaction_log[]
 
-  role role @relation(fields: [role_id], references: [id])
+  role role @relation(fields: [role_name], references: [role_name])
 
   @@unique([email])
   @@map("user") // Optional: To make sure the table is named "user"
@@ -200,8 +201,7 @@ model media {
 }
 
 model role {
-  id          Int    @id @default(autoincrement())
-  role_name   String
+  role_name   String @id
   description String
   user        user[]
 }

@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import Image from "next/image";
 import SearchBar from "./SearchBar";
@@ -8,10 +8,16 @@ import { FavouriteIcon } from "../icons/FavouriteIcon";
 import Navbar from "./Navbar";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
+import UserProfile from "./UserProfile";
 
 const hideHeaderPaths = ["/login", "/register", "/admin"];
 
 export default function Header() {
+  const [openUserInfo, setOpenUserInfo] = useState(false);
+
+  const toggleUserInfo = () => setOpenUserInfo(!openUserInfo);
+
   const pathname = usePathname();
   if (hideHeaderPaths.some((path) => pathname?.startsWith(path))) return null;
   return (
@@ -36,7 +42,10 @@ export default function Header() {
         <div className="md:col-start-2 mx-1 md:ml-0 self-stretch my-0 flex justify-normal items-center">
           <SearchBar />
         </div>
-        <Link href="/login" className="md:col-start-3 flex justify-center md:justify-start items-center">
+        <Link
+          href="/login"
+          className="md:col-start-3 flex justify-center md:justify-start items-center"
+        >
           <div className="md:flex ml-1 md:ml-2 hidden">
             <button className="hover:bg-slate-100 rounded-xl">
               <ShoppingCart02Icon height={20} className="text-gray-700" />
@@ -48,7 +57,9 @@ export default function Header() {
               <FavouriteIcon height={20} className="text-gray-700" />
             </button>
           </div>
-          <div className="flex md:justify-start justify-center cursor-pointer md:gap-2 items-center md:mr-10 hover:bg-blue-900 hover:bg-opacity-10 rounded-xl md:px-3">
+          <div
+            className="flex md:justify-start justify-center cursor-pointer md:gap-2 items-center md:mr-10 hover:bg-blue-900 hover:bg-opacity-10 rounded-xl md:px-3"
+          >
             <Image
               key="profile_image"
               src="/myImage.jpg"
@@ -62,9 +73,17 @@ export default function Header() {
             </p>
           </div>
         </Link>
+        <button onClick={toggleUserInfo}>
+          My Info
+        </button>
         <div className="py-2 col-span-2 md:col-start-2 row-start-2 md:flex overflow-hidden px-4 md:py-0 md:mt-2">
           <Navbar />
         </div>
+        {openUserInfo ? (
+          <div className="absolute top-2 right-2 z-50">
+            <UserProfile />
+          </div>
+        ) : null}
         {/* <div className="md:col-start-3 row-start-2 relative">
           <button className="hidden md:flex items-center gap-1 ml-auto cursor-pointer mr-10">
             <Location05Icon
@@ -79,5 +98,3 @@ export default function Header() {
     </header>
   );
 }
-
-
