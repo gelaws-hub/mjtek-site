@@ -5,13 +5,19 @@ import { Share01Icon } from "@/components/icons/Share01Icon";
 import { FavouriteIcon } from "@/components/icons/FavouriteIcon";
 import QuantitySelector from "@/components/product/QtySelector";
 import { ShoppingCart02Icon } from "@/components/icons/ShoppingCart02Icon";
+import FavoriteButton from "@/components/product/FavoriteButton";
 
 interface OrderSectionProps {
   price: number;
   productQty?: number;
+  productId: string;
 }
 
-export default function OrderSection({ price, productQty }: OrderSectionProps) {
+export default function OrderSection({
+  price,
+  productQty,
+  productId,
+}: OrderSectionProps) {
   const [qty, setQty] = useState<number>(1);
   const [copySuccess, setCopySuccess] = useState<string>("");
 
@@ -70,10 +76,7 @@ export default function OrderSection({ price, productQty }: OrderSectionProps) {
             </p>
           )}
           <span className="text-gray-500 text-xs">|</span>
-          <button className="flex items-center font-medium text-gray-700 hover:bg-slate-100 p-2 rounded-lg">
-            <FavouriteIcon height={16} className="text-gray-700" />
-            <span className="text-xs">Favorit</span>
-          </button>
+            <FavoriteButton productId={productId} text="Favorit"/>
         </div>
       </aside>
       {/* Mobile */}

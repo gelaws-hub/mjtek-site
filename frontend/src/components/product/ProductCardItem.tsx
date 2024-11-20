@@ -1,22 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { FavouriteIcon } from "../icons/FavouriteIcon";
-
-interface Media {
-  source: string;
-  file_type: string;
-}
-
-interface Product {
-  id: number;
-  product_name: string;
-  price: number;
-  media: Media[];
-  category: {
-    id: number;
-    category_name: string;
-  };
-}
+import FavoriteButton from "./FavoriteButton";
+import { Product } from "./ProductInterface";
 
 interface ProductCardItemProps {
   product: Product;
@@ -47,8 +32,8 @@ export default function ProductCardItem({ product }: ProductCardItemProps) {
             height={300}
             className="w-full h-full object-cover overflow-hidden"
           />
-          <button className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md z-10">
-            <FavouriteIcon width={20} height={20} />
+          <button className="absolute top-2 right-2 bg-white rounded-full shadow-md z-10">
+            <FavoriteButton productId={product.id.toString()} />
           </button>
         </div>
       )}

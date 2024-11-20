@@ -6,15 +6,17 @@ import Link from "next/link";
 import { useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from "next/navigation";
 import LoadingAuth from "../loading";
 
 export default function Login() {
-  const bannerLogin = "https://images.tokopedia.net/img/cache/1200/BgtCLw/2021/9/20/a4a3e98f-d9e4-40ae-84b6-8df6903ba113.jpg.webp?ect=4g";
+  const bannerLogin =
+    "https://images.tokopedia.net/img/cache/1200/BgtCLw/2021/9/20/a4a3e98f-d9e4-40ae-84b6-8df6903ba113.jpg.webp?ect=4g";
   const [userEmail, setUserEmail] = useState("");
   const [userPassword, setUserPassword] = useState("");
   const [error, setError] = useState(null);
   const router = useRouter();
+  const pathname = usePathname();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -28,20 +30,17 @@ export default function Login() {
   const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
     setIsLoading(true);
     event.preventDefault();
-    console.log(userEmail, userPassword);
     axios
       .post(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
         email: userEmail,
         password: userPassword,
       })
       .then((response) => {
-        console.log(response.data.accessToken);
         Cookies.set("accessToken", response.data.accessToken, {
           expires: 7, //days
         });
-        router.push("/simulasi");
+          router.push("/");
         setIsLoading(false);
-        console.log(response);
       })
       .catch((error) => {
         setIsLoading(false);
@@ -54,7 +53,9 @@ export default function Login() {
     <div className="min-h-[100vh] grid xl:grid-cols-[50%_50%] grid-cols-1 justify-center p-20 rounded-xl">
       <div className="bg-white rounded-l-2xl drop-shadow-lg shadow-background flex flex-col p-[20%]">
         <section className="">
-          {isLoading ? <LoadingAuth className="absolute top-1/2 left-1/2" /> : null}
+          {isLoading ? (
+            <LoadingAuth className="absolute top-1/2 left-1/2" />
+          ) : null}
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
             <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl">
               Silahkan Login

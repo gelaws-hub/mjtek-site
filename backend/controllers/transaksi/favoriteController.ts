@@ -20,7 +20,8 @@ export const getAllFavoritesByUserId = async (req: Request, res: Response) => {
           product: {
             include: {
               media: true,
-            }
+              category: true,
+            },
           },
         },
       }),
@@ -41,15 +42,36 @@ export const getAllFavoritesByUserId = async (req: Request, res: Response) => {
   }
 };
 
+export const isProductFavorite = async (req: Request, res: Response) => {
+  const { user_id, product_id } = req.body;
+  console.log(user_id, product_id);
+
+  try {
+    const favoriteExists = await prisma.favorite.findFirst({
+      where: {
+        user_id: user_id,
+        product_id: parseInt(product_id),
+      },
+    });
+
+    console.log(!!favoriteExists);
+    res.status(200).json({ isFavorite: !!favoriteExists });
+  } catch (error: any) {
+    console.error("Error checking favorite status:", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 export const addToFavorites = async (req: Request, res: Response) => {
-  const { user_id, id_produk } = req.body;
+  const { product_id } = req.body;
+  const { user_id } = req.params;
 
   try {
     // Check if the product is already in favorites for the user
     const existingFavorite = await prisma.favorite.findFirst({
       where: {
-        product_id: parseInt(id_produk),
-        user_id,
+        product_id: parseInt(product_id),
+        user_id: user_id,
       },
     });
 
@@ -59,7 +81,7 @@ export const addToFavorites = async (req: Request, res: Response) => {
       // Create a new entry in favorites if the product isn't already added
       const newFavorite = await prisma.favorite.create({
         data: {
-          product_id: parseInt(id_produk),
+          product_id: parseInt(product_id),
           user_id,
         },
       });
@@ -73,18 +95,33 @@ export const addToFavorites = async (req: Request, res: Response) => {
 };
 
 export const removeFromFavorites = async (req: Request, res: Response) => {
-  const { id } = req.params; // id refers to id_favorit
+  const { product_id } = req.body;
+  const { user_id } = req.params;
 
   try {
-    await prisma.favorite.delete({
+    const existingFavorite = await prisma.favorite.findFirst({
       where: {
-        id: parseInt(id),
+        user_id,
+        product_id: parseInt(product_id),
       },
     });
 
-    res.status(204).end();
+    if (!existingFavorite) {
+      return res.status(404).json({ error: "Favorite not found" });
+    }
+
+    await prisma.favorite.delete({
+      where: {
+        id: existingFavorite.id,
+      },
+    });
+
+    return res.status(200).json({ message: "Favorite removed successfully" });
   } catch (error: any) {
     console.error("Error removing from favorites:", error.message);
+    if (error.code === "P2025") {
+      return res.status(404).json({ error: "Favorite not found" });
+    }
     res.status(500).json({ error: "Internal server error" });
   }
 };

@@ -6,20 +6,24 @@ import { ShoppingCart02Icon } from "../icons/ShoppingCart02Icon";
 import { Notification03Icon } from "../icons/Notification03Icon";
 import { FavouriteIcon } from "../icons/FavouriteIcon";
 import UserInfoModal from "./UserInfoModal";
-
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  profile_pic: string;
-  role_name: string;
-}
+import { useAuth } from "@/app/(authentication)/auth/useAuth";
+import { useRouter } from "next/navigation";
 
 export default function UserProfile() {
-  const [user, setUser] = useState<User | null>(null);
   const [openUserInfo, setOpenUserInfo] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { user, isLoggedIn } = useAuth();
+  const router = useRouter();
 
+  const handleViewFavorite = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isLoggedIn) {
+      router.push("/login");
+    }
+    if (user?.id) {
+      router.push(`/favorite?user=${encodeURIComponent(user?.id)}`);
+    }
+  };
+  
   const toggleUserInfo = () => {
     setOpenUserInfo(!openUserInfo);
   };
@@ -55,29 +59,6 @@ export default function UserProfile() {
     }
   };
 
-  useEffect(() => {
-    const checkLoginStatus = async () => {
-      const token = Cookies.get("accessToken");
-      if (token) {
-        try {
-          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/me`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          const data = await res.json();
-          if (res.status === 200) {
-            setIsLoggedIn(true);
-            setUser(data);
-          }
-        } catch (error) {
-          console.error(error);
-        }
-      }
-    };
-    checkLoginStatus();
-  }, []);
-
   return (
     <div className="md:col-start-3 flex justify-center md:justify-start items-center gap-2">
       <div className="md:flex ml-1 md:ml-2 hidden">
@@ -87,7 +68,10 @@ export default function UserProfile() {
         <button className="hover:bg-slate-100 rounded-lg">
           <Notification03Icon height={20} className="text-gray-700" />
         </button>
-        <button className="hover:bg-slate-100 rounded-lg">
+        <button
+          className="hover:bg-slate-100 rounded-lg"
+          onClick={handleViewFavorite}
+        >
           <FavouriteIcon height={20} className="text-gray-700" />
         </button>
       </div>
@@ -110,7 +94,13 @@ export default function UserProfile() {
               {user?.name}
             </p>
           </div>
-          {openUserInfo && <UserInfoModal user={user} className="absolute" handleLogout={handleLogout} />}
+          {openUserInfo && (
+            <UserInfoModal
+              user={user}
+              className="absolute"
+              handleLogout={handleLogout}
+            />
+          )}
         </div>
       ) : (
         <div className="flex justify-center items-center gap-2">

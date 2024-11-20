@@ -77,7 +77,7 @@ export default function ProductDetail() {
                       className="text-blue-900 hover:font-semibold"
                       href={`/${product.data.category.category_name.toLowerCase()}`}
                     >
-                       {product.data.category.category_name}
+                      {product.data.category.category_name}
                     </Link>
                   </li>
                 )}
@@ -107,6 +107,7 @@ export default function ProductDetail() {
         {/* Order Section */}
         <section className="md:self-start sticky top-[10.9rem] h-auto">
           <OrderSection
+            productId={product.data.id}
             price={product.data.price}
             productQty={product.data.stock}
           />

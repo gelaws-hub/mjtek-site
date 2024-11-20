@@ -39,7 +39,7 @@ export const ensureAuthenticated: RequestHandler = async (req, res, next) => {
 
     // Type assertion to match CustomRequest
     (req as CustomRequest).user = {
-      id: decoded.userId,
+      id: decoded.id,
       role_name: decoded.role_name,
       name: decoded.name,
       email: decoded.email,
@@ -125,15 +125,13 @@ export const login = async (req: Request, res: Response) => {
         user.id,
         parseInt(process.env.CACHE_TEMP_TOKEN_EXPIRATION!)
       );
-      return res
-        .status(200)
-        .json({
-          tempToken,
-          expiresInSeconds: process.env.CACHE_TEMP_TOKEN_EXPIRATION,
-        });
+      return res.status(200).json({
+        tempToken,
+        expiresInSeconds: process.env.CACHE_TEMP_TOKEN_EXPIRATION,
+      });
     } else {
       const accessToken = jwt.sign(
-        { userId: user.id, name: user.name },
+        { id: user.id, name: user.name },
         process.env.ACCESS_TOKEN_SECRET!,
         {
           subject: "accessApi",
@@ -213,7 +211,7 @@ export const refreshToken = async (req: Request, res: Response) => {
       process.env.ACCESS_TOKEN_SECRET!,
       {
         subject: "accessApi",
-        expiresIn: "30m",
+        expiresIn: "10h",
       }
     );
 

@@ -10,6 +10,7 @@ import UserProfile from "./UserProfile";
 const hideHeaderPaths = ["/login", "/register", "/admin"]; //Header won't be visible on these paths
 
 export default function Header() {
+
   const pathname = usePathname();
   if (hideHeaderPaths.some((path) => pathname?.startsWith(path))) return null;
   return (

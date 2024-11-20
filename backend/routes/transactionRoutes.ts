@@ -4,6 +4,7 @@ import { addToCart, clearCart, getAllCartByUserId, removeFromCart, updateCartIte
 import {
   getAllFavoritesByUserId,
   addToFavorites,
+  isProductFavorite,
   removeFromFavorites,
 } from "../controllers/transaksi/favoriteController";
 
@@ -24,6 +25,7 @@ import {
   updateLogTransaksi,
   deleteLogTransaksi,
 } from '../controllers/transaksi/logTransaksiController';
+import { ensureCorrectUser } from "../auth/middleware/buyer/buyerMiddleware";
 
 const transaksiRoutes = express.Router();
 
@@ -33,9 +35,11 @@ transaksiRoutes.post("/cart", addToCart);
 transaksiRoutes.put("/cart/:id", updateCartItem);
 transaksiRoutes.delete("/cart/:id", removeFromCart);
 
-transaksiRoutes.get("/favorite/:id_user", getAllFavoritesByUserId);
-transaksiRoutes.post("/favorite", addToFavorites);
-transaksiRoutes.delete("/favorite/:id", removeFromFavorites);
+//ensureCorrectUser has to take :user_id as a param to make sure it's the correct user
+transaksiRoutes.get("/favorite/:user_id", ensureCorrectUser, getAllFavoritesByUserId);
+transaksiRoutes.post("/favorite/:user_id", ensureCorrectUser, addToFavorites);
+transaksiRoutes.post("/isFavorite/:user_id", ensureCorrectUser, isProductFavorite);
+transaksiRoutes.delete("/favorite/:user_id", ensureCorrectUser, removeFromFavorites); 
 
 // Transaksi routes
 transaksiRoutes.get('/transaction', getAllTransaction);
