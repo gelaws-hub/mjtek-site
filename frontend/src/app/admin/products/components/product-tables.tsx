@@ -41,16 +41,14 @@ function ProductTables() {
           Daftar Produk
         </h4>
       </div>
-      <div className="flex max-w-[96%] items-center justify-center overflow-hidden">
-        <table className="w-full border-collapse border-t border-stroke text-xs dark:border-strokedark md:text-sm">
+      <div className="flex max-w-[90vw] overflow-x-auto sm:max-w-full">
+        <table className="mx-auto w-full min-w-[600px] border-collapse border-t border-stroke text-xs dark:border-strokedark md:text-sm">
           <thead>
-            <tr className="grid grid-cols-[25px_3fr_1fr_0.5fr_1fr] px-4 py-4.5 sm:grid-cols-[40px_3fr_1fr_1fr_1fr_1fr] md:px-6 2xl:px-7.5">
+            <tr className="grid grid-cols-[25px_3fr_1fr_1fr_0.5fr_1fr] px-4 py-4.5 sm:grid-cols-[40px_3fr_1fr_1fr_0.5fr_1fr] md:px-6 2xl:px-7.5">
               <th className="text-left font-medium">No</th>
-              <th className="text-left font-medium">Produk</th>
-              <th className="hidden text-left font-medium sm:block">
-                Kategori
-              </th>
+              <th className="text-center font-medium">Produk</th>
               <th className="text-left font-medium">Harga</th>
+              <th className="text-left font-medium">Kategori</th>
               <th className="text-center font-medium">Stok</th>
               <th className="text-center font-medium">Actions</th>
             </tr>
@@ -59,7 +57,8 @@ function ProductTables() {
             {products ? (
               products.map((product, key) => (
                 <tr
-                  className="grid grid-cols-[25px_3fr_1fr_1fr_1fr] border-t border-stroke px-4 py-4.5 dark:border-strokedark sm:grid-cols-[40px_3fr_1fr_1fr_1fr_1fr] md:px-6 2xl:px-7.5"
+                  className={`grid grid-cols-[25px_3fr_1fr_1fr_0.5fr_1fr] border-t border-stroke px-4 py-4.5 odd:bg-white even:bg-gray-50 hover:bg-primary/10 dark:border-strokedark
+          dark:odd:bg-black dark:even:bg-strokedark dark:hover:bg-primary/20 sm:grid-cols-[40px_3fr_1fr_1fr_0.5fr_1fr] md:px-6 2xl:px-7.5`}
                   key={product.id}
                 >
                   {/* No Column */}
@@ -70,8 +69,8 @@ function ProductTables() {
                   </td>
 
                   {/* Product Name Column */}
-                  <td className="flex items-center gap-2">
-                    <div className="h-8 w-8 flex-shrink-0 overflow-hidden rounded-md md:h-12 md:w-12">
+                  <td className="mr-2 flex items-center gap-2">
+                    <div className="h-8 w-8 flex-shrink-0 overflow-hidden rounded-sm sm:rounded-md md:h-12 md:w-12">
                       <Image
                         className="h-full w-full object-cover"
                         src={product.media[0].source}
@@ -85,17 +84,17 @@ function ProductTables() {
                     </p>
                   </td>
 
-                  {/* Category Column */}
-                  <td className="hidden items-center sm:flex">
-                    <p className="truncate text-xs text-black dark:text-white md:text-sm">
-                      {product.category.category_name}
-                    </p>
-                  </td>
-
                   {/* Price Column */}
                   <td className="flex items-center overflow-hidden">
                     <p className="line-clamp-2 pr-2 text-xs text-black dark:text-white md:text-sm">
                       Rp. {Intl.NumberFormat("id-ID").format(product.price)}
+                    </p>
+                  </td>
+
+                  {/* Category Column */}
+                  <td className="flex items-center">
+                    <p className="truncate text-xs text-black dark:text-white md:text-sm">
+                      {product.category.category_name}
                     </p>
                   </td>
 
