@@ -5,7 +5,6 @@ import { PrismaClient } from "@prisma/client";
 import crypto from "crypto";
 import NodeCache from "node-cache";
 import dotenv from "dotenv";
-// import { google } from 'googleapis';
 
 const prisma = new PrismaClient();
 const cache = new NodeCache();
@@ -135,7 +134,7 @@ export const login = async (req: Request, res: Response) => {
         process.env.ACCESS_TOKEN_SECRET!,
         {
           subject: "accessApi",
-          expiresIn: "30m",
+          expiresIn: process.env.REFRESH_TOKEN_TIME,
         }
       );
 
@@ -144,7 +143,7 @@ export const login = async (req: Request, res: Response) => {
         process.env.REFRESH_TOKEN_SECRET!,
         {
           subject: "refreshToken",
-          expiresIn: "1h",
+          expiresIn: process.env.REFRESH_TOKEN_TIME,
         }
       );
 
@@ -211,7 +210,7 @@ export const refreshToken = async (req: Request, res: Response) => {
       process.env.ACCESS_TOKEN_SECRET!,
       {
         subject: "accessApi",
-        expiresIn: "10h",
+        expiresIn: process.env.REFRESH_TOKEN_TIME,
       }
     );
 
@@ -220,7 +219,7 @@ export const refreshToken = async (req: Request, res: Response) => {
       process.env.REFRESH_TOKEN_SECRET!,
       {
         subject: "refreshToken",
-        expiresIn: "1w",
+        expiresIn: process.env.REFRESH_TOKEN_TIME,
       }
     );
 

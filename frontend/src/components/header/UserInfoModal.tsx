@@ -1,6 +1,5 @@
 import Image from "next/image";
-import { User } from "./UserProfile";
-import { DiscAlbum } from "lucide-react";
+import { User } from "@/app/(authentication)/auth/useAuth";
 
 export interface UserInfoModalProps {
   user: User | null;

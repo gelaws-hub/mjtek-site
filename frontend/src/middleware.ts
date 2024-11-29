@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import Cookies from "js-cookie";
+import { match } from "assert";
 
 async function checkLogin(token: string | undefined, requestUrl: string) {
   if (!token) {
@@ -26,6 +27,7 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin:path*"],
+  // matcher: ["/admin:path*"],
+  matcher: []
 };
 

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 
-interface User {
+export interface User {
     id: string;
     name: string;
     username: string;

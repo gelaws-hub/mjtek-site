@@ -14,7 +14,6 @@ export default function ProductCard() {
         const response = await axios.get(
           `${process.env.NEXT_PUBLIC_API_URL}/product?limit=10&page=1`
         );
-        console.log("what I need : ", response.data.products)
         setProducts(response.data.products);
       } catch (error) {
         console.error("Error fetching products:", error);

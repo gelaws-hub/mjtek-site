@@ -23,7 +23,7 @@ export default function UserProfile() {
       router.push(`/favorite?user=${encodeURIComponent(user?.id)}`);
     }
   };
-  
+
   const toggleUserInfo = () => {
     setOpenUserInfo(!openUserInfo);
   };

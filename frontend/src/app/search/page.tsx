@@ -57,7 +57,7 @@ function SearchResultsComponent() {
     const fetchProducts = async (searchTerm: string, categoryIds: number[]) => {
       try {
         const url = new URL(
-          `${process.env.NEXT_PUBLIC_API_URL}/product?limit=10&page=${page}`
+          `${process.env.NEXT_PUBLIC_API_URL}/product?limit=9&page=${page}`
         );
         url.searchParams.append("q", encodeURIComponent(searchTerm));
         if (categoryIds.length > 0) {

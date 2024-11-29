@@ -268,8 +268,6 @@ export const partialUpdateProduct = async (req: Request, res: Response) => {
 };
 
 
-
-
 export const deleteProduct = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
