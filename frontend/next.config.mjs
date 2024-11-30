@@ -13,6 +13,16 @@ const nextConfig = {
           hostname: "raw.githubusercontent.com",
           pathname: "**",
         },
+        {
+          protocol: "https",
+          hostname: process.env.NEXT_PUBLIC_API_URL,
+          pathname: "**",
+        },
+        {
+          protocol: "http",
+          hostname: "localhost",
+          pathname: "**",
+        },
       ],
     },
   };

@@ -1,5 +1,6 @@
 "use client";
 
+import Loading from "@/app/loading";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
@@ -43,7 +44,7 @@ export default function ThumbnailImageSection({
         {selectedImage && (
           <div className="w-full h-full max-h-[50vh]">
             {isLoading ? (
-              <div className="animate-pulse bg-gray-300 w-full h-full rounded-lg"></div> // Skeleton Loader
+              <Loading />
             ) : (
               <Image
                 src={selectedImage}

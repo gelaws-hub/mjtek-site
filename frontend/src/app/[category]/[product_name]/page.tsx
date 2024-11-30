@@ -6,6 +6,7 @@ import OrderSection from "./components/OrderSection";
 import ThumbnailImageSection from "./components/ThumbnailImageSection";
 import ProductRecommendation from "./components/ProductRecommendation";
 import Link from "next/link";
+import Loading from "@/app/loading";
 
 export default function ProductDetail() {
   const pathname = usePathname();
@@ -35,7 +36,7 @@ export default function ProductDetail() {
   };
 
   if (!product) {
-    return <p>Loading...</p>;
+    return <Loading />
   }
 
   return (
