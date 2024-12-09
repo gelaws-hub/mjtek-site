@@ -473,7 +473,7 @@ export default function MainComponentSim() {
         </Card>
 
         {/* Summary */}
-        <Card className="sticky bottom-0 mt-8">
+        <Card className="sticky bottom-0 mt-8 bg-white">
           <CardContent className="p-6">
             <div className="flex justify-between items-center">
               <div>
@@ -486,15 +486,6 @@ export default function MainComponentSim() {
                       minimumFractionDigits: 0,
                       maximumFractionDigits: 0,
                     }).format(
-                      // Object.values(selectedComponents).reduce(
-                      //   (acc, component) => {
-                      //     if (component && (component as Product).price) {
-                      //       return acc + (component as Product).price;
-                      //     }
-                      //     return acc;
-                      //   },
-                      //   0
-                      // )
                       Object.values(selectedComponents).reduce(
                         (acc, component) => {
                           if (Array.isArray(component)) {
@@ -560,7 +551,7 @@ export default function MainComponentSim() {
                   </span>
                 </p>
               </div>
-              <div className="flex gap-1">
+              <div className="flex gap-1 ">
                 <Button
                   variant="outline"
                   onClick={handleResetClick}
