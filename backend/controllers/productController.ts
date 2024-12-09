@@ -276,8 +276,8 @@ export const deleteProduct = async (req: Request, res: Response) => {
       data: { is_deleted: true },
     });
 
-    res.status(204).json({
-      status_code: 204,
+    res.status(200).json({
+      status_code: 200,
       message: "success deleting product",
     });
   } catch (error: any) {
