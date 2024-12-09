@@ -20,19 +20,21 @@ app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const allowedOrigin = process.env.CORS_ALLOWED_ORIGIN || "";
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin || origin === allowedOrigin) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true,
-  })
-);
+// const allowedOrigin = process.env.CORS_ALLOWED_ORIGIN || "";
+// app.use(
+//   cors({
+//     origin: (origin, callback) => {
+//       if (!origin || origin === allowedOrigin) {
+//         callback(null, true);
+//       } else {
+//         callback(new Error("Not allowed by CORS"));
+//       }
+//     },
+//     credentials: true,
+//   })
+// );
+
+app.use(cors());
 
 app.use("/", produkRoutes);
 app.use("/", produkDetailRoutes);
