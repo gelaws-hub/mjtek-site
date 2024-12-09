@@ -7,7 +7,7 @@ import { AddCircleIcon } from "@/components/icons/AddCircleIcon";
 import GreenAlerts from "@/components/alerts/GreenAlerts";
 import RedAlerts from "@/components/alerts/RedAlerts";
 import { Bounce, toast } from "react-toastify";
-import { useRefreshContext } from "../page";
+import { useRefreshContext } from "./refreshContext";
 
 interface AddProductModalProps {
   isOpen: boolean;
@@ -93,7 +93,7 @@ export default function AddProductModal({
         throw new Error("Failed to add product with media");
       }
       addToast();
-      setRefresh(true);
+      setRefresh(!refresh);
     } catch (error) {
       console.error("Error adding product:", error);
       setAlert({

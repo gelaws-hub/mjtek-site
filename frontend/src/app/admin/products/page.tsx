@@ -1,15 +1,10 @@
-"use client";
+'use client';
 
 import DefaultLayout from "@/components/tailadmin/Layouts/DefaultLayout";
-import React, { useState, useContext, Dispatch, SetStateAction } from "react";
+import React, { useState } from "react";
 import ProductTables from "./components/product-tables";
 import ProductOptions from "./components/productOptions";
-
-type RefreshContextType = [boolean, Dispatch<SetStateAction<boolean>>];
-
-export const RefreshContext = React.createContext<
-  RefreshContextType | undefined
->(undefined);
+import { RefreshContext } from "./components/refreshContext"
 
 const ProductPage: React.FC = () => {
   const [refresh, setRefresh] = useState(false);
@@ -26,13 +21,3 @@ const ProductPage: React.FC = () => {
 };
 
 export default ProductPage;
-
-export const useRefreshContext = (): RefreshContextType => {
-  const context = useContext(RefreshContext);
-  if (!context) {
-    throw new Error(
-      "useRefreshContext must be used within a RefreshContext.Provider",
-    );
-  }
-  return context;
-};

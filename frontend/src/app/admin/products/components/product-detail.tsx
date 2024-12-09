@@ -8,7 +8,7 @@ import PriceInput from "./PriceInput";
 import React from "react";
 import { Bounce, toast } from "react-toastify";
 import TextareaAutosize from "react-textarea-autosize";
-import { useRefreshContext } from "../page";
+import { useRefreshContext } from "./refreshContext";
 
 interface ProductDetailProps {
   product: Product;
@@ -76,7 +76,7 @@ export function ProductDetail({ product, onClose }: ProductDetailProps) {
       );
 
       if (response.ok) {
-        setRefresh(true);
+        setRefresh(!refresh);
         successToast();
         onClose();
       } else {

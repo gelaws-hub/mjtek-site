@@ -10,7 +10,7 @@ import { PencilEdit02Icon } from "@/components/icons/PencilEdit02Icon";
 import { DeletePutBackIcon } from "@/components/icons/DeletePutBackIcon";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal";
 import { Bounce, ToastContainer, toast } from "react-toastify";
-import { useRefreshContext } from "../page";
+import { useRefreshContext } from "./refreshContext";
 
 function ProductTables() {
   const router = useRouter();
@@ -36,7 +36,6 @@ function ProductTables() {
       .then((data) => {
         setProducts(data.products);
         setTotalPages(data.totalPages);
-        setRefresh(false);
       });
   }, [currentPage, refresh]);
 
