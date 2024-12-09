@@ -4,6 +4,7 @@ import { AddCircleIcon } from "@/components/icons/AddCircleIcon";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import AddProductModal from "./addProductModal";
+import { ToastContainer } from "react-toastify";
 
 export default function ProductOptions() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -21,15 +22,11 @@ export default function ProductOptions() {
         <AddProductModal
             isOpen={isModalOpen}
             onClose={() => setIsModalOpen(false)}
+            
         />
-        {/* {isModalOpen && (
-          <AddProductModal
-            isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
-          />
-        )} */}
       </div>
       <div className="mb-4"></div>
+      <ToastContainer />
     </>
   );
 }

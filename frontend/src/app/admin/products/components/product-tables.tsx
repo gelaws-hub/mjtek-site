@@ -9,8 +9,8 @@ import { ProductDetail } from "./product-detail";
 import { PencilEdit02Icon } from "@/components/icons/PencilEdit02Icon";
 import { DeletePutBackIcon } from "@/components/icons/DeletePutBackIcon";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal";
-import { TickDouble02Icon } from "@/components/icons/TickDouble02Icon";
 import { Bounce, ToastContainer, toast } from "react-toastify";
+import { useRefreshContext } from "../page";
 
 function ProductTables() {
   const router = useRouter();
@@ -20,7 +20,7 @@ function ProductTables() {
 
   const [products, setProducts] = useState<Product[] | null>(null);
   const [totalPages, setTotalPages] = useState(1);
-  const [refresh, setRefresh] = useState(false);
+  const [refresh, setRefresh] = useRefreshContext();
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deletedProductId, setDeletedProductId] = useState<number | null>(null);
@@ -49,6 +49,18 @@ function ProductTables() {
     setIsDeleteModalOpen(true);
   };
 
+  const deleteToast = () => toast.success('Produk berhasil dihapus', {
+    position: "bottom-right",
+    autoClose: 3000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+    theme: "light",
+    transition: Bounce,
+    });
+
   const handleDelete = () => {
     if (!deletedProductId) {
       setIsDeleteModalOpen(false);
@@ -59,7 +71,7 @@ function ProductTables() {
     }).then(() => {
       setRefresh(!refresh);
       setIsDeleteModalOpen(false);
-      console.log("product : ", selectedProduct);
+      deleteToast();
     });
   };
 
@@ -172,7 +184,6 @@ function ProductTables() {
         </div>
         {selectedProduct && (
           <ProductDetail
-            setRefresh={setRefresh}
             product={selectedProduct}
             onClose={() => setSelectedProduct(null)}
           />

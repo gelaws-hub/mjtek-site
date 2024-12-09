@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import ImageUploader from "./ImageUploader";
 import { Button } from "@/components/ui/button";
 import { AddCircleIcon } from "@/components/icons/AddCircleIcon";
 import GreenAlerts from "@/components/alerts/GreenAlerts";
 import RedAlerts from "@/components/alerts/RedAlerts";
+import { Bounce, toast } from "react-toastify";
+import { useRefreshContext } from "../page";
 
 interface AddProductModalProps {
   isOpen: boolean;
@@ -39,6 +41,8 @@ export default function AddProductModal({
     title: string;
     description: string;
   }>({ type: null, title: "", description: "" });
+
+  const [refresh, setRefresh] = useRefreshContext();
 
   const handleInputChange = (
     e: React.ChangeEvent<
@@ -88,12 +92,8 @@ export default function AddProductModal({
       if (!response.ok) {
         throw new Error("Failed to add product with media");
       }
-
-      setAlert({
-        type: "success",
-        title: "Produk berhasil ditambahkan!",
-        description: "Produk Anda telah berhasil diunggah ke sistem.",
-      });
+      addToast();
+      setRefresh(true);
     } catch (error) {
       console.error("Error adding product:", error);
       setAlert({
@@ -103,6 +103,19 @@ export default function AddProductModal({
       });
     }
   };
+
+  const addToast = () =>
+    toast.success("Produk berhasil ditambahkan", {
+      position: "bottom-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+      transition: Bounce,
+    });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -131,12 +144,10 @@ export default function AddProductModal({
     fetchData();
   }, []);
 
-  // if (!isOpen) return null;
-
   return (
     <>
       <div
-        className={`flex items-center justify-center p-4 transition-all ${isOpen ? "visible scale-y-100 opacity-100" : "invisible scale-y-0 opacity-0 hidden"}`}
+        className={`flex items-center justify-center p-4 transition-all ${isOpen ? "visible scale-y-100 opacity-100" : "invisible hidden scale-y-0 opacity-0"}`}
       >
         <section className="relative w-full rounded-lg border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
           <button
@@ -146,6 +157,7 @@ export default function AddProductModal({
           >
             ✕
           </button>
+          <button onClick={() => setRefresh(!refresh)}>CONTEXT TEST</button>
           <header className="border-b border-stroke px-6.5 py-4 dark:border-strokedark">
             <h2 className="font-medium text-black dark:text-white">
               Tambah Produk

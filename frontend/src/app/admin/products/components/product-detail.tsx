@@ -8,20 +8,17 @@ import PriceInput from "./PriceInput";
 import React from "react";
 import { Bounce, toast } from "react-toastify";
 import TextareaAutosize from "react-textarea-autosize";
+import { useRefreshContext } from "../page";
 
 interface ProductDetailProps {
   product: Product;
   onClose: () => void;
-  setRefresh?: (value: boolean) => void;
 }
 
-export function ProductDetail({
-  product,
-  onClose,
-  setRefresh = () => {},
-}: ProductDetailProps) {
+export function ProductDetail({ product, onClose }: ProductDetailProps) {
   const [editedProduct, setEditedProduct] = useState(product);
-  const [selectedImage, setSelectedImage] = useState(product.media[0].source);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [refresh, setRefresh] = useRefreshContext();
 
   // Handle input change
   const handleInputChange = (field: keyof Product, value: any) => {
@@ -51,6 +48,7 @@ export function ProductDetail({
       if (
         product[key as keyof Product] !== editedProduct[key as keyof Product]
       ) {
+        // @ts-ignore
         changes[key as keyof Product] = editedProduct[key as keyof Product];
       }
     }
@@ -105,11 +103,13 @@ export function ProductDetail({
         <ScrollArea className="h-[calc(100vh-200px)]">
           <div className="flex h-full flex-col gap-6 overflow-auto p-4 md:flex-row">
             <div className="w-full md:w-1/3">
-              <ThumbnailImageSection
-                media={product.media}
-                selectedImage={selectedImage}
-                setSelectedImage={setSelectedImage}
-              />
+              {selectedImage && (
+                <ThumbnailImageSection
+                  media={product.media}
+                  selectedImage={selectedImage}
+                  setSelectedImage={setSelectedImage}
+                />
+              )}
             </div>
             <div className="w-full space-y-4 md:w-2/3">
               {/* Editable Fields */}
