@@ -5,6 +5,7 @@ interface ConfirmationModalProps {
   onClose: () => void;
   onConfirm: () => void;
   message: string;
+  opacity?: string;
 }
 
 const DeleteConfirmModal: React.FC<ConfirmationModalProps> = ({
@@ -12,12 +13,13 @@ const DeleteConfirmModal: React.FC<ConfirmationModalProps> = ({
   onClose,
   onConfirm,
   message,
+  opacity = "0.5",
 }) => {
   if (!isOpen) return null;
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-gray-900 bg-opacity-50"
+      className={`fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-gray-900 bg-opacity-15`}
       role="dialog"
       aria-modal="true"
     >
