@@ -68,7 +68,7 @@ export const getAllProducts = async (req: Request, res: Response) => {
       const [titleMatches, descriptionMatches, totalTitleCount, totalDescriptionCount] = await Promise.all([
         prisma.product.findMany({
           where: {
-            AND: [titleConditions, categoryFilter, compatibilityFilters],
+            AND: [titleConditions, categoryFilter, compatibilityFilters, { is_deleted: false }],
           },
           skip,
           take: limit,
@@ -89,6 +89,7 @@ export const getAllProducts = async (req: Request, res: Response) => {
               { NOT: titleConditions },
               categoryFilter,
               compatibilityFilters,
+              { is_deleted: false },
             ],
           },
           skip,
@@ -105,7 +106,7 @@ export const getAllProducts = async (req: Request, res: Response) => {
         }),
         prisma.product.count({
           where: {
-            AND: [titleConditions, categoryFilter, compatibilityFilters],
+            AND: [titleConditions, categoryFilter, compatibilityFilters, { is_deleted: false }],
           },
         }),
         prisma.product.count({
@@ -115,6 +116,7 @@ export const getAllProducts = async (req: Request, res: Response) => {
               { NOT: titleConditions },
               categoryFilter,
               compatibilityFilters,
+              { is_deleted: false },
             ],
           },
         }),
@@ -127,7 +129,7 @@ export const getAllProducts = async (req: Request, res: Response) => {
         skip,
         take: limit,
         orderBy: { id: "asc" },
-        where: { ...categoryFilter, ...compatibilityFilters },
+        where: { ...categoryFilter, ...compatibilityFilters, is_deleted: false },
         include: {
           category: true,
           sub_category: true,
@@ -139,7 +141,7 @@ export const getAllProducts = async (req: Request, res: Response) => {
       });
 
       totalCount = await prisma.product.count({
-        where: { ...categoryFilter, ...compatibilityFilters },
+        where: { ...categoryFilter, ...compatibilityFilters, is_deleted: false },
       });
     }
 
@@ -202,3 +204,4 @@ export const getAllProducts = async (req: Request, res: Response) => {
       .json({ status_code: 500, message: "Internal server error" });
   }
 };
+
