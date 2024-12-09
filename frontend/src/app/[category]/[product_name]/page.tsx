@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import OrderSection from "./components/OrderSection";
-import ThumbnailImageSection from "./components/ThumbnailImageSection";
+import ThumbnailImageSection from "../../../components/product/ThumbnailImageSection";
 import ProductRecommendation from "./components/ProductRecommendation";
 import Link from "next/link";
 import Loading from "@/app/loading";
