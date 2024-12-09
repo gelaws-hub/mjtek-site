@@ -7,17 +7,24 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ProductDetail } from "./product-detail";
 import { PencilEdit02Icon } from "@/components/icons/PencilEdit02Icon";
+import { DeletePutBackIcon } from "@/components/icons/DeletePutBackIcon";
+import DeleteConfirmModal from "@/components/DeleteConfirmModal";
 
 function ProductTables() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null); //for patching product
+  
   const [products, setProducts] = useState<Product[] | null>(null);
   const [totalPages, setTotalPages] = useState(1);
+  const [refresh, setRefresh] = useState(false);
+  
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deletedProductId, setDeletedProductId] = useState<number | null>(null);
 
   const currentPage = Number(searchParams.get("page")) || 1;
-  const limit = 25;
+  const limit = 10;
 
   useEffect(() => {
     fetch(
@@ -27,16 +34,36 @@ function ProductTables() {
       .then((data) => {
         setProducts(data.products);
         setTotalPages(data.totalPages);
+        setRefresh(false);
       });
-  }, [currentPage]);
+  }, [currentPage, refresh]);
 
   const handlePageChange = (newPage: number) => {
     router.push(`?page=${newPage}`);
   };
 
+  const handleDeleteButton = (id: number) => {
+    setDeletedProductId(id);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleDelete = () => {
+    if (!deletedProductId) {
+      setIsDeleteModalOpen(false);
+      return;
+    }
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/product/${deletedProductId}`, {
+      method: "DELETE",
+    }).then(() => {
+      setRefresh(!refresh);
+      setIsDeleteModalOpen(false);
+      console.log("product : ", selectedProduct);
+    });
+  };
+
   return (
     <div className="rounded-sm border border-stroke bg-white py-4 shadow-default dark:border-strokedark dark:bg-boxdark">
-      <div className="px-4 py-6 md:px-6 xl:px-7.5">
+      <div className="px-4 py-2 md:px-6 xl:px-7.5">
         <h4 className="text-xl font-semibold text-black dark:text-white">
           Daftar Produk
         </h4>
@@ -71,15 +98,17 @@ function ProductTables() {
                   {/* Product Name Column */}
                   <td className="mr-2 flex items-center gap-2">
                     <div className="h-8 w-8 flex-shrink-0 overflow-hidden rounded-sm sm:rounded-md md:h-12 md:w-12">
-                      <Image
-                        className="h-full w-full object-cover"
-                        src={product.media[0].source}
-                        width={64}
-                        height={64}
-                        alt={product.product_name}
-                      />
+                      {product.media ? (
+                        <Image
+                          className="h-full w-full object-cover"
+                          src={product.media[0].source}
+                          width={64}
+                          height={64}
+                          alt={product.product_name}
+                        />
+                      ) : null}
                     </div>
-                    <p className="line-clamp-2 text-xs text-black dark:text-white md:text-sm">
+                    <p className="line-clamp-2 px-2 text-xs text-black dark:text-white md:text-sm">
                       {product.product_name}
                     </p>
                   </td>
@@ -106,13 +135,25 @@ function ProductTables() {
                   </td>
 
                   {/* Actions Column */}
-                  <td className="flex items-center justify-center text-xs text-white md:text-sm">
+                  <td className="flex items-center justify-center gap-1 text-xs text-white md:text-sm">
                     <button
-                      className="rounded-md bg-primary px-2 py-1 text-white hover:bg-opacity-80"
+                      className="rounded-md bg-primary p-1 text-white hover:bg-opacity-80"
                       onClick={() => setSelectedProduct(product)}
                     >
-                      <PencilEdit02Icon color="#fff" width={14} />
+                      <PencilEdit02Icon color="#fff" width={16} height={16} />
                     </button>
+                    <button
+                      className="rounded-md bg-red p-1 text-white hover:bg-opacity-80"
+                      onClick={() => handleDeleteButton(product.id)}
+                    >
+                      <DeletePutBackIcon color="#fff" width={16} height={16} />
+                    </button>
+                    <DeleteConfirmModal
+                      isOpen={isDeleteModalOpen}
+                      onClose={() => setIsDeleteModalOpen(false)}
+                      onConfirm={handleDelete}
+                      message="Apakah anda yakin untuk menghapus Produk ini?"
+                    />
                   </td>
                 </tr>
               ))
@@ -130,8 +171,9 @@ function ProductTables() {
         />
       )}
 
-      <div className="mt-4 flex items-center justify-center gap-4 text-white">
+      <div className="mt-4 flex items-center justify-center gap-4 dark:text-white">
         <Button
+          className="text-white"
           onClick={() =>
             handlePageChange(currentPage > 1 ? currentPage - 1 : currentPage)
           }
@@ -142,6 +184,7 @@ function ProductTables() {
           {currentPage} dari {totalPages}
         </span>
         <Button
+          className="text-white"
           onClick={() =>
             handlePageChange(
               currentPage < totalPages ? currentPage + 1 : currentPage,
