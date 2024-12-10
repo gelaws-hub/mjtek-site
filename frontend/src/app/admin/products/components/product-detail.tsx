@@ -20,7 +20,6 @@ export function ProductDetail({ product, onClose }: ProductDetailProps) {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [refresh, setRefresh] = useRefreshContext();
 
-  // Handle input change
   const handleInputChange = (field: keyof Product, value: any) => {
     setEditedProduct((prev) => ({
       ...prev,
@@ -103,9 +102,10 @@ export function ProductDetail({ product, onClose }: ProductDetailProps) {
         <ScrollArea className="h-[calc(100vh-200px)]">
           <div className="flex h-full flex-col gap-6 overflow-auto p-4 md:flex-row">
             <div className="w-full md:w-1/3">
-              {selectedImage && (
+              {product.media && (
                 <ThumbnailImageSection
                   media={product.media}
+                  // @ts-ignore
                   selectedImage={selectedImage}
                   setSelectedImage={setSelectedImage}
                 />

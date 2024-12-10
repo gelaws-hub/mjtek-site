@@ -5,6 +5,7 @@ import React, { useState } from "react";
 import ProductTables from "./components/product-tables";
 import ProductOptions from "./components/productOptions";
 import { RefreshContext } from "./components/refreshContext"
+import { ToastContainer } from "react-toastify";
 
 const ProductPage: React.FC = () => {
   const [refresh, setRefresh] = useState(false);
@@ -12,10 +13,10 @@ const ProductPage: React.FC = () => {
   return (
     <DefaultLayout>
       <RefreshContext.Provider value={[refresh, setRefresh]}>
-        {`context : ${refresh}`}
         <ProductOptions />
         <ProductTables />
       </RefreshContext.Provider>
+      <ToastContainer />
     </DefaultLayout>
   );
 };

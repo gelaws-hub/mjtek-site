@@ -9,7 +9,7 @@ import { ProductDetail } from "./product-detail";
 import { PencilEdit02Icon } from "@/components/icons/PencilEdit02Icon";
 import { DeletePutBackIcon } from "@/components/icons/DeletePutBackIcon";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal";
-import { Bounce, ToastContainer, toast } from "react-toastify";
+import { Bounce, toast } from "react-toastify";
 import { useRefreshContext } from "./refreshContext";
 
 function ProductTables() {
@@ -212,7 +212,6 @@ function ProductTables() {
           </Button>
         </div>
       </div>
-      <ToastContainer />
     </>
   );
 }
