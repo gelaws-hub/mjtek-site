@@ -44,7 +44,6 @@ export const getAllFavoritesByUserId = async (req: Request, res: Response) => {
 
 export const isProductFavorite = async (req: Request, res: Response) => {
   const { user_id, product_id } = req.body;
-  console.log(user_id, product_id);
 
   try {
     const favoriteExists = await prisma.favorite.findFirst({
@@ -54,7 +53,6 @@ export const isProductFavorite = async (req: Request, res: Response) => {
       },
     });
 
-    console.log(!!favoriteExists);
     res.status(200).json({ isFavorite: !!favoriteExists });
   } catch (error: any) {
     console.error("Error checking favorite status:", error.message);
