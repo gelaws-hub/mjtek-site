@@ -120,21 +120,14 @@ export default function AddProductModal({
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [categoriesResponse, subCategoriesResponse, brandsResponse] =
-          await Promise.all([
-            fetch(`${process.env.NEXT_PUBLIC_API_URL}/category`),
-            fetch(`${process.env.NEXT_PUBLIC_API_URL}/sub-category`),
-            fetch(`${process.env.NEXT_PUBLIC_API_URL}/brand`),
-          ]);
-
-        const categories = await categoriesResponse.json();
-        const subCategories = await subCategoriesResponse.json();
-        const brands = await brandsResponse.json();
-
+        const categoryBrand = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/category-brand`,
+        );
+        const response = await categoryBrand.json();
         setProductInfo({
-          categories: categories.data || [],
-          subCategories: subCategories || [],
-          brands: brands.data || [],
+          categories: response.data.categories || [],
+          subCategories: response.data.sub_categories || [],
+          brands: response.data.brands || [],
         });
       } catch (error) {
         console.error("Error fetching product information:", error);
@@ -157,7 +150,6 @@ export default function AddProductModal({
           >
             ✕
           </button>
-          <button onClick={() => setRefresh(!refresh)}>CONTEXT TEST</button>
           <header className="border-b border-stroke px-6.5 py-4 dark:border-strokedark">
             <h2 className="font-medium text-black dark:text-white">
               Tambah Produk
