@@ -18,13 +18,6 @@ import {
   deleteDetailTransaksi,
 } from '../controllers/transaksi/transactionDetailController';
 
-import {
-  getAllLogTransaksi,
-  getLogTransaksiById,
-  createLogTransaksi,
-  updateLogTransaksi,
-  deleteLogTransaksi,
-} from '../controllers/transaksi/logTransaksiController';
 import { ensureCorrectUser } from "../auth/middleware/buyer/buyerMiddleware";
 
 const transaksiRoutes = express.Router();
@@ -54,12 +47,5 @@ transaksiRoutes.get('/transaction-detail/:id', getDetailTransaksiById);
 transaksiRoutes.post('/transaction-detail', createDetailTransaksi);
 transaksiRoutes.put('/transaction-detail/:id', updateDetailTransaksi);
 transaksiRoutes.delete('/transaction-detail/:id', deleteDetailTransaksi);
-
-// Log_Transaksi routes
-transaksiRoutes.get('/transaction-log', getAllLogTransaksi);
-transaksiRoutes.get('/transaction-log/:id', getLogTransaksiById);
-transaksiRoutes.post('/transaction-log', createLogTransaksi);
-transaksiRoutes.put('/transaction-log/:id', updateLogTransaksi);
-transaksiRoutes.delete('/transaction-log/:id', deleteLogTransaksi);
 
 export default transaksiRoutes;

@@ -7,7 +7,6 @@ export const getAllTransaction = async (req: Request, res: Response) => {
     const transaksi = await prisma.transaction.findMany({
       include: {
         transaction_detail: true,
-        transaction_log: true,
       },
     });
     res.status(200).json(transaksi);
@@ -25,7 +24,6 @@ export const getTransactionById = async (req: Request, res: Response) => {
       where: { id: parseInt(id) },
       include: {
         transaction_detail: true,
-        transaction_log: true,
       },
     });
     res.status(200).json(transaksi);
@@ -37,24 +35,20 @@ export const getTransactionById = async (req: Request, res: Response) => {
 
 // Create new Transaksi
 export const createTransaction = async (req: Request, res: Response) => {
-  const { user_id, total_items, total_price, description, transaction_detail, transaction_log } = req.body;
+  const { user_id, total_items, total_price, status, transaction_detail } = req.body;
   try {
     const newTransaksi = await prisma.transaction.create({
       data: {
         user_id,
         total_items,
         total_price,
-        description,
+        status,
         transaction_detail: {
           create: transaction_detail,
-        },
-        transaction_log: {
-          create: transaction_log,
         },
       },
       include: {
         transaction_detail: true,
-        transaction_log: true,
       },
     });
     res.status(201).json(newTransaksi);
@@ -67,14 +61,13 @@ export const createTransaction = async (req: Request, res: Response) => {
 // Update Transaksi by ID
 export const updateTransaction = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { total_items, total_price, description } = req.body;
+  const { total_items, total_price } = req.body;
   try {
     const updatedTransaksi = await prisma.transaction.update({
       where: { id: parseInt(id) },
       data: {
         total_items,
         total_price,
-        description,
       },
     });
     res.status(200).json(updatedTransaksi);

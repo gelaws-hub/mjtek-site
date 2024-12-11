@@ -165,7 +165,7 @@ model transaction {
   total_price        Decimal              @db.Decimal(10, 2)
   status             String
   start_time         DateTime             @default(now())
-  end_time           DateTime
+  end_time           DateTime?
   user               user                 @relation(fields: [user_id], references: [id])
   transaction_detail transaction_detail[]
 
