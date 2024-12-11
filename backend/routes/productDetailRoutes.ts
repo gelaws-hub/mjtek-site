@@ -29,6 +29,7 @@ import {
   getAllMedia,
   getMediaById,
 } from "../controllers/produk_details/productMediaController";
+import { getCategoryBrand } from "../controllers/produk_details/categoryBrandController";
 
 const produkDetailRoutes = express.Router();
 
@@ -52,6 +53,9 @@ produkDetailRoutes.get("/brand/:id", getBrandById);
 produkDetailRoutes.post("/brand", createBrand);
 produkDetailRoutes.put("/brand/:id", updateBrand);
 produkDetailRoutes.delete("/brand/:id", deleteBrand);
+
+// Category, sub-category, and brand routes
+produkDetailRoutes.get("/category-brand", getCategoryBrand);
 
 // Media routes
 produkDetailRoutes.get("/media", getAllMedia);
