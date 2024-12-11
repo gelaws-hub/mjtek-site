@@ -6,7 +6,7 @@ type Category = {
 type SubCategory = {
   id: number;
   sub_category_name: string;
-} | null; // Allow null if sub_category is not provided
+} | null;
 
 type Brand = {
   id: number;
@@ -16,7 +16,7 @@ type Brand = {
 type ProductSocket = {
   id: number;
   socket_name: string;
-  release_date: string; // ISO date string
+  release_date: string;
   description: string;
   brand_id: number;
 };
@@ -29,21 +29,38 @@ type RamType = {
 type Media = {
   id: number;
   source: string;
-  file_type: string; // e.g., "image"
+  file_type: string;
 };
 
 export type Product = {
   id: number;
   product_name: string;
   price: number;
-  estimated_weight: string; // Keep as string to match the provided data
+  estimated_weight: string;
   description: string;
   stock: number;
   category: Category;
-  sub_category: SubCategory; // Allow null
+  sub_category: SubCategory;
   brand: Brand;
-  product_ram_type: RamType[]; // Changed to an array of RamType
+  product_ram_type: RamType[];
   product_socket: ProductSocket[];
   media: Media[];
   is_deleted: boolean;
 };
+
+export interface UpdateProductRequest {
+  product_name?: string;
+  category_id?: number;
+  sub_category_id?: number;
+  brand_id?: number;
+  price?: number;
+  estimated_weight?: number;
+  description?: string;
+  stock?: number;
+  media?: {
+    sumber: string;
+    tipe_file: string;
+  }[];
+  product_ram_type?: number[];
+  product_socket?: number[];
+}

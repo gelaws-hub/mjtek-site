@@ -5,7 +5,7 @@ import { Product } from "./FullProductInterface";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ProductDetail } from "./product-detail";
+import { EditProductModal } from "./editProductModal";
 import { PencilEdit02Icon } from "@/components/icons/PencilEdit02Icon";
 import { DeletePutBackIcon } from "@/components/icons/DeletePutBackIcon";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal";
@@ -48,16 +48,17 @@ function ProductTables() {
     setIsDeleteModalOpen(true);
   };
 
-  const deleteToast = () => toast.success('Produk berhasil dihapus', {
-    position: "bottom-right",
-    autoClose: 3000,
-    hideProgressBar: false,
-    closeOnClick: true,
-    pauseOnHover: true,
-    draggable: true,
-    progress: undefined,
-    theme: "light",
-    transition: Bounce,
+  const deleteToast = () =>
+    toast.success("Produk berhasil dihapus", {
+      position: "bottom-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+      transition: Bounce,
     });
 
   const handleDelete = () => {
@@ -128,14 +129,14 @@ function ProductTables() {
                     </td>
 
                     {/* Price Column */}
-                    <td className="flex items-center overflow-hidden w-full">
+                    <td className="flex w-full items-center overflow-hidden">
                       <p className="truncate pr-2 text-xs text-black dark:text-white md:text-sm">
                         Rp. {Intl.NumberFormat("id-ID").format(product.price)}
                       </p>
                     </td>
 
                     {/* Category Column */}
-                    <td className="flex items-center overflow-hidden w-full">
+                    <td className="flex w-full items-center overflow-hidden">
                       <p className="truncate text-xs text-black dark:text-white md:text-sm">
                         {product.category.category_name}
                       </p>
@@ -176,13 +177,15 @@ function ProductTables() {
                   </tr>
                 ))
               ) : (
-                <h2 className="text-center ">Produk tidak ditemukan</h2>
+                <tr>
+                  <td className="text-center ">Produk tidak ditemukan</td>
+                </tr>
               )}
             </tbody>
           </table>
         </div>
         {selectedProduct && (
-          <ProductDetail
+          <EditProductModal
             product={selectedProduct}
             onClose={() => setSelectedProduct(null)}
           />

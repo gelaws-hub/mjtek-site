@@ -19,9 +19,8 @@ export default function ProductOptions() {
           Tambah Produk
         </Button>
         <AddProductModal
-            isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
-            
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
         />
       </div>
       <div className="mb-4"></div>

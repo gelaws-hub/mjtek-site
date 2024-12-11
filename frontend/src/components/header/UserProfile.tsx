@@ -62,9 +62,9 @@ export default function UserProfile() {
   return (
     <div className="md:col-start-3 flex justify-center md:justify-start items-center gap-2">
       <div className="md:flex ml-1 md:ml-2 hidden">
-        <button className="hover:bg-slate-100 rounded-xl">
+        <Link href="/cart" className="hover:bg-slate-100 rounded-xl">
           <ShoppingCart02Icon height={20} className="text-gray-700" />
-        </button>
+        </Link>
         <button className="hover:bg-slate-100 rounded-lg">
           <Notification03Icon height={20} className="text-gray-700" />
         </button>

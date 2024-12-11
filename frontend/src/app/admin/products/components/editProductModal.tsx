@@ -9,15 +9,35 @@ import React from "react";
 import { Bounce, toast } from "react-toastify";
 import TextareaAutosize from "react-textarea-autosize";
 import { useRefreshContext } from "./refreshContext";
+import { Combobox } from "./comboBox";
 
 interface ProductDetailProps {
   product: Product;
   onClose: () => void;
 }
 
-export function ProductDetail({ product, onClose }: ProductDetailProps) {
+interface categoryBrand {
+  categories: {
+    id: number;
+    category_name: string;
+    editState: false;
+  }[];
+  subCategories: {
+    id: number;
+    sub_category_name: string;
+    editState: false;
+  }[];
+  brands: {
+    id: number;
+    brand_name: string;
+    editState: false;
+  }[];
+}
+
+export function EditProductModal({ product, onClose }: ProductDetailProps) {
   const [editedProduct, setEditedProduct] = useState(product);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [categoryBrand, setCategoryBrand] = useState<categoryBrand>();
   const [refresh, setRefresh] = useRefreshContext();
 
   const handleInputChange = (field: keyof Product, value: any) => {
@@ -43,25 +63,38 @@ export function ProductDetail({ product, onClose }: ProductDetailProps) {
   // Compute changes
   const getChangedFields = (): Partial<Product> => {
     const changes: Partial<Product> = {};
+  
     for (const key in product) {
-      if (
-        product[key as keyof Product] !== editedProduct[key as keyof Product]
-      ) {
-        // @ts-ignore
-        changes[key as keyof Product] = editedProduct[key as keyof Product];
+      if (product[key as keyof Product] !== editedProduct[key as keyof Product]) {
+        // Handle category, sub_category, and brand differently
+        if (key === "category" && editedProduct.category) {
+          // @ts-ignore
+          changes.category_id = editedProduct.category.id;
+        } else if (key === "sub_category" && editedProduct.sub_category) {
+          // @ts-ignore
+          changes.sub_category_id = editedProduct.sub_category.id;
+        } else if (key === "brand" && editedProduct.brand) {
+          // @ts-ignore
+          changes.brand_id = editedProduct.brand.id;
+        } else {
+          // @ts-ignore
+          changes[key as keyof Product] = editedProduct[key as keyof Product];
+        }
       }
     }
+  
     return changes;
   };
+  
   const handleSubmit = async () => {
     const changes = getChangedFields();
-
+  
     // If there are no changes, do nothing
     if (Object.keys(changes).length === 0) {
       alert("No changes detected.");
       return;
     }
-
+  
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/product/${product.id}`,
@@ -71,11 +104,12 @@ export function ProductDetail({ product, onClose }: ProductDetailProps) {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(changes),
-        },
+        }
       );
-
+  
       if (response.ok) {
         setRefresh(!refresh);
+        console.log("Product updated:", changes);
         successToast();
         onClose();
       } else {
@@ -86,9 +120,27 @@ export function ProductDetail({ product, onClose }: ProductDetailProps) {
       alert("An error occurred. Please try again.");
     }
   };
+  
 
-  const changes = getChangedFields();
-  console.log(changes);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const categoryBrandResponse = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/category-brand`,
+        );
+        const response = await categoryBrandResponse.json();
+        setCategoryBrand({
+          categories: response.data.categories || [],
+          subCategories: response.data.sub_categories || [],
+          brands: response.data.brands || [],
+        });
+      } catch (error) {
+        console.error("Error fetching product information:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-60 p-4 dark:bg-boxdark dark:bg-opacity-60">
@@ -144,17 +196,62 @@ export function ProductDetail({ product, onClose }: ProductDetailProps) {
                 </div>
                 <div>
                   <label className="font-semibold">Category</label>
-                  <p>{product.category.category_name}</p>
+                  <Combobox
+                    defaultOption={{
+                      value: editedProduct.category.id.toString(),
+                      label: editedProduct.category.category_name,
+                    }}
+                    setOption={(selectedOption: any) =>
+                      handleInputChange("category", {
+                        id: Number(selectedOption.value),
+                        category_name: selectedOption.label,
+                      })
+                    }
+                    options={categoryBrand?.categories.map((category) => ({
+                      label: category.category_name,
+                      value: category.id.toString(),
+                    }))}
+                  />
                 </div>
                 {product.sub_category && (
                   <div>
                     <label className="font-semibold">Sub Category</label>
-                    <p>{product.sub_category.sub_category_name}</p>
+                    <Combobox
+                    defaultOption={{
+                      value: editedProduct.sub_category?.id.toString(),
+                      label: editedProduct.sub_category?.sub_category_name,
+                    }}
+                    setOption={(selectedOption: any) =>
+                      handleInputChange("sub_category", {
+                        id: Number(selectedOption.value),
+                        sub_category_name: selectedOption.label,
+                      })
+                    }
+                    options={categoryBrand?.subCategories?.map((sub_category) => ({
+                      label: sub_category.sub_category_name,
+                      value: sub_category.id.toString(),
+                    }))}
+                  />
                   </div>
                 )}
                 <div>
                   <label className="font-semibold">Brand</label>
-                  <p>{product.brand.brand_name}</p>
+                  <Combobox
+                    defaultOption={{
+                      value: editedProduct.brand.id.toString(),
+                      label: editedProduct.brand.brand_name,
+                    }}
+                    setOption={(selectedOption: any) =>
+                      handleInputChange("brand", {
+                        id: Number(selectedOption.value),
+                        brand_name: selectedOption.label,
+                      })
+                    }
+                    options={categoryBrand?.brands.map((brand) => ({
+                      label: brand.brand_name,
+                      value: brand.id.toString(),
+                    }))}
+                  />
                 </div>
                 <div>
                   <label className="font-semibold">Estimated Weight</label>
