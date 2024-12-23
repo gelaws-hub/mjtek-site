@@ -130,7 +130,12 @@ export const login = async (req: Request, res: Response) => {
       });
     } else {
       const accessToken = jwt.sign(
-        { id: user.id, name: user.name },
+        {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role_name: user.role_name,
+        },
         process.env.ACCESS_TOKEN_SECRET!,
         {
           subject: "accessApi",
@@ -139,7 +144,12 @@ export const login = async (req: Request, res: Response) => {
       );
 
       const refreshToken = jwt.sign(
-        { userId: user.id, name: user.name },
+        {
+          userId: user.id,
+          name: user.name,
+          email: user.email,
+          role_name: user.role_name,
+        },
         process.env.REFRESH_TOKEN_SECRET!,
         {
           subject: "refreshToken",
@@ -158,8 +168,9 @@ export const login = async (req: Request, res: Response) => {
         id: user.id,
         name: user.name,
         email: user.email,
+        role_name: user.role_name,
         accessToken,
-        refreshToken,
+        // refreshToken, this should never be delivered to client
       });
     }
   } catch (error: any) {

@@ -48,7 +48,7 @@ const storage = multer.diskStorage({
   filename: (req, file, cb) => {
     try {
       const productNameSlug = req.body.product_name
-        ?.replace(/\s+/g, "-")
+        ?.replace(/[\/\s]+/g, "-")
         .toLowerCase();
       const timestamp = Date.now();
       const extension = path.extname(file.originalname);
@@ -112,6 +112,7 @@ export const createFullDetailProduct = async (req: Request, res: Response) => {
         !category_id ||
         !brand_id ||
         !price ||
+        !description ||
         !estimated_weight ||
         !stock
       ) {
@@ -152,7 +153,7 @@ export const createFullDetailProduct = async (req: Request, res: Response) => {
           .replace(/\s+/g, "-");
 
         for (const file of files) {
-          const fileUrl = `${process.env.BASE_URL}/uploads/products/${categoryName}/${file.filename}`;
+          const fileUrl = `/uploads/products/${categoryName}/${file.filename}`;
           const media = await prisma.media.create({
             data: {
               product_id: product.id,
@@ -164,10 +165,43 @@ export const createFullDetailProduct = async (req: Request, res: Response) => {
         }
       }
 
+      const product_ram_type = (req.body.product_ram_type as string)
+        .split(",")
+        .filter((id) => id.trim() !== "")
+        .map((id) => ({
+          product_id: product.id,
+          ram_type_id: parseInt(id),
+        }));
+
+      const product_socket = (req.body.product_socket as string)
+        .split(",")
+        .filter((id) => id.trim() !== "")
+        .map((id) => ({
+          product_id: product.id,
+          socket_id: parseInt(id),
+        }));
+
+      if (product_ram_type.length > 0) {
+        await prisma.product_ram_type.createMany({
+          data: product_ram_type,
+        });
+      }
+
+      if (product_socket.length > 0) {
+        await prisma.product_socket.createMany({
+          data: product_socket,
+        });
+      }
+
       res.status(201).json({
+        status: 201,
         message: "Product created successfully.",
-        product,
-        media: savedMedia,
+        data: {
+          product,
+          media: savedMedia,
+          product_ram_type,
+          product_socket,
+        },
       });
     } catch (error) {
       console.error("Error creating product:", error);

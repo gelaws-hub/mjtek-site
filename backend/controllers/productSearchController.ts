@@ -161,7 +161,7 @@ export const getAllProducts = async (req: Request, res: Response) => {
       },
     });
 
-    const formattedProducts = products.map((product) => ({
+     const formattedProducts = products.map((product) => ({
       id: product.id,
       product_name: product.product_name,
       price: parseFloat(product.price.toString()),
@@ -180,7 +180,14 @@ export const getAllProducts = async (req: Request, res: Response) => {
           ? product.product_socket.map((socket) => socket.socket)
           : null,
       media:
-        product.media.length > 0 ? product.media.map((media) => media) : null,
+        product.media.length > 0
+          ? product.media.map((media) => ({
+              ...media,
+              source: media.source.startsWith("/")
+                ? `${process.env.BASE_URL}${media.source}`
+                : media.source,
+            }))
+          : null,
       is_deleted: product.is_deleted,
     }));
 
@@ -204,4 +211,3 @@ export const getAllProducts = async (req: Request, res: Response) => {
       .json({ status_code: 500, message: "Internal server error" });
   }
 };
-

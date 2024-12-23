@@ -135,7 +135,7 @@ model user {
 
 model user_refresh_token {
   id            String   @id @default(uuid())
-  refresh_token String   @db.VarChar(255)
+  refresh_token String   @db.VarChar(1024)
   user_id       String
   created_at    DateTime @default(now())
   user          user     @relation(fields: [user_id], references: [id], onDelete: Cascade)

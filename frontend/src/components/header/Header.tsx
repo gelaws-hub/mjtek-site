@@ -15,7 +15,7 @@ export default function Header() {
   if (hideHeaderPaths.some((path) => pathname?.startsWith(path))) return null;
   return (
     <header className="sticky top-0 border-b-2 border-b-gray-100 bg-white z-50 ">
-      <div className="grid grid-cols-[10%_80%_10%] md:grid-cols-[25%_50%_25%] mx-auto pt-6 md:pb-4 w-[96%]">
+      <div className="grid grid-cols-[15%_70%_15%] md:grid-cols-[25%_50%_25%] mx-auto pt-6 md:pb-4 w-[96%]">
         <Link
           href="/"
           className="col-start-1  my-0 md:flex flex-row items-center gap-4 justify-center md:justify-end md:mr-4 lg:mr-[20%]"

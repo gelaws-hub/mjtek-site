@@ -4,12 +4,14 @@ interface CurrencyInputProps {
   value: number;
   onChange: (value: number) => void;
   currency?: string;
+  className?: string;
 }
 
 const CurrencyInput = ({
   value,
   onChange,
   currency = "IDR",
+  className = "",
 }: CurrencyInputProps) => {
   const [isFocused, setIsFocused] = useState(false);
 
@@ -76,7 +78,7 @@ const CurrencyInput = ({
       onFocus={handleFocus}
       onBlur={handleBlur}
       onChange={handleChange}
-      className="w-full rounded bg-inherit placeholder:outline-none focus:ring-1"
+      className={className}
     />
   );
 };

@@ -1,13 +1,14 @@
 "use client";
 
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import ImageUploader from "./ImageUploader";
 import { Button } from "@/components/ui/button";
 import { AddCircleIcon } from "@/components/icons/AddCircleIcon";
-import GreenAlerts from "@/components/alerts/GreenAlerts";
-import RedAlerts from "@/components/alerts/RedAlerts";
 import { Bounce, toast } from "react-toastify";
 import { useRefreshContext } from "./refreshContext";
+import { Combobox } from "./comboBox";
+import { inputStyleNumber } from "./styleFormat";
+import { CompatibilitySelection } from "./compatibilitySelection";
 
 interface AddProductModalProps {
   isOpen: boolean;
@@ -34,13 +35,9 @@ export default function AddProductModal({
     subCategoryId: "",
     brandId: "",
     mediaFiles: [] as File[],
+    product_ram_type_ids: [],
+    product_socket_ids: [],
   });
-
-  const [alert, setAlert] = useState<{
-    type: "success" | "error" | null;
-    title: string;
-    description: string;
-  }>({ type: null, title: "", description: "" });
 
   const [refresh, setRefresh] = useRefreshContext();
 
@@ -53,6 +50,13 @@ export default function AddProductModal({
     setFormData((prev) => ({
       ...prev,
       [id]: value,
+    }));
+  };
+
+  const handleCombobox = (field: any, selectedOption: any) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: selectedOption,
     }));
   };
 
@@ -79,6 +83,14 @@ export default function AddProductModal({
       uploadData.append("description", formData.description);
       uploadData.append("stock", formData.stock);
       uploadData.append("isDeleted", "false");
+      uploadData.append(
+        "product_ram_type",
+        formData.product_ram_type_ids.join(","),
+      );
+      uploadData.append(
+        "product_socket",
+        formData.product_socket_ids.join(","),
+      );
       formData.mediaFiles.forEach((file) => uploadData.append("media", file));
 
       const response = await fetch(
@@ -96,10 +108,16 @@ export default function AddProductModal({
       setRefresh(!refresh);
     } catch (error) {
       console.error("Error adding product:", error);
-      setAlert({
-        type: "error",
-        title: "Gagal menambahkan produk",
-        description: "Terjadi kesalahan saat mengunggah produk.",
+      toast.error("Gagal menambahkan produk!", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        transition: Bounce,
       });
     }
   };
@@ -137,10 +155,17 @@ export default function AddProductModal({
     fetchData();
   }, []);
 
+  const updateFormData = (key: keyof typeof formData, value: any) => {
+    setFormData((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
+
   return (
     <>
       <div
-        className={`flex items-center justify-center p-4 transition-all ${isOpen ? "visible scale-y-100 opacity-100" : "invisible hidden scale-y-0 opacity-0"}`}
+        className={`flex items-center justify-center transition-all md:p-4 ${isOpen ? "visible scale-y-100 opacity-100" : "invisible hidden scale-y-0 opacity-0"}`}
       >
         <section className="relative w-full rounded-lg border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
           <button
@@ -201,7 +226,7 @@ export default function AddProductModal({
                   value={formData.price}
                   onChange={handleInputChange}
                   placeholder="Masukkan Harga Produk..."
-                  className="w-full appearance-none rounded-lg border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                  className={`${inputStyleNumber}`}
                 />
               </div>
               <div>
@@ -218,7 +243,7 @@ export default function AddProductModal({
                   value={formData.estimatedWeight}
                   onChange={handleInputChange}
                   placeholder="Masukkan Berat Produk..."
-                  className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                  className={`${inputStyleNumber}`}
                 />
               </div>
               <div>
@@ -234,7 +259,7 @@ export default function AddProductModal({
                   value={formData.stock}
                   onChange={handleInputChange}
                   placeholder="Masukkan Stok Produk..."
-                  className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                  className={`${inputStyleNumber}`}
                 />
               </div>
             </div>
@@ -246,19 +271,16 @@ export default function AddProductModal({
                 >
                   Kategori
                 </label>
-                <select
-                  id="categoryId"
-                  value={formData.categoryId}
-                  onChange={handleInputChange}
-                  className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                >
-                  <option value="">Kategori</option>
-                  {productInfo.categories.map((category: any) => (
-                    <option key={category.id} value={category.id}>
-                      {category.category_name}
-                    </option>
-                  ))}
-                </select>
+                <Combobox
+                  label="Kategori"
+                  setOption={(selectedOption: { value: any }) => {
+                    handleCombobox("categoryId", selectedOption.value);
+                  }}
+                  options={productInfo?.categories.map((category: any) => ({
+                    label: category.category_name,
+                    value: category.id.toString(),
+                  }))}
+                />
               </div>
               <div>
                 <label
@@ -267,42 +289,52 @@ export default function AddProductModal({
                 >
                   Sub Kategori
                 </label>
-                <select
-                  id="subCategoryId"
-                  value={formData.subCategoryId}
-                  onChange={handleInputChange}
-                  className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                >
-                  <option value="">Sub Kategori</option>
-                  {productInfo.subCategories.map((subCategory: any) => (
-                    <option key={subCategory.id} value={subCategory.id}>
-                      {subCategory.sub_category_name}
-                    </option>
-                  ))}
-                </select>
+                <Combobox
+                  label="Sub Kategori"
+                  setOption={(selectedOption: { value: any }) => {
+                    handleCombobox("subCategoryId", selectedOption.value);
+                  }}
+                  options={productInfo?.subCategories.map((sub_cat: any) => ({
+                    label: sub_cat.sub_category_name,
+                    value: sub_cat.id.toString(),
+                  }))}
+                />
               </div>
               <div>
                 <label
                   htmlFor="brandId"
                   className="mb-3 block text-sm font-medium text-black dark:text-white"
                 >
-                  Merek
+                  Merk
                 </label>
-                <select
-                  id="brandId"
-                  value={formData.brandId}
-                  onChange={handleInputChange}
-                  className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                >
-                  <option value="">Merek</option>
-                  {productInfo.brands.map((brand: any) => (
-                    <option key={brand.id} value={brand.id}>
-                      {brand.brand_name}
-                    </option>
-                  ))}
-                </select>
+                <Combobox
+                  label="Merk"
+                  setOption={(selectedOption: { value: any }) => {
+                    handleCombobox("brandId", selectedOption.value);
+                  }}
+                  options={productInfo?.brands.map((brand: any) => ({
+                    label: brand.brand_name,
+                    value: brand.id.toString(),
+                  }))}
+                />
               </div>
             </div>
+            <CompatibilitySelection
+              socketDisabledState={
+                !(formData.categoryId === "1" || formData.categoryId === "4")
+              }
+              ramTypeDisabledState={
+                !(formData.categoryId === "2" || formData.categoryId === "4")
+              }
+              socketIds={formData.product_socket_ids}
+              setSocketIds={(value: any) =>
+                updateFormData("product_socket_ids", value)
+              }
+              ramTypeIds={formData.product_ram_type_ids}
+              setRamTypeIds={(value: any) =>
+                updateFormData("product_ram_type_ids", value)
+              }
+            />
             <div>
               <ImageUploader onFileSelect={handleMediaFileChange} />
             </div>
@@ -313,20 +345,6 @@ export default function AddProductModal({
           </form>
         </section>
       </div>
-      {alert.type === "success" && (
-        <GreenAlerts
-          title={alert.title}
-          description={alert.description}
-          onClose={() => setAlert({ type: null, title: "", description: "" })}
-        />
-      )}
-      {alert.type === "error" && (
-        <RedAlerts
-          title={alert.title}
-          description={alert.description}
-          onClose={() => setAlert({ type: null, title: "", description: "" })}
-        />
-      )}
     </>
   );
 }

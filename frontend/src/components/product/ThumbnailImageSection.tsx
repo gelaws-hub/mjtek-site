@@ -59,8 +59,8 @@ export default function ThumbnailImageSection({
         )}
       </div>
       {/* Thumbnails */}
-      <div className="flex flex-row scrollbar-none">
-        <div className="flex flex-row gap-2 content-center py-1 justify-center max-w-[50vw]">
+      <div className="flex flex-row scrollbar-none w-full overflow-hidden">
+        <div className="flex flex-row gap-2 content-center py-1 justify-center">
           {media.map((mediaItem) => (
             <button
               key={mediaItem.id}

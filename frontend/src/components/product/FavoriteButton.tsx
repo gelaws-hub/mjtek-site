@@ -20,7 +20,7 @@ const FavoriteButton = ({ productId, text }: FavoriteButtonProps) => {
       setIsFavourite(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoggedIn]);
+  }, []);
 
   const checkFavoriteStatus = async () => {
     try {
@@ -75,6 +75,8 @@ const FavoriteButton = ({ productId, text }: FavoriteButtonProps) => {
       console.error("An error occurred while toggling favorite:", error);
     }
   };
+  
+  console.log("isLoggedIn", isLoggedIn);
 
   return (
     <button

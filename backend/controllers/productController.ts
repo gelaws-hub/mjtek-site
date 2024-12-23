@@ -32,7 +32,9 @@ export const getProductById = async (req: Request, res: Response) => {
     });
 
     if (!produk) {
-      return res.status(404).json({ status_code: 404, message: "Produk not found" });
+      return res
+        .status(404)
+        .json({ status_code: 404, message: "Produk not found" });
     }
 
     const formattedProduk = {
@@ -45,14 +47,8 @@ export const getProductById = async (req: Request, res: Response) => {
       category: produk.category || null,
       sub_category: produk.sub_category || null,
       brand: produk.brand || null,
-      product_ram_type:
-        produk.product_ram_type.length > 0
-          ? produk.product_ram_type.map((tipeRam: any) => tipeRam.Tipe_RAM)
-          : null,
-      product_socket:
-        produk.product_socket.length > 0
-          ? produk.product_socket.map((socket: any) => socket.nama_socket)
-          : null,
+      product_ram_type: produk.product_ram_type,
+      product_socket: produk.product_socket,
       media:
         produk.media.length > 0
           ? produk.media.map((media: any) => media)
@@ -67,7 +63,9 @@ export const getProductById = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     console.error("Error fetching Produk by ID:", error.message);
-    res.status(500).json({ status_code: 500, message: "Internal server error" });
+    res
+      .status(500)
+      .json({ status_code: 500, message: "Internal server error" });
   }
 };
 
@@ -123,10 +121,11 @@ export const createProduct = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     console.error("Error adding product:", error.message);
-    res.status(500).json({ status_code: 500, message: "Internal server error" });
+    res
+      .status(500)
+      .json({ status_code: 500, message: "Internal server error" });
   }
 };
-
 
 export const updateProduct = async (req: Request, res: Response) => {
   const { id } = req.params;
@@ -184,7 +183,9 @@ export const updateProduct = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     console.error("Error updating product:", error.message);
-    res.status(500).json({ status_code: 500, message: "Internal server error" });
+    res
+      .status(500)
+      .json({ status_code: 500, message: "Internal server error" });
   }
 };
 
@@ -209,10 +210,12 @@ export const partialUpdateProduct = async (req: Request, res: Response) => {
 
     if (product_name !== undefined) updateData.product_name = product_name;
     if (category_id !== undefined) updateData.category_id = category_id;
-    if (sub_category_id !== undefined) updateData.sub_category_id = sub_category_id;
+    if (sub_category_id !== undefined)
+      updateData.sub_category_id = sub_category_id;
     if (brand_id !== undefined) updateData.brand_id = brand_id;
-    if (price !== undefined) updateData.price = price
-    if (estimated_weight !== undefined) updateData.estimated_weight = estimated_weight;
+    if (price !== undefined) updateData.price = price;
+    if (estimated_weight !== undefined)
+      updateData.estimated_weight = estimated_weight;
     if (description !== undefined) updateData.description = description;
     if (stock !== undefined) updateData.stock = stock;
 
@@ -263,10 +266,11 @@ export const partialUpdateProduct = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     console.error("Error partially updating product:", error.message);
-    res.status(500).json({ status_code: 500, message: "Internal server error" });
+    res
+      .status(500)
+      .json({ status_code: 500, message: "Internal server error" });
   }
 };
-
 
 export const deleteProduct = async (req: Request, res: Response) => {
   const { id } = req.params;
@@ -282,6 +286,8 @@ export const deleteProduct = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     console.error("Error deleting product:", error.message);
-    res.status(500).json({ status_code: 500, message: "Internal server error" });
+    res
+      .status(500)
+      .json({ status_code: 500, message: "Internal server error" });
   }
 };

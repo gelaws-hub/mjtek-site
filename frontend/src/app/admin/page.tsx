@@ -3,9 +3,8 @@ import { Metadata } from "next";
 import DefaultLayout from "@/components/tailadmin/Layouts/DefaultLayout";
 
 export const metadata: Metadata = {
-  title:
-    "Next.js E-commerce Dashboard | TailAdmin - Next.js Dashboard Template",
-  description: "This is Next.js Home for TailAdmin Dashboard Template",
+  title: "Mj Teknologi Semarang Admin Page",
+  description: "This page is for MJ Teknologi Semarang Website",
 };
 
 export default function Home() {

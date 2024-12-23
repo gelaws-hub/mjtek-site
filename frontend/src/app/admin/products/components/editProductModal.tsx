@@ -6,10 +6,11 @@ import { Product } from "./FullProductInterface";
 import ThumbnailImageSection from "@/components/product/ThumbnailImageSection";
 import PriceInput from "./PriceInput";
 import React from "react";
-import { Bounce, toast } from "react-toastify";
 import TextareaAutosize from "react-textarea-autosize";
 import { useRefreshContext } from "./refreshContext";
 import { Combobox } from "./comboBox";
+import { inputStyle, inputStyleNumber } from "./styleFormat";
+import { successToast, errorToast } from "./reactToastify";
 
 interface ProductDetailProps {
   product: Product;
@@ -47,25 +48,14 @@ export function EditProductModal({ product, onClose }: ProductDetailProps) {
     }));
   };
 
-  const successToast = () =>
-    toast.success("Berhasil memperbarui produk", {
-      position: "bottom-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "light",
-      transition: Bounce,
-    });
-
   // Compute changes
   const getChangedFields = (): Partial<Product> => {
     const changes: Partial<Product> = {};
-  
+
     for (const key in product) {
-      if (product[key as keyof Product] !== editedProduct[key as keyof Product]) {
+      if (
+        product[key as keyof Product] !== editedProduct[key as keyof Product]
+      ) {
         // Handle category, sub_category, and brand differently
         if (key === "category" && editedProduct.category) {
           // @ts-ignore
@@ -82,19 +72,19 @@ export function EditProductModal({ product, onClose }: ProductDetailProps) {
         }
       }
     }
-  
+
     return changes;
   };
-  
+
   const handleSubmit = async () => {
     const changes = getChangedFields();
-  
+
     // If there are no changes, do nothing
     if (Object.keys(changes).length === 0) {
-      alert("No changes detected.");
+      errorToast("Tidak ada perubahan yang ditemukan.");
       return;
     }
-  
+
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/product/${product.id}`,
@@ -104,23 +94,22 @@ export function EditProductModal({ product, onClose }: ProductDetailProps) {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(changes),
-        }
+        },
       );
-  
+
       if (response.ok) {
         setRefresh(!refresh);
         console.log("Product updated:", changes);
-        successToast();
+        successToast(`Berhasil memperbarui ${editedProduct.product_name}`);
         onClose();
       } else {
-        alert("Failed to update the product. Please try again.");
+        errorToast("Gagal memperbarui produk. Silakan coba lagi.");
       }
     } catch (error) {
       console.error("Error updating product:", error);
-      alert("An error occurred. Please try again.");
+      errorToast("Gagal memperbarui produk. Silakan coba lagi.");
     }
   };
-  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -135,7 +124,7 @@ export function EditProductModal({ product, onClose }: ProductDetailProps) {
           brands: response.data.brands || [],
         });
       } catch (error) {
-        console.error("Error fetching product information:", error);
+        errorToast("Gagal memuat data kategori dan merek. Silakan coba lagi.");
       }
     };
 
@@ -165,10 +154,10 @@ export function EditProductModal({ product, onClose }: ProductDetailProps) {
             </div>
             <div className="w-full space-y-4 md:w-2/3">
               {/* Editable Fields */}
-              <div>
-                <label className="font-semibold">Name</label>
+              <div className="flex flex-col">
+                <label className="font-semibold">Nama Produk</label>
                 <input
-                  className="w-full rounded bg-inherit outline-none focus:ring-1"
+                  className={`${inputStyle}`}
                   value={editedProduct.product_name}
                   onChange={(e) =>
                     handleInputChange("product_name", e.target.value)
@@ -176,17 +165,18 @@ export function EditProductModal({ product, onClose }: ProductDetailProps) {
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="font-semibold">Price</label>
+                <div className="flex flex-col">
+                  <label className="font-semibold">Harga</label>
                   <PriceInput
                     value={editedProduct.price}
                     onChange={(e) => handleInputChange("price", e)}
+                    className={`${inputStyleNumber}`}
                   />
                 </div>
-                <div>
-                  <label className="font-semibold">Stock</label>
+                <div className="flex flex-col">
+                  <label className="font-semibold">Stok</label>
                   <input
-                    className="w-full rounded bg-inherit outline-none [appearance:textfield] focus:ring-1 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                    className={`${inputStyleNumber}`}
                     type="number"
                     value={editedProduct.stock}
                     onChange={(e) =>
@@ -194,8 +184,8 @@ export function EditProductModal({ product, onClose }: ProductDetailProps) {
                     }
                   />
                 </div>
-                <div>
-                  <label className="font-semibold">Category</label>
+                <div className="flex flex-col">
+                  <label className="font-semibold">Kategori</label>
                   <Combobox
                     defaultOption={{
                       value: editedProduct.category.id.toString(),
@@ -213,10 +203,10 @@ export function EditProductModal({ product, onClose }: ProductDetailProps) {
                     }))}
                   />
                 </div>
-                {product.sub_category && (
-                  <div>
-                    <label className="font-semibold">Sub Category</label>
-                    <Combobox
+                <div className="flex flex-col">
+                  <label className="font-semibold">Sub kategori</label>
+                  <Combobox
+                    label="Sub Category"
                     defaultOption={{
                       value: editedProduct.sub_category?.id.toString(),
                       label: editedProduct.sub_category?.sub_category_name,
@@ -227,15 +217,16 @@ export function EditProductModal({ product, onClose }: ProductDetailProps) {
                         sub_category_name: selectedOption.label,
                       })
                     }
-                    options={categoryBrand?.subCategories?.map((sub_category) => ({
-                      label: sub_category.sub_category_name,
-                      value: sub_category.id.toString(),
-                    }))}
+                    options={categoryBrand?.subCategories?.map(
+                      (sub_category) => ({
+                        label: sub_category.sub_category_name,
+                        value: sub_category.id.toString(),
+                      }),
+                    )}
                   />
-                  </div>
-                )}
-                <div>
-                  <label className="font-semibold">Brand</label>
+                </div>
+                <div className="flex flex-col">
+                  <label className="font-semibold">Merk</label>
                   <Combobox
                     defaultOption={{
                       value: editedProduct.brand.id.toString(),
@@ -254,9 +245,9 @@ export function EditProductModal({ product, onClose }: ProductDetailProps) {
                   />
                 </div>
                 <div>
-                  <label className="font-semibold">Estimated Weight</label>
+                  <label className="h-9 font-semibold">Estimasi berat</label>
                   <input
-                    className="w-full rounded bg-inherit outline-none focus:ring-1"
+                    className={`${inputStyleNumber}`}
                     value={editedProduct.estimated_weight}
                     onChange={(e) =>
                       handleInputChange("estimated_weight", e.target.value)
@@ -265,9 +256,9 @@ export function EditProductModal({ product, onClose }: ProductDetailProps) {
                 </div>
               </div>
               <div>
-                <label className="font-semibold">Description</label>
+                <label className="font-semibold">Deskripsi</label>
                 <TextareaAutosize
-                  className="h-[50vh] w-full max-w-full resize-none rounded bg-inherit outline-none scrollbar-none focus:ring-0"
+                  className="h-[50vh] w-full max-w-full resize-none rounded border-[1px] bg-inherit px-4 py-2 outline-none scrollbar-none focus:ring-0 dark:border-gray-500"
                   value={editedProduct.description}
                   onChange={(e) =>
                     handleInputChange("description", e.target.value)

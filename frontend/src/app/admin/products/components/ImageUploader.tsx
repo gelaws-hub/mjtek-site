@@ -51,7 +51,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onFileSelect }) => {
               <button
                 type="button"
                 onClick={() => removeImage(index)}
-                className="z-99 absolute right-1 top-1 rounded-full bg-red-500 p-1 text-white shadow-lg hover:bg-red-600"
+                className="absolute right-1 top-1 z-99 h-6 w-6 rounded-full bg-red-500 font-bold text-white shadow-lg hover:bg-red-600"
               >
                 ✕
               </button>

@@ -31,8 +31,7 @@ export const menuGroups = [
             </svg>
           ),
           label: "Dashboard",
-          route: "#",
-          children: [{ label: "eCommerce", route: "/admin" }],
+          route: "/admin",
         },
         {
           icon: (

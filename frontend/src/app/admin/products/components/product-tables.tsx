@@ -8,22 +8,22 @@ import { Button } from "@/components/ui/button";
 import { EditProductModal } from "./editProductModal";
 import { PencilEdit02Icon } from "@/components/icons/PencilEdit02Icon";
 import { DeletePutBackIcon } from "@/components/icons/DeletePutBackIcon";
-import DeleteConfirmModal from "@/components/DeleteConfirmModal";
-import { Bounce, toast } from "react-toastify";
 import { useRefreshContext } from "./refreshContext";
+import DeleteAlert from "./DeleteAlert";
+import { deleteToast } from "./reactToastify";
+import Link from "next/link";
 
 function ProductTables() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null); //for patching product
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   const [products, setProducts] = useState<Product[] | null>(null);
   const [totalPages, setTotalPages] = useState(1);
   const [refresh, setRefresh] = useRefreshContext();
 
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [deletedProductId, setDeletedProductId] = useState<number | null>(null);
+  const [deletedProduct, setDeletedProduct] = useState<Product | null>(null);
 
   const currentPage = Number(searchParams.get("page")) || 1;
   const limit = 10;
@@ -43,45 +43,49 @@ function ProductTables() {
     router.push(`?page=${newPage}`);
   };
 
-  const handleDeleteButton = (id: number) => {
-    setDeletedProductId(id);
-    setIsDeleteModalOpen(true);
+  const handleDeleteButton = (product: Product) => {
+    setDeletedProduct(product);
   };
 
-  const deleteToast = () =>
-    toast.success("Produk berhasil dihapus", {
-      position: "bottom-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "light",
-      transition: Bounce,
-    });
-
   const handleDelete = () => {
-    if (!deletedProductId) {
-      setIsDeleteModalOpen(false);
+    if (!deletedProduct) {
+      setDeletedProduct(null);
       return;
     }
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/product/${deletedProductId}`, {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/product/${deletedProduct.id}`, {
       method: "DELETE",
     }).then(() => {
       setRefresh(!refresh);
-      setIsDeleteModalOpen(false);
-      deleteToast();
+      deleteToast(`Produk ${deletedProduct.product_name} berhasil dihapus`);
+      setDeletedProduct(null);
     });
   };
+
+  if (currentPage > totalPages) {
+    return (
+      <div className="flex items-center justify-center text-xl">
+        <p>Halaman yang anda cari tidak ada, </p>
+        <span>
+          &nbsp;
+          <Link
+            className="text-blue-500"
+            href={`/admin/products?page=1`}
+          >
+            kembali ke halaman awal
+          </Link>
+        </span>{" "}
+      </div>
+    );
+  }
 
   return (
     <>
       <div className="rounded-sm border border-stroke bg-white py-4 shadow-default dark:border-strokedark dark:bg-boxdark">
         <div className="px-4 py-2 md:px-6 xl:px-7.5">
           <h4 className="text-xl font-semibold text-black dark:text-white">
-            Daftar Produk
+            Menampilkan {limit} Produk
           </h4>
+          
         </div>
         <div className="flex max-w-[90vw] overflow-x-auto sm:max-w-full">
           <table className="mx-auto w-full min-w-[600px] border-collapse border-t border-stroke text-xs dark:border-strokedark md:text-sm">
@@ -157,22 +161,22 @@ function ProductTables() {
                       >
                         <PencilEdit02Icon color="#fff" width={16} height={16} />
                       </button>
-                      <button
-                        className="rounded-md bg-red p-1 text-white hover:bg-opacity-80"
-                        onClick={() => handleDeleteButton(product.id)}
+                      <DeleteAlert
+                        actionComponent={<span>Hapus</span>}
+                        action={handleDelete}
+                        deleteMessage={`Apakah anda yakin akan menghapus <strong>${product.product_name}</strong> ?`}
                       >
-                        <DeletePutBackIcon
-                          color="#fff"
-                          width={16}
-                          height={16}
-                        />
-                      </button>
-                      <DeleteConfirmModal
-                        isOpen={isDeleteModalOpen}
-                        onClose={() => setIsDeleteModalOpen(false)}
-                        onConfirm={handleDelete}
-                        message="Apakah anda yakin untuk menghapus Produk ini?"
-                      />
+                        <button
+                          className="rounded-md bg-red p-1 text-white hover:bg-opacity-80"
+                          onClick={() => handleDeleteButton(product)}
+                        >
+                          <DeletePutBackIcon
+                            color="#fff"
+                            width={16}
+                            height={16}
+                          />
+                        </button>
+                      </DeleteAlert>
                     </td>
                   </tr>
                 ))

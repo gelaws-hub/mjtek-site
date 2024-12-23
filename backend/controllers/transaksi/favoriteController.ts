@@ -43,20 +43,28 @@ export const getAllFavoritesByUserId = async (req: Request, res: Response) => {
 };
 
 export const isProductFavorite = async (req: Request, res: Response) => {
-  const { user_id, product_id } = req.body;
+  const { user_id } = req.params;
+  const { product_id } = req.body;
 
   try {
+    // Check input validation (optional but recommended)
+    if (!user_id || !product_id) {
+      return res
+        .status(400)
+        .json({ error: "user_id and product_id are required" });
+    }
+
+    // Ensure only one response is sent
     const favoriteExists = await prisma.favorite.findFirst({
       where: {
-        user_id: user_id,
-        product_id: parseInt(product_id),
+        AND: [{ user_id: user_id }, { product_id: parseInt(product_id) }],
       },
     });
 
-    res.status(200).json({ isFavorite: !!favoriteExists });
+    return res.status(200).json({ isFavorite: !!favoriteExists });
   } catch (error: any) {
     console.error("Error checking favorite status:", error.message);
-    res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
 
