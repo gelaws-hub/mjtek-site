@@ -94,6 +94,7 @@ export function EditProductModal({ product, onClose }: ProductDetailProps) {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(changes),
+          credentials: "include",
         },
       );
 

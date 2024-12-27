@@ -23,29 +23,34 @@ interface ValidationRequest extends Request {
   user?: CustomRequest["user"];
 }
 
+const isProduction = process.env.NODE_ENV === "production";
+
 // Middleware untuk validasi token
 export const ensureAuthenticated: RequestHandler = async (req, res, next) => {
-  const authHeader = req.headers.authorization;
+  // Get the token from the cookies
+  const token = req.cookies.accessToken;
 
-  if (!authHeader) {
+  // If no token is found in cookies, return 401 Unauthorized
+  if (!token) {
     return res.status(401).json({ message: "Access token not found" });
   }
 
-  const token = authHeader.split(" ")[1];
-
   try {
+    // Verify the token using the secret
     const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!) as any;
 
-    // Type assertion to match CustomRequest
-    (req as CustomRequest).user = {
+    // Attach the user data to the request
+    (req as any).user = {
       id: decoded.id,
       role_name: decoded.role_name,
       name: decoded.name,
       email: decoded.email,
     };
 
+    // Continue with the next middleware or route handler
     next();
   } catch (error: any) {
+    // Handle token errors (expired, invalid, etc.)
     if (error instanceof jwt.TokenExpiredError) {
       return res.status(401).json({ message: "Access token expired" });
     } else if (error instanceof jwt.JsonWebTokenError) {
@@ -164,12 +169,19 @@ export const login = async (req: Request, res: Response) => {
         },
       });
 
+      res.cookie("accessToken", accessToken, {
+        httpOnly: true, // Prevent client-side access
+        secure: isProduction, // Use HTTPS in production
+        sameSite: isProduction ? "none" : "strict", // Prevent CSRF attacks
+        maxAge: 3600 * 1000, // 1 hour expiration
+      });
+
       return res.status(200).json({
         id: user.id,
         name: user.name,
         email: user.email,
         role_name: user.role_name,
-        accessToken,
+        // accessToken, // access token is received via http only cookie
         // refreshToken, this should never be delivered to client
       });
     }
@@ -282,19 +294,20 @@ export const getUsers = async (_req: ValidationRequest, res: Response) => {
 };
 
 // Logout User
-export const logoutUser = async (req: ValidationRequest, res: Response) => {
+export const logoutUser: RequestHandler = (req, res) => {
   try {
-    const userName = req.user?.name; // Ambil nama pengguna dari req.user
-
-    await prisma.user_refresh_token.deleteMany({
-      where: { user_id: req.user?.id },
+    // Clear the cookie storing the access token
+    res.clearCookie("accessToken", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // Use secure cookies in production
+      sameSite: "strict", // Prevent CSRF attacks
     });
 
-    return res
-      .status(200)
-      .json({ message: `User ${userName} has been logged out` });
+    return res.status(200).json({ message: "Successfully logged out." });
   } catch (error: any) {
-    return res.status(500).json({ message: error.message });
+    return res
+      .status(500)
+      .json({ message: "Failed to log out.", error: error.message });
   }
 };
 
@@ -315,7 +328,7 @@ export const authorize = (roles: string[]) => {
       });
 
       if (!user || !roles.includes(user.role_name)) {
-        return res.status(403).json({ message: "Access denied" });
+        return res.status(403).json({ message: "Access denied 2" });
       }
 
       // Jika user memiliki role yang diizinkan, lanjutkan ke endpoint berikutnya
@@ -325,4 +338,23 @@ export const authorize = (roles: string[]) => {
       return res.status(500).json({ message: "Server error" });
     }
   };
+};
+
+export const validateSession = (req: ValidationRequest, res: Response) => {
+  // Get the JWT token from cookies
+  const token = req.cookies.accessToken;
+
+  if (!token) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  try {
+    // Verify the JWT token
+    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!);
+
+    // If token is valid, return user data
+    return res.status(200).json({ user: decoded });
+  } catch (error) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
 };

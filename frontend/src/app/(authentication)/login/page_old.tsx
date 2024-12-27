@@ -27,27 +27,27 @@ export default function Login() {
     setUserPassword(event.target.value);
   };
 
-  const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
-    setIsLoading(true);
-    event.preventDefault();
-    axios
-      .post(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
-        email: userEmail,
-        password: userPassword,
-      })
-      .then((response) => {
-        Cookies.set("accessToken", response.data.accessToken, {
-          expires: 7, //days
-        });
-          router.push("/");
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        setIsLoading(false);
-        setError(error.response.data.message);
-        console.error(error);
-      });
-  };
+  // const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
+  //   setIsLoading(true);
+  //   event.preventDefault();
+  //   axios
+  //     .post(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
+  //       email: userEmail,
+  //       password: userPassword,
+  //     })
+  //     .then((response) => {
+  //       Cookies.set("accessToken", response.data.accessToken, {
+  //         expires: 7, //days
+  //       });
+  //         router.push("/");
+  //       setIsLoading(false);
+  //     })
+  //     .catch((error) => {
+  //       setIsLoading(false);
+  //       setError(error.response.data.message);
+  //       console.error(error);
+  //     });
+  // };
 
   return (
     <div className="min-h-[100vh] grid xl:grid-cols-[50%_50%] grid-cols-1 justify-center p-20 rounded-xl">

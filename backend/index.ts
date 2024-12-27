@@ -20,21 +20,28 @@ app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// const allowedOrigin = process.env.CORS_ALLOWED_ORIGIN || "";
-// app.use(
-//   cors({
-//     origin: (origin, callback) => {
-//       if (!origin || origin === allowedOrigin) {
-//         callback(null, true);
-//       } else {
-//         callback(new Error("Not allowed by CORS"));
-//       }
-//     },
-//     credentials: true,
-//   })
-// );
+// Get the allowed origins from the environment variables (comma-separated)
+const allowedOrigins = process.env.CORS_ALLOWED_ORIGINS
+  ? process.env.CORS_ALLOWED_ORIGINS.split(",")
+  : [];
 
-app.use(cors());
+  console.log(allowedOrigins);
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps or Postman)
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true, // Enable sending cookies
+  })
+);
+
+// app.use(cors());
 
 app.use("/", produkRoutes);
 app.use("/", produkDetailRoutes);
@@ -44,7 +51,10 @@ app.use("/", userRoutes);
 app.use("/", mediaUploaderRouter);
 
 // Serve the uploads directory
-const uploadsDir = path.join(process.cwd(), process.env.PRODUCT_UPLOADS_DIR || "uploads/products");
+const uploadsDir = path.join(
+  process.cwd(),
+  process.env.PRODUCT_UPLOADS_DIR || "uploads/products"
+);
 app.use("/uploads/products", express.static(uploadsDir));
 
 app.get("/", (req, res) => {

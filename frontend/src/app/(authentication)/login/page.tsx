@@ -29,9 +29,9 @@ export default function Login() {
       .required("Password harus diisi"),
   });
 
-  const handleLogin = (values: any, actions: any) => {
+  const handleLogin = async (values: any, actions: any) => {
     actions.setSubmitting(true);
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -40,6 +40,7 @@ export default function Login() {
         email: values.email,
         password: values.password,
       }),
+      credentials: "include",
     })
       .then(async (response) => {
         if (!response.ok) {
@@ -49,12 +50,14 @@ export default function Login() {
         return response.json();
       })
       .then((data) => {
-        Cookies.set("accessToken", data.accessToken, {
-          expires: 7, //days
-        });
+        // Cookies.set("accessToken", data.accessToken); // changed my mind, I used http only cookie instead
         actions.resetForm();
         actions.setSubmitting(false);
-        router.push("/");
+        if (data.role_name === "admin" || data.role_name === "owner")
+          router.push("/admin");
+        else {
+          router.push("/");
+        }
       })
       .catch((error) => {
         setError(error.message);

@@ -7,7 +7,8 @@ import {
     getUsers, 
     logoutUser,
     ensureAuthenticated,
-    authorize
+    authorize,
+    validateSession
 } from '../auth/userController';
 
 import { createRole, getAllRoles, getRoleById, updateRole, deleteRole } from '../auth/roleController';
@@ -52,5 +53,6 @@ userRoutes.get('/role/:id', getRoleById);
 userRoutes.put('/role/:id', updateRole);
 userRoutes.delete('/role/:id', deleteRole);
 
+userRoutes.get("/validate-session", ensureAuthenticated, validateSession);
 
-export default userRoutes;
+export default userRoutes

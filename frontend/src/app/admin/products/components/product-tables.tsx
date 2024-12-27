@@ -10,7 +10,7 @@ import { PencilEdit02Icon } from "@/components/icons/PencilEdit02Icon";
 import { DeletePutBackIcon } from "@/components/icons/DeletePutBackIcon";
 import { useRefreshContext } from "./refreshContext";
 import DeleteAlert from "./DeleteAlert";
-import { deleteToast } from "./reactToastify";
+import { deleteToast, errorToast } from "./reactToastify";
 import Link from "next/link";
 
 function ProductTables() {
@@ -30,7 +30,8 @@ function ProductTables() {
 
   useEffect(() => {
     fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/product?page=${currentPage}&limit=${limit}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/admin-products?page=${currentPage}&limit=${limit}`,
+      { method: "GET", credentials: "include" },
     )
       .then((response) => response.json())
       .then((data) => {
@@ -54,11 +55,22 @@ function ProductTables() {
     }
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/product/${deletedProduct.id}`, {
       method: "DELETE",
-    }).then(() => {
-      setRefresh(!refresh);
-      deleteToast(`Produk ${deletedProduct.product_name} berhasil dihapus`);
-      setDeletedProduct(null);
-    });
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.status_code === 200) {
+          setRefresh(!refresh);
+          deleteToast(`Produk ${deletedProduct.product_name} berhasil dihapus`);
+          setDeletedProduct(null);
+        } else {
+          errorToast(`Gagal menghapus produk ${deletedProduct.product_name}`);
+        }
+      })
+      .catch((error) => console.error("Error deleting product:", error));
   };
 
   if (currentPage > totalPages) {
@@ -67,10 +79,7 @@ function ProductTables() {
         <p>Halaman yang anda cari tidak ada, </p>
         <span>
           &nbsp;
-          <Link
-            className="text-blue-500"
-            href={`/admin/products?page=1`}
-          >
+          <Link className="text-blue-500" href={`/admin/products?page=1`}>
             kembali ke halaman awal
           </Link>
         </span>{" "}
@@ -85,7 +94,6 @@ function ProductTables() {
           <h4 className="text-xl font-semibold text-black dark:text-white">
             Menampilkan {limit} Produk
           </h4>
-          
         </div>
         <div className="flex max-w-[90vw] overflow-x-auto sm:max-w-full">
           <table className="mx-auto w-full min-w-[600px] border-collapse border-t border-stroke text-xs dark:border-strokedark md:text-sm">

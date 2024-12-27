@@ -1,8 +1,7 @@
 import Image from "next/image";
-import { User } from "@/app/(authentication)/auth/useAuth";
 
 export interface UserInfoModalProps {
-  user: User | null;
+  user: any | null;
   className?: string;
   handleLogout: () => void;
 }

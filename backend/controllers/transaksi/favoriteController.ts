@@ -1,19 +1,32 @@
 import { Request, Response } from "express";
 import prisma from "../../utils/database";
 
+interface CustomRequest extends Request {
+  user?: {
+    id: string;
+    role_name: string;
+    name: string;
+    email: string;
+  };
+}
+
 export const getAllFavoritesByUserId = async (req: Request, res: Response) => {
-  const { user_id } = req.params;
   const page = parseInt(req.query.page as string) || 1;
   const limit = parseInt(req.query.limit as string) || 10;
   const skip = (page - 1) * limit;
 
+  const user = (req as CustomRequest).user;
+  if (!user) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
   try {
     const [totalCount, favorites] = await prisma.$transaction([
       prisma.favorite.count({
-        where: { user_id },
+        where: { user_id: user.id },
       }),
       prisma.favorite.findMany({
-        where: { user_id },
+        where: { user_id: user.id },
         skip,
         take: limit,
         include: {
@@ -43,21 +56,25 @@ export const getAllFavoritesByUserId = async (req: Request, res: Response) => {
 };
 
 export const isProductFavorite = async (req: Request, res: Response) => {
-  const { user_id } = req.params;
-  const { product_id } = req.body;
+  const { product_id } = req.params;
+
+  const user = (req as CustomRequest).user;
+  if (!user) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
 
   try {
     // Check input validation (optional but recommended)
-    if (!user_id || !product_id) {
+    if (!user.id || !product_id) {
       return res
         .status(400)
-        .json({ error: "user_id and product_id are required" });
+        .json({ error: "user token and product_id are required" });
     }
 
     // Ensure only one response is sent
     const favoriteExists = await prisma.favorite.findFirst({
       where: {
-        AND: [{ user_id: user_id }, { product_id: parseInt(product_id) }],
+        AND: [{ user_id: user.id }, { product_id: parseInt(product_id) }],
       },
     });
 
@@ -70,16 +87,20 @@ export const isProductFavorite = async (req: Request, res: Response) => {
 
 export const addToFavorites = async (req: Request, res: Response) => {
   const { product_id } = req.body;
-  const { user_id } = req.params;
+  const user = (req as CustomRequest).user;
+  if (!user) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
 
   try {
     // Check if the product is already in favorites for the user
     const existingFavorite = await prisma.favorite.findFirst({
       where: {
-        product_id: parseInt(product_id),
-        user_id: user_id,
+        product_id: product_id,
+        user_id: user.id,
       },
     });
+    console.log(product_id, user.id);
 
     if (existingFavorite) {
       res.status(400).json({ error: "Product is already in favorites" });
@@ -87,8 +108,8 @@ export const addToFavorites = async (req: Request, res: Response) => {
       // Create a new entry in favorites if the product isn't already added
       const newFavorite = await prisma.favorite.create({
         data: {
-          product_id: parseInt(product_id),
-          user_id,
+          product_id: product_id,
+          user_id: user.id,
         },
       });
 
@@ -102,13 +123,16 @@ export const addToFavorites = async (req: Request, res: Response) => {
 
 export const removeFromFavorites = async (req: Request, res: Response) => {
   const { product_id } = req.body;
-  const { user_id } = req.params;
+  const user = (req as CustomRequest).user;
+  if (!user) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
 
   try {
     const existingFavorite = await prisma.favorite.findFirst({
       where: {
-        user_id,
-        product_id: parseInt(product_id),
+        user_id: user.id,
+        product_id: product_id,
       },
     });
 

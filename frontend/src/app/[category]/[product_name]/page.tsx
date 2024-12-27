@@ -40,7 +40,7 @@ export default function ProductDetail() {
   }
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col bg-white">
       <section className="flex flex-col pt-2 max-w-[90%] md:grid md:grid-cols-[minmax(0,30%)_minmax(0,45%)_minmax(0,25%)] gap-10 md:pt-12 md:max-w-[54%] mx-auto">
         {/* Thumbnail Section */}
         <div className="md:self-start md:sticky top-[10.6rem] h-auto">

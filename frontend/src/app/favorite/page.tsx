@@ -1,27 +1,24 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useAuth } from "../(authentication)/auth/useAuth";
+import useCheckSession from "../(authentication)/auth/useCheckSession";
 import { Product } from "@/components/product/ProductInterface";
 import ProductCardItem from "@/components/product/ProductCardItem";
 
 export default function FavoritePage() {
-  const { user, isLoggedIn, token } = useAuth();
+  const { loading, error, isAuthenticated, roleName, user } = useCheckSession();
   const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
-    if (!isLoggedIn || !user || !token) return;
+    if (!isAuthenticated || !user) return;
 
     const fetchProducts = async () => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/favorite/${user.id}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/favorite`,
           {
             method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
+            credentials: "include",
           }
         );
 
@@ -38,7 +35,7 @@ export default function FavoritePage() {
     };
 
     fetchProducts();
-  }, [isLoggedIn, user, token]);
+  }, [isAuthenticated, user]);
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-w-[60%] mx-auto">

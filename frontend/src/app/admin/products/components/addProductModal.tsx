@@ -97,7 +97,11 @@ export default function AddProductModal({
         `${process.env.NEXT_PUBLIC_API_URL}/product`,
         {
           method: "POST",
+          headers: {
+            application: "application/json",
+          },
           body: uploadData,
+          credentials: "include",
         },
       );
 

@@ -6,18 +6,19 @@ import { ShoppingCart02Icon } from "../icons/ShoppingCart02Icon";
 import { Notification03Icon } from "../icons/Notification03Icon";
 import { FavouriteIcon } from "../icons/FavouriteIcon";
 import UserInfoModal from "./UserInfoModal";
-import { useAuth } from "@/app/(authentication)/auth/useAuth";
+import useCheckSession from "@/app/(authentication)/auth/useCheckSession";
 import { useRouter } from "next/navigation";
-import { UserSidebar } from "../UserSidebar";
+import useCurrentUser from "@/app/(authentication)/auth/useCurrentUser";
 
 export default function UserProfile() {
   const [openUserInfo, setOpenUserInfo] = useState(false);
-  const { user, isLoggedIn } = useAuth();
+  const { isAuthenticated } = useCheckSession();
+  const { user } = useCurrentUser();
   const router = useRouter();
 
   const handleViewFavorite = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isLoggedIn) {
+    if (!isAuthenticated) {
       router.push("/login");
     }
     if (user?.id) {
@@ -30,35 +31,23 @@ export default function UserProfile() {
     setOpenUserInfo(!openUserInfo);
   };
 
-  // const handleOutsideClick = (event: any) => {
-  //   event.stopPropagation();
-  //   if (!event.target.closest(".toggle-user-info")) {
-  //     setOpenUserInfo(!openUserInfo);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   document.addEventListener("click", handleOutsideClick);
-  //   return () => {
-  //     document.removeEventListener("click", handleOutsideClick);
-  //   };
-  // }, []);
-
   const handleLogout = async () => {
-    const token = Cookies.get("accessToken");
-    if (token) {
-      try {
-        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/logout`, {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/logout`,
+        {
           method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+          credentials: "include",
+        },
+      );
+      if (response.ok) {
         Cookies.remove("accessToken");
         window.location.reload();
-      } catch (error) {
-        console.error(error);
+      } else {
+        throw new Error("Failed to log out");
       }
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -78,7 +67,7 @@ export default function UserProfile() {
           <FavouriteIcon height={20} className="text-gray-700" />
         </button>
       </div>
-      {isLoggedIn ? (
+      {isAuthenticated ? (
         <button className="" onClick={toggleUserInfo}>
           <div className="flex cursor-pointer items-center justify-center rounded-xl hover:bg-blue-900 hover:bg-opacity-10 md:mr-10 md:justify-start md:gap-2 md:px-3 md:py-1">
             <Image

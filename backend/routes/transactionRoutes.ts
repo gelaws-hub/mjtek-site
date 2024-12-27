@@ -29,10 +29,10 @@ transaksiRoutes.put("/cart/:id", updateCartItem);
 transaksiRoutes.delete("/cart/:id", removeFromCart);
 
 //ensureCorrectUser has to take :user_id as a param to make sure it's the correct user
-transaksiRoutes.get("/favorite/:user_id", ensureCorrectUser, getAllFavoritesByUserId);
-transaksiRoutes.post("/favorite/:user_id", ensureCorrectUser, addToFavorites);
-transaksiRoutes.post("/isFavorite/:user_id", ensureCorrectUser, isProductFavorite);
-transaksiRoutes.delete("/favorite/:user_id", ensureCorrectUser, removeFromFavorites); 
+transaksiRoutes.get("/favorite", ensureCorrectUser, getAllFavoritesByUserId);
+transaksiRoutes.get("/isFavorite/:product_id", ensureCorrectUser, isProductFavorite);
+transaksiRoutes.post("/favorite", ensureCorrectUser, addToFavorites);
+transaksiRoutes.delete("/favorite", ensureCorrectUser, removeFromFavorites); 
 
 // Transaksi routes
 transaksiRoutes.get('/transaction', getAllTransaction);

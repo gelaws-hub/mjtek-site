@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import FavoriteButton from "./FavoriteButton";
+// import FavoriteButton from "./FavoriteButton";
 import { Product } from "./ProductInterface";
 
 interface ProductCardItemProps {
@@ -21,7 +21,7 @@ export default function ProductCardItem({ product }: ProductCardItemProps) {
   return (
     <Link
       href={productUrl}
-      className="bg-white overflow-hidden w-full p-2 rounded-lg hover:shadow-lg hover:shadow-blue-200 transition-all duration-300 ease-in-out"
+      className="bg-white overflow-hidden w-full p-2 rounded-lg hover:shadow-lg hover:scale-105 transition-all duration-300 ease-in-out"
     >
       {product.media && product.media.length > 0 && (
         <div className="relative flex aspect-[1/1]">
@@ -33,7 +33,7 @@ export default function ProductCardItem({ product }: ProductCardItemProps) {
             className="w-full h-full object-cover overflow-hidden"
           />
           <button className="absolute top-2 right-2 bg-white rounded-full shadow-md z-10">
-            <FavoriteButton productId={product.id.toString()} />
+            {/* <FavoriteButton productId={product.id.toString()} /> */}
           </button>
         </div>
       )}
