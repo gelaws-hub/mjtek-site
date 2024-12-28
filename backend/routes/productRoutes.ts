@@ -8,10 +8,11 @@ import {
 import { getAllProducts } from "../controllers/productSearchController";
 import { createFullDetailProduct } from "../controllers/image_uploader/createFullDetailProduct";
 import { authorize, ensureAuthenticated } from "../auth/userController";
+import { getClientProducts } from "../controllers/product_controllers/getClientProducts";
 
 const productRoutes = express.Router();
 
-productRoutes.get("/product", getAllProducts);
+productRoutes.get("/product", getClientProducts);
 productRoutes.get("/product/:id", getProductById);
 
 // Admin only routes

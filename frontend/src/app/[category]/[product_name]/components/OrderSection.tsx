@@ -37,10 +37,10 @@ export default function OrderSection({
   return (
     <>
       <aside className="hidden md:block border border-gray-400 md:p-4 rounded-lg h-auto">
-        <p className="md:block font-semibold text-lg mb-2">
+        <p className="md:block font-semibold text-base lg:text-lg mb-2">
           Atur jumlah pembelian
         </p>
-        <div className="flex flex-row items-center justify-between py-2">
+        <div className="flex flex-row items-center justify-between py-2 text-sm lg:text-base">
           <label htmlFor="quantity-input" className="font-medium">
             Jumlah :
           </label>
@@ -50,7 +50,7 @@ export default function OrderSection({
             maxQty={productQty}
           />
         </div>
-        <div className="flex flex-row items-center justify-between py-2">
+        <div className="flex flex-row items-center justify-between py-2 text-sm lg:text-base">
           <p className="font-normal">Subtotal :</p>
           <p className="font-semibold ml-auto text-blue-900">
             {new Intl.NumberFormat("id-ID", {

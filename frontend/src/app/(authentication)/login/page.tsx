@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Cookies from "js-cookie";
-import { useRouter } from "next/navigation";
 import LoadingAuth from "../loading";
 import { object, string } from "yup";
 import { useFormik } from "formik";
@@ -15,6 +15,8 @@ export default function Login() {
     "https://images.tokopedia.net/img/cache/1200/BgtCLw/2021/9/20/a4a3e98f-d9e4-40ae-84b6-8df6903ba113.jpg.webp?ect=4g";
   const [error, setError] = useState(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirectTo") || "/"; // Default to '/' if no redirectTo is provided
 
   const userSchema = object({
     email: string()
@@ -24,7 +26,7 @@ export default function Login() {
       .min(6)
       .matches(
         /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{6,}$/,
-        "Password harus memiliki minimal 6 karakter, terdapat huruf besar, angka, dan karakter khusus",
+        "Password harus memiliki minimal 6 karakter, terdapat huruf besar, angka, dan karakter khusus"
       )
       .required("Password harus diisi"),
   });
@@ -53,10 +55,11 @@ export default function Login() {
         // Cookies.set("accessToken", data.accessToken); // changed my mind, I used http only cookie instead
         actions.resetForm();
         actions.setSubmitting(false);
-        if (data.role_name === "admin" || data.role_name === "owner")
+        if (data.role_name === "admin" || data.role_name === "owner") {
           router.push("/admin");
-        else {
-          router.push("/");
+        } else {
+          // Redirect to the original page or home page
+          router.push(redirectTo);
         }
       })
       .catch((error) => {

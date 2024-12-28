@@ -13,3 +13,11 @@ export interface Product {
     category_name: string;
   };
 }
+
+export interface ProductCardItemProps {
+  id: number; 
+  product_name: string;
+  price: number; 
+  media_source: string | null; 
+  category_name: string;
+}

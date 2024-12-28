@@ -22,9 +22,9 @@ import { ensureCorrectUser } from "../auth/middleware/buyer/buyerMiddleware";
 
 const transaksiRoutes = express.Router();
 
-transaksiRoutes.get("/cart/:id_user", getAllCartByUserId);
+transaksiRoutes.get("/cart", ensureCorrectUser, getAllCartByUserId);
 transaksiRoutes.get("/cart/detail/:id", clearCart);
-transaksiRoutes.post("/cart", addToCart);
+transaksiRoutes.post("/cart", ensureCorrectUser, addToCart);
 transaksiRoutes.put("/cart/:id", updateCartItem);
 transaksiRoutes.delete("/cart/:id", removeFromCart);
 

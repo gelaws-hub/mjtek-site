@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { FavouriteIcon } from "@/components/icons/FavouriteIcon";
 import useCheckSession from "@/app/(authentication)/auth/useCheckSession";
+import { useRouter } from "next/navigation";
+import { useGoToLogin } from "@/lib/goToLogin";
 
 interface FavoriteButtonProps {
   productId: string;
@@ -11,9 +13,12 @@ interface FavoriteButtonProps {
 
 const FavoriteButton = ({ productId, text }: FavoriteButtonProps) => {
   const [isFavourite, setIsFavourite] = useState<boolean>(false);
-  const { loading, error, isAuthenticated, roleName, user } = useCheckSession();
+  const { loading, error, isAuthenticated } = useCheckSession();
+  const router = useRouter();
+  const { goToLogin } = useGoToLogin();
 
   const checkFavoriteStatus = async () => {
+    if (!isAuthenticated) return;
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/isfavorite/${productId}`,
@@ -44,7 +49,7 @@ const FavoriteButton = ({ productId, text }: FavoriteButtonProps) => {
     e.preventDefault();
     e.stopPropagation();
     if (!isAuthenticated) {
-      alert("Please log in to manage favorites.");
+      goToLogin();
       return;
     }
 
@@ -70,8 +75,6 @@ const FavoriteButton = ({ productId, text }: FavoriteButtonProps) => {
       console.error("An error occurred while toggling favorite:", error);
     }
   };
-
-  if (loading || error) return null;
 
   return (
     <button

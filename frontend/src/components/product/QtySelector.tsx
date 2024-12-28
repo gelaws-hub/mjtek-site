@@ -35,7 +35,7 @@ export default function QuantitySelector({
 
   return (
     <form className={`max-w-xs`+` ${className}`}>
-      <div className="relative flex items-center max-w-[8rem] md:border border-gray-300 rounded-lg">
+      <div className="relative flex items-center max-w-[8rem] border border-gray-300 rounded-lg">
         <button
           type="button"
           id="decrement-button"
@@ -44,7 +44,7 @@ export default function QuantitySelector({
           className="hover:bg-gray-50 rounded-s-lg p-2"
         >
           <svg
-            className="w-3 h-3 text-gray-900"
+            className="w-3 h-6 text-gray-900"
             aria-hidden="true"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -80,7 +80,7 @@ export default function QuantitySelector({
           className="hover:bg-gray-50 rounded-e-lg p-2"
         >
           <svg
-            className="w-3 h-3 text-gray-900"
+            className="w-3 h-6 text-gray-900"
             aria-hidden="true"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"

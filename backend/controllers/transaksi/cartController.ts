@@ -2,19 +2,29 @@
 import { Request, Response } from "express";
 import prisma from "../../utils/database";
 
-// Get all Keranjang by id_user
+interface CustomRequest extends Request {
+  user?: {
+    id: string;
+    role_name: string;
+    name: string;
+    email: string;
+  };
+}
+
 export const getAllCartByUserId = async (req: Request, res: Response) => {
-  const { id_user } = req.params;
+  const user = (req as CustomRequest).user;
+  if (!user) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
   try {
     const keranjang = await prisma.cart.findMany({
       where: {
-        user_id: id_user,
+        user_id: user.id,
       },
       include: {
         product: {
           include: {
             category: true,
-            sub_category: true,
             brand: true,
             product_ram_type: {
               include: {
@@ -27,17 +37,37 @@ export const getAllCartByUserId = async (req: Request, res: Response) => {
               },
             },
             media: {
+              where: {
+                file_type: "image", // Filter media to only include images
+              },
+              take: 1, // Only take the first image
               select: {
-                id: true,
-                source: true,
-                file_type: true,
+                source: true, // Select only the source of the image
               },
             },
           },
         },
       },
     });
-    res.status(200).json(keranjang);
+
+    // Format the result
+    const formattedCart = keranjang.map((cartItem) => ({
+      id: cartItem.product.id,
+      product_name: cartItem.product.product_name,
+      price: parseFloat(cartItem.product.price.toString()), // Assuming price is stored as a string in the DB
+      stock: cartItem.product.stock,
+      quantity: cartItem.quantity,
+      media_source:
+        cartItem.product.media.length > 0
+          ? cartItem.product.media[0].source
+          : null,
+      category_name: cartItem.product.category.category_name,
+      brand: cartItem.product.brand?.brand_name || "", // Assuming brand has a `brand_name` field
+      estimated_weight: cartItem.product.estimated_weight || null, // Assuming estimated_weight is stored in product
+      is_selected: cartItem.is_selected,
+    }));
+
+    res.status(200).json({ status: "success fetching carts", carts: formattedCart });
   } catch (error: any) {
     console.error("Error fetching Keranjang:", error.message);
     res.status(500).json({ error: "Internal server error" });
@@ -46,27 +76,32 @@ export const getAllCartByUserId = async (req: Request, res: Response) => {
 
 // Add a new item to Keranjang
 export const addToCart = async (req: Request, res: Response) => {
-  const { user_id, id_produk, quantity } = req.body;
+  const user = (req as CustomRequest).user;
+  const { id_produk, quantity } = req.body;
+
+  if (!user) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
 
   try {
     // Check if the product is already in Keranjang for the user
     const existingKeranjang = await prisma.cart.findFirst({
       where: {
         product_id: parseInt(id_produk),
-        user_id,
+        user_id: user.id,
       },
     });
 
+    const incrementQuantity = quantity ? quantity : 1; // Default to 1 if no quantity is provided
+
     if (existingKeranjang) {
-      // Update the existing entry to increase jumlah_produk
+      // Update the existing entry to increase quantity
       const updatedKeranjang = await prisma.cart.update({
         where: {
           id: existingKeranjang.id,
         },
         data: {
-          quantity: {
-            increment: quantity, // Increment jumlah_produk by the amount provided
-          },
+          quantity: existingKeranjang.quantity + incrementQuantity, // Increment current quantity
         },
       });
 
@@ -76,8 +111,8 @@ export const addToCart = async (req: Request, res: Response) => {
       const newKeranjang = await prisma.cart.create({
         data: {
           product_id: parseInt(id_produk),
-          user_id,
-          quantity,
+          user_id: user.id,
+          quantity: incrementQuantity, // Set quantity to the increment value
           date: new Date(),
         },
       });

@@ -1,21 +1,17 @@
 import Image from "next/image";
 import Link from "next/link";
 // import FavoriteButton from "./FavoriteButton";
-import { Product } from "./ProductInterface";
+import { ProductCardItemProps } from "./ProductInterface";
 
-interface ProductCardItemProps {
-  product: Product;
-}
 
-export default function ProductCardItem({ product }: ProductCardItemProps) {
-  // Function to format the URL-friendly product name
+export default function ProductCardItem({ product }: { product: ProductCardItemProps }) {
   const formatProductNameForUrl = (productName: string) => {
     return productName.toLowerCase().replace(/\s+/g, "-");
   };
 
   // Construct the URL using the formatted product name and category
   const productUrl = `/${encodeURIComponent(
-    product.category.category_name.toLowerCase(),
+    product.category_name.toLowerCase(),
   )}/${formatProductNameForUrl(product.product_name)}-${product.id}`;
 
   return (
@@ -24,11 +20,11 @@ export default function ProductCardItem({ product }: ProductCardItemProps) {
       // className="bg-white overflow-hidden p-2 rounded-lg transition-transform duration-200 ease-in-out relative hover:scale-105 hover:z-10" >
       className="group relative overflow-visible"
     >
-      <div className="p-2 flex flex-col relative group-hover:absolute group-hover:scale-[102%] group-hover:shadow-lg group-hover:z-10 transition-all duration-300 ease-in-out bg-white rounded-lg">
-        {product.media && product.media.length > 0 && (
+      <div className="p-2 flex flex-col relative group-hover:absolute group-hover:scale-[102%] group-hover:[box-shadow:0px_-4px_10px_rgba(0,0,0,0.1),0px_4px_10px_rgba(0,0,0,0.1)] group-hover:z-10 transition-all duration-300 ease-in-out bg-white rounded-lg">
+        {product.media_source && (
           <div className="relative flex aspect-[1/1]">
             <Image
-              src={product.media[0].source}
+              src={product.media_source}
               alt={product.product_name}
               width={300}
               height={300}

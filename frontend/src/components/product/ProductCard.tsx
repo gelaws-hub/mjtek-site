@@ -3,10 +3,10 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import ProductCardItem from "./ProductCardItem";
-import { Product } from "./ProductInterface";
+import { ProductCardItemProps } from "./ProductInterface";
 
 export default function ProductCard() {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<ProductCardItemProps[]>([]);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -24,7 +24,7 @@ export default function ProductCard() {
   }, []);
 
   return (
-    <div className="mx-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 lg:max-w-[1024px]">
+    <div className="grid grid-cols-[repeat(auto-fit,minmax(146px,1fr))]">
       {products &&
         products.map((product) => (
           <ProductCardItem key={product.id} product={product} />

@@ -1,24 +1,9 @@
 "use client";
 
 import ProductCardItem from "@/components/product/ProductCardItem";
+import { ProductCardItemProps } from "@/components/product/ProductInterface";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState, Suspense } from "react";
-
-interface Media {
-  source: string;
-  file_type: string;
-}
-
-interface Product {
-  id: number;
-  product_name: string;
-  price: number;
-  media: Media[];
-  category: {
-    id: number;
-    category_name: string;
-  };
-}
 
 interface Category {
   id: number;
@@ -30,7 +15,7 @@ function SearchResultsComponent() {
   const query = searchParams.get("q");
   const pageParam = searchParams.get("page");
   const [page, setPage] = useState<number>(pageParam ? parseInt(pageParam) : 1);
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<ProductCardItemProps[]>([]);
   const [totalCount, setTotalCount] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -57,7 +42,7 @@ function SearchResultsComponent() {
     const fetchProducts = async (searchTerm: string, categoryIds: number[]) => {
       try {
         const url = new URL(
-          `${process.env.NEXT_PUBLIC_API_URL}/product?limit=9&page=${page}`
+          `${process.env.NEXT_PUBLIC_API_URL}/product?limit=10&page=${page}`
         );
         url.searchParams.append("q", encodeURIComponent(searchTerm));
         if (categoryIds.length > 0) {
@@ -101,7 +86,7 @@ function SearchResultsComponent() {
   };
 
   return (
-    <div className="grid grid-cols-[25%_75%] mt-0">
+    <div className="grid grid-cols-[25%_75%] mt-0 bg-white min-h-screen">
       <div className="flex flex-col ml-20 border-r-2 border-r-gray-200 ">
         <h2 className="text-3xl font-bold text-blue-900 mb-4 pt-6">Filter</h2>
         <div>
@@ -137,7 +122,7 @@ function SearchResultsComponent() {
         <div className="border-l-8"></div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
           {products.length > 0 ? (
-            products.map((product: Product) => (
+            products.map((product: ProductCardItemProps) => (
               <ProductCardItem key={product.id} product={product} />
             ))
           ) : (
