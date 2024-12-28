@@ -20,6 +20,7 @@ export default function CartPage() {
     (total, item) => total + (item.price || 0) * (item.quantity || 1),
     0,
   );
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchCarts = async () => {
     try {
@@ -39,6 +40,7 @@ export default function CartPage() {
   };
 
   const toCart = async (id_product: number, quantity = 1) => {
+    setIsLoading(true);
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/cart`, {
         method: "POST",
@@ -57,8 +59,11 @@ export default function CartPage() {
           item.id === data.id ? { ...item, quantity: data.quantity } : item,
         ),
       );
+      setIsLoading(false);
     } catch (error) {
+      alert("Error updating cart");
       console.error("Error updating cart:", error);
+      setIsLoading(false);
     }
   };
 
@@ -131,6 +136,7 @@ export default function CartPage() {
             onCheckItem={handleCheckItem}
             onDeleteItem={handleDeleteItem}
             onAddToFavorite={handleAddToFavorite}
+            isLoading={isLoading}
           />
         ))}
       </div>
