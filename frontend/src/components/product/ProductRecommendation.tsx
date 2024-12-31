@@ -6,11 +6,14 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProductCardItemProps } from "@/components/product/ProductInterface";
 import Link from "next/link";
+import ProductCardItem from "./ProductCardItem";
 
 export function ProductRecommendation({
   products,
+  afterAddToCart,
 }: {
   products: ProductCardItemProps[];
+  afterAddToCart?: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
@@ -59,41 +62,13 @@ export function ProductRecommendation({
     return productName.toLowerCase().replace(/\s+/g, "-");
   };
 
+  if (!products) return null;
+
   return (
-    <div className="relative h-[350px]">
-      <div ref={scrollRef} className="flex space-x-4 scrollbar-none">
+    <div className="relative pb-10">
+      <div ref={scrollRef} className="grid grid-cols-[repeat(auto-fit,minmax(146px,1fr))]">
         {products.map((product) => (
-          <Link
-            href={`/${encodeURIComponent(
-              product.category_name.toLowerCase(),
-            )}/${formatProductNameForUrl(product.product_name)}-${product.id}`}
-            key={product.id}
-            className="group w-64 transform transition-transform duration-300 ease-in-out sm:w-72 rounded-lg"
-          >
-            <div className="relative">
-            <div className="flex h-full flex-col rounded-lg bg-white shadow-md transition-transform duration-300 ease-in-out relative group-hover:scale-105 group-hover:z-10 group-hover:overflow-visible group-hover:shadow-lg group-hover:bg-white">
-                <Image
-                  src={product.media_source ? product.media_source : ""}
-                  alt={product.product_name}
-                  width={288}
-                  height={288}
-                  className="h-48 w-full object-cover rounded-t-md"
-                />
-                <div className="flex flex-grow flex-col p-4">
-                  <h3 className="mb-2 truncate text-md font-semibold group-hover:whitespace-normal">
-                    {product.product_name}
-                  </h3>
-                  <p className="mt-auto text-gray-600">
-                    {new Intl.NumberFormat("id-ID", {
-                      style: "currency",
-                      currency: "IDR",
-                    }).format(product.price)}
-                  </p>
-                  <Button className="mt-2 w-full">+ Keranjang</Button>
-                </div>
-              </div>
-            </div>
-          </Link>
+          <ProductCardItem key={product.id} product={product} afterAddToCart={afterAddToCart} />
         ))}
       </div>
       {showLeftArrow && (

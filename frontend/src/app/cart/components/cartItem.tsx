@@ -2,6 +2,7 @@ import Image from "next/image";
 import { Heart, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CartItem as CartItemType } from "./types";
+import FavoriteButton from "@/components/product/FavoriteButton";
 
 interface CartItemProps {
   item: CartItemType;
@@ -21,12 +22,12 @@ export default function CartItem({
   isLoading = false,
 }: CartItemProps) {
   return (
-    <div className="flex flex-col items-center rounded-lg border-b bg-white p-4">
+    <div className="mb-2 flex flex-col items-center  rounded-md border bg-white p-4 pb-2">
       <div className="flex w-full flex-row items-center justify-start border-b border-opacity-30 pb-1">
         <input
           type="checkbox"
           checked={item.is_selected}
-          onChange={(e) => onCheckItem(item.id, e.target.checked)}
+          onChange={(e) => onCheckItem(item.product_id, e.target.checked)}
           className="m-1 my-auto h-4 w-4 cursor-pointer rounded-md border-gray-300 bg-gray-100 text-blue-600 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800"
         />
         <Image
@@ -38,7 +39,7 @@ export default function CartItem({
         />
         <div className="flex-grow">
           <h2 className="line-clamp-1 font-semibold">{item.product_name}</h2>
-          <p className="text-sm text-gray-600">ID: {item.id}</p>
+          <p className="text-sm text-gray-600">ID: {item.product_id}</p>
           <p className="text-sm text-gray-600">
             Berat: {item.estimated_weight} kg
           </p>
@@ -50,21 +51,14 @@ export default function CartItem({
           </div>
         </div>
       </div>
-      <div className="mt-1 flex w-full justify-start pl-7">
-        <div className="flex items-center gap-2 text-gray-600 hover:border-gray-400 border-gray-200">
+      <div className="mt-2 flex w-full justify-start pl-7">
+        <div className="flex items-center gap-2 border-gray-200 text-gray-600 hover:border-gray-400">
+          <FavoriteButton height="7" productId={item.product_id} />
           <Button
             variant="outline"
             size="icon"
-            onClick={() => onAddToFavorite(item.id)}
-            className="h-7 w-7 hover:bg-blue-400 transition-all duration-300 ease-in-out"
-          >
-            <Heart className="h-3 w-3" />
-          </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => onDeleteItem(item.id)}
-            className="h-7 w-7 hover:bg-red-400 transition-all duration-300 ease-in-out"
+            onClick={() => onDeleteItem(item.product_id)}
+            className="h-7 w-7 transition-all duration-300 ease-in-out hover:bg-red-400"
           >
             <Trash2 className="h-4 w-4" />
           </Button>
@@ -73,9 +67,9 @@ export default function CartItem({
           <Button
             variant="outline"
             size="icon"
-            onClick={() => onQuantityChange(item.id, -1)}
+            onClick={() => onQuantityChange(item.product_id, -1)}
             disabled={item.quantity <= 1 || isLoading}
-            className="h-7 w-7 hover:bg-blue-400 transition-all duration-300 ease-in-out"
+            className="h-7 w-7 transition-all duration-300 ease-in-out hover:bg-blue-400"
           >
             -
           </Button>
@@ -83,9 +77,9 @@ export default function CartItem({
           <Button
             variant="outline"
             size="icon"
-            onClick={() => onQuantityChange(item.id, +1)}
+            onClick={() => onQuantityChange(item.product_id, +1)}
             disabled={item.quantity >= item.stock || isLoading}
-            className="h-7 w-7 hover:bg-blue-400 transition-all duration-300 ease-in-out"
+            className="h-7 w-7 transition-all duration-300 ease-in-out hover:bg-blue-400"
           >
             +
           </Button>

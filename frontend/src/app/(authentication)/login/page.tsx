@@ -33,6 +33,17 @@ export default function Login() {
 
   const handleLogin = async (values: any, actions: any) => {
     actions.setSubmitting(true);
+    // await fetch(`/api/login`, {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify({
+    //     email: values.email,
+    //     password: values.password,
+    //   }),
+    //   credentials: "include",
+    // })
     await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
       method: "POST",
       headers: {

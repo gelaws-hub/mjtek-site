@@ -32,7 +32,6 @@ export default function useCheckSession() {
         }
       } catch (error) {
         setError("Error while checking session");
-        router.push("/login");
       } finally {
         setLoading(false);
       }

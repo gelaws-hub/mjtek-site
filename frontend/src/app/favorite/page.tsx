@@ -2,12 +2,12 @@
 
 import { useEffect, useState } from "react";
 import useCheckSession from "../(authentication)/auth/useCheckSession";
-import { Product } from "@/components/product/ProductInterface";
+import { ProductCardItemProps } from "@/components/product/ProductInterface";
 import ProductCardItem from "@/components/product/ProductCardItem";
 
 export default function FavoritePage() {
   const { loading, error, isAuthenticated, roleName, user } = useCheckSession();
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<ProductCardItemProps[]>([]);
 
   useEffect(() => {
     if (!isAuthenticated || !user) return;
@@ -19,7 +19,7 @@ export default function FavoritePage() {
           {
             method: "GET",
             credentials: "include",
-          }
+          },
         );
 
         if (!response.ok) {
@@ -27,7 +27,7 @@ export default function FavoritePage() {
         }
 
         const data = await response.json();
-        const favProducts = data.favorites.flatMap((favorite: any) => favorite.product);
+        const favProducts = data.favorites.flatMap((favorite: any) => favorite);
         setProducts(favProducts);
       } catch (error) {
         console.error("Error fetching products:", error);
@@ -38,14 +38,20 @@ export default function FavoritePage() {
   }, [isAuthenticated, user]);
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-w-[60%] mx-auto">
-      {products.length > 0 ? (
-        products.map((product) => (
-          <ProductCardItem key={product.id} product={product} />
-        ))
-      ) : (
-        <p>No favorite products found.</p>
-      )}
+    <div className="container mx-auto">
+      <h1 className="mb-4 mt-8 text-2xl font-bold">
+        <span className="mx-4 rounded-md border-x-[6px] border-solid border-blue-900"></span>
+        Produk yang disukai
+      </h1>
+      <div className="grid grid-cols-2 p-4 md:grid-cols-[repeat(auto-fit,minmax(146px,1fr))]">
+        {products.length > 0 ? (
+          products.map((product) => (
+            <ProductCardItem key={product.id} product={product} />
+          ))
+        ) : (
+          <p>No favorite products found.</p>
+        )}
+      </div>
     </div>
   );
 }

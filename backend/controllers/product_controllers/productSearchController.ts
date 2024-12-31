@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import prisma from "../utils/database";
+import prisma from "../../utils/database";
 
 export const getAllProducts = async (req: Request, res: Response) => {
   const page = parseInt(req.query.page as string) || 1;

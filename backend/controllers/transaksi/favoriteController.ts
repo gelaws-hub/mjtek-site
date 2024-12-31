@@ -32,7 +32,15 @@ export const getAllFavoritesByUserId = async (req: Request, res: Response) => {
         include: {
           product: {
             include: {
-              media: true,
+              media: {
+                select: {
+                  source: true,
+                },
+                where: {
+                  file_type: "image",
+                },
+                take: 1,
+              },
               category: true,
             },
           },
@@ -42,12 +50,25 @@ export const getAllFavoritesByUserId = async (req: Request, res: Response) => {
 
     const totalPages = Math.ceil(totalCount / limit);
 
+    const formattedFavorites = favorites.map((favorite) => {
+      const product = favorite.product;
+
+      return {
+        id: product.id,
+        product_name: product.product_name,
+        price: product.price,
+        media_source: product.media[0]?.source || "",
+        category_id: product.category.id,
+        category_name: product.category.category_name,
+      };
+    });
+
     res.status(200).json({
       totalCount,
       totalPages,
       currentPage: page,
       pageSize: limit,
-      favorites,
+      favorites: formattedFavorites,
     });
   } catch (error: any) {
     console.error("Error fetching favorites:", error.message);
@@ -64,14 +85,12 @@ export const isProductFavorite = async (req: Request, res: Response) => {
   }
 
   try {
-    // Check input validation (optional but recommended)
     if (!user.id || !product_id) {
       return res
         .status(400)
         .json({ error: "user token and product_id are required" });
     }
 
-    // Ensure only one response is sent
     const favoriteExists = await prisma.favorite.findFirst({
       where: {
         AND: [{ user_id: user.id }, { product_id: parseInt(product_id) }],
@@ -93,7 +112,6 @@ export const addToFavorites = async (req: Request, res: Response) => {
   }
 
   try {
-    // Check if the product is already in favorites for the user
     const existingFavorite = await prisma.favorite.findFirst({
       where: {
         product_id: product_id,
@@ -105,7 +123,6 @@ export const addToFavorites = async (req: Request, res: Response) => {
     if (existingFavorite) {
       res.status(400).json({ error: "Product is already in favorites" });
     } else {
-      // Create a new entry in favorites if the product isn't already added
       const newFavorite = await prisma.favorite.create({
         data: {
           product_id: product_id,

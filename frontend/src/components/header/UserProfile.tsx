@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import Cookies from "js-cookie";
 import Image from "next/image";
 import Link from "next/link";
@@ -18,11 +18,15 @@ export default function UserProfile() {
 
   const handleViewFavorite = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isAuthenticated) {
-      router.push("/login");
-    }
     if (user?.id) {
       router.push(`/favorite?user=${encodeURIComponent(user?.id)}`);
+    }
+  };
+
+  const handleViewCart = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (user?.id) {
+      router.push(`/cart`);
     }
   };
 
@@ -54,9 +58,9 @@ export default function UserProfile() {
   return (
     <div className="flex items-center justify-center gap-2 md:col-start-3 md:justify-start">
       <div className="ml-1 hidden md:ml-2 md:flex">
-        <Link href="/cart" className="rounded-xl hover:bg-slate-100">
+        <button onClick={handleViewCart} className="rounded-xl hover:bg-slate-100">
           <ShoppingCart02Icon height={20} className="text-gray-700" />
-        </Link>
+        </button>
         <button className="rounded-lg hover:bg-slate-100">
           <Notification03Icon height={20} className="text-gray-700" />
         </button>

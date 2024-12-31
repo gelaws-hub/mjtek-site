@@ -8,7 +8,7 @@ interface QuantitySelectorProps {
 export default function QuantitySelector({
   qty,
   onQtyChange,
-  maxQty = 9, // Default maxQty to Infinity if not provided
+  maxQty = 1, // Default maxQty to Infinity if not provided
   className = "",
 }: QuantitySelectorProps) {
   const increaseQty = () => {
@@ -41,7 +41,7 @@ export default function QuantitySelector({
           id="decrement-button"
           onClick={decreaseQty}
           data-input-counter-decrement="quantity-input"
-          className="hover:bg-gray-50 rounded-s-lg p-2"
+          className="rounded-s-lg p-2"
         >
           <svg
             className="w-3 h-6 text-gray-900"
@@ -66,7 +66,7 @@ export default function QuantitySelector({
           id="quantity-input"
           data-input-counter
           aria-describedby="helper-text-explanation"
-          className="max-w-8 md:self-stretch border-x-0 border-gray-300 text-center text-gray-900 text-sm block w-full outline-none"
+          className="bg-inherit max-w-8 md:self-stretch border-x-0 text-center text-gray-900 text-sm block w-full outline-none"
           placeholder="1"
           required
           min={1}
@@ -77,7 +77,7 @@ export default function QuantitySelector({
           id="increment-button"
           onClick={increaseQty}
           data-input-counter-increment="quantity-input"
-          className="hover:bg-gray-50 rounded-e-lg p-2"
+          className="rounded-e-lg p-2"
         >
           <svg
             className="w-3 h-6 text-gray-900"

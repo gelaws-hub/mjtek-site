@@ -5,22 +5,56 @@ import { CartItem as CartItemType } from "./components/types";
 import CartHeader from "./components/cartHeader";
 import CartItem from "./components/cartItem";
 import CartFooter from "./components/cartFooter";
+import { ProductCardItemProps } from "@/components/product/ProductInterface";
+import { ProductRecommendation } from "@/components/product/ProductRecommendation";
+import { errorToast, successToast } from "@/components/toast/reactToastify";
 
 export default function CartPage() {
   const [cartItems, setCartItems] = useState<CartItemType[]>([]);
-
-  // Ensure these computations default to valid values if `cartItems` is empty
-  const totalItems = cartItems.length || 0;
+  const [refresh, setRefresh] = useState(false);
+  const totalItems = cartItems.reduce(
+    (total, item) => total + item.quantity,
+    0,
+  );
   const totalWeight = cartItems.reduce(
     (total, item) => total + (parseFloat(item.estimated_weight) || 0),
     0,
   );
   const checkedItems = cartItems.filter((item) => item.is_selected);
+
   const checkedTotalPrice = checkedItems.reduce(
     (total, item) => total + (item.price || 0) * (item.quantity || 1),
     0,
   );
+
+  const checkedTotalItems = checkedItems.reduce(
+    (total, item) => total + item.quantity,
+    0,
+  );
+
   const [isLoading, setIsLoading] = useState(false);
+
+  const [recommendedProducts, setRecommendedProducts] = useState<
+    ProductCardItemProps[]
+  >([]);
+
+  // Fetch recommended products
+  useEffect(() => {
+    const fetchRecommendedProducts = async () => {
+      try {
+        const categoryIds = cartItems.map((item) => item.category_id).join(",");
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/product?limit=10&page=1&categories=${categoryIds}`,
+        );
+        const data = await response.json();
+        setRecommendedProducts(data.products);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
+
+    fetchRecommendedProducts();
+  }, []);
 
   const fetchCarts = async () => {
     try {
@@ -39,7 +73,7 @@ export default function CartPage() {
     }
   };
 
-  const toCart = async (id_product: number, quantity = 1) => {
+  const toCart = async (product_id: number, quantity = 1) => {
     setIsLoading(true);
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/cart`, {
@@ -48,7 +82,7 @@ export default function CartPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          id_produk: id_product,
+          product_id: product_id,
           quantity: quantity,
         }),
         credentials: "include",
@@ -56,49 +90,127 @@ export default function CartPage() {
       const data = await response.json();
       setCartItems((items) =>
         items.map((item) =>
-          item.id === data.id ? { ...item, quantity: data.quantity } : item,
+          item.product_id === data.product_id
+            ? { ...item, quantity: data.quantity }
+            : item,
         ),
       );
       setIsLoading(false);
     } catch (error) {
-      alert("Error updating cart");
-      console.error("Error updating cart:", error);
+      errorToast("Error saat memperbarui keranjang", "top-left");
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
     fetchCarts();
-  }, []);
+  }, [refresh]);
 
-  const handleQuantityChange = (id: number, changeBy: number) => {
-    toCart(id, changeBy);
+  const handleQuantityChange = (product_id: number, changeBy: number) => {
+    toCart(product_id, changeBy);
   };
 
-  const handleCheckItem = (id: number, isChecked: boolean) => {
-    setCartItems((items) =>
-      items.map((item) =>
-        item.id === id ? { ...item, is_selected: isChecked } : item,
-      ),
-    );
+  const handleCheckItem = async (
+    product_id?: number,
+    is_selected?: boolean,
+  ) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/cart/${product_id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            is_selected: is_selected,
+          }),
+          credentials: "include",
+        },
+      );
+      const data = await response.json();
+      if (response.ok) {
+        setCartItems((items) =>
+          items.map((item) =>
+            item.product_id === data.updatedCartItem.product_id
+              ? { ...item, is_selected: data.updatedCartItem.is_selected }
+              : item,
+          ),
+        );
+      }
+    } catch (error) {
+      console.error("Error fetching carts:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleCheckAll = (isChecked: boolean) => {
-    setCartItems((items) =>
-      items.map((item) => ({ ...item, is_selected: isChecked })),
-    );
+  const handleCheckAll = async (isChecked: boolean) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/cart`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          is_selected: isChecked,
+        }),
+        credentials: "include",
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        setCartItems((items) =>
+          items.map((item) => {
+            const updatedItem = data.cartItems.find((cartItem: any) => cartItem.product_id === item.product_id);
+            return updatedItem ? { ...item, is_selected: updatedItem.is_selected } : item;
+          })
+        );
+      } else {
+        console.error("Failed to update cart items:", data.message);
+      }
+    } catch (error) {
+      console.error("Error fetching carts:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+
+  const handleDelete = async (product_id?: number) => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/cart${product_id ? `/${product_id}` : ""}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        },
+      );
+
+      if (response.ok) {
+        if (product_id) {
+          // Delete a single item
+          setCartItems((items) =>
+            items.filter((item) => item.product_id !== product_id),
+          );
+        } else {
+          // Clear the entire cart
+          setCartItems([]);
+        }
+      }
+    } catch (error) {
+      console.error("Error deleting item:", error);
+    }
   };
 
-  const handleDeleteItem = (id: number) => {
-    setCartItems((items) => items.filter((item) => item.id !== id));
-  };
-
-  const handleDeleteAll = () => {
-    setCartItems([]);
-  };
-
-  const handleAddToFavorite = (id: number) => {
-    console.log(`Added product ${id} to favorites`);
+  const handleAddToFavorite = (product_id: number) => {
+    console.log(`Added product ${product_id} to favorites`);
   };
 
   if (!cartItems) {
@@ -110,37 +222,50 @@ export default function CartPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="mx-auto flex min-h-screen flex-col lg:max-w-[70%]">
       <CartHeader
         totalItems={totalItems}
         totalWeight={totalWeight}
-        onDeleteAll={handleDeleteAll}
+        onDeleteAll={() => handleDelete()}
       />
-      <div className="flex-grow p-4 bg-slate-50">
-        <div className="mb-1 p-2 border-b bg-white">
-          <label className="flex items-center cursor-pointer">
+      {cartItems.length !== 0 && (
+        <div className="mb-1 border-b p-2">
+          <label className="flex cursor-pointer items-center">
             <input
               type="checkbox"
               checked={cartItems.every((item) => item.is_selected)}
               onChange={(e) => handleCheckAll(e.target.checked)}
-              className="w-3 h-3 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-1 dark:bg-gray-700 dark:border-gray-600 m-1 cursor-pointer"
+              className="m-1 h-3 w-3 cursor-pointer rounded border-gray-300 text-blue-600 focus:ring-1 focus:ring-blue-500"
             />
             Check semua
           </label>
         </div>
+      )}
+      <div className="flex-grow p-4">
         {cartItems.map((item) => (
           <CartItem
-            key={item.id}
+            key={item.product_id}
             item={item}
             onQuantityChange={handleQuantityChange}
             onCheckItem={handleCheckItem}
-            onDeleteItem={handleDeleteItem}
+            onDeleteItem={handleDelete}
             onAddToFavorite={handleAddToFavorite}
             isLoading={isLoading}
           />
         ))}
       </div>
-      <CartFooter totalPrice={checkedTotalPrice} />
+      {/* Product Recommendations */}
+      <div className="mt-12 space-y-4">
+        <h2 className="mb-4 text-2xl font-bold">Recommended Products</h2>
+        <ProductRecommendation
+          products={recommendedProducts}
+          afterAddToCart={setRefresh}
+        />
+      </div>
+      <CartFooter
+        totalPrice={checkedTotalPrice}
+        totalItems={checkedTotalItems}
+      />
     </div>
   );
 }

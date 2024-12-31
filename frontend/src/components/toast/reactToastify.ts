@@ -1,8 +1,8 @@
-import { Bounce, toast } from "react-toastify";
+import { Bounce, toast, ToastPosition } from "react-toastify";
 
-export const successToast = (message = "Berhasil") =>
+export const successToast = (message = "Berhasil", position: ToastPosition = "bottom-right") =>
   toast.success(message, {
-    position: "bottom-right",
+    position: position,
     autoClose: 3000,
     hideProgressBar: false,
     closeOnClick: true,
@@ -13,9 +13,9 @@ export const successToast = (message = "Berhasil") =>
     transition: Bounce,
   });
 
-export const errorToast = (message: string) =>
+export const errorToast = (message: string, position: ToastPosition = "bottom-right") =>
   toast.error(message, {
-    position: "bottom-right",
+    position: position,
     autoClose: 5000,
     hideProgressBar: false,
     closeOnClick: true,
@@ -26,9 +26,9 @@ export const errorToast = (message: string) =>
     transition: Bounce,
   });
 
-export const deleteToast = (message = "Produk berhasil dihapus") =>
+export const deleteToast = (message = "Produk berhasil dihapus", position: ToastPosition = "bottom-right") =>
   toast.success(message, {
-    position: "bottom-right",
+    position: position,
     autoClose: 3000,
     hideProgressBar: false,
     closeOnClick: true,

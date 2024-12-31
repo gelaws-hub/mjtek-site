@@ -7,7 +7,7 @@ export async function checkSession(request: Request) {
     const accessToken = cookieStore.get('accessToken')?.value;
   
     if (!accessToken) {
-      return NextResponse.redirect(new URL("/login", request.url));
+      return "Unauthorized";
     }
   
     // Call the Express server to validate the session
@@ -17,7 +17,7 @@ export async function checkSession(request: Request) {
     });
   
     if (res.status === 401) {
-      return NextResponse.redirect(new URL("/login", request.url));
+      return "Unauthorized";
     }
   
     const userData = await res.json();

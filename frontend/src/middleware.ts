@@ -3,11 +3,11 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import jwt from "jsonwebtoken";
 
-// First layer of security, check the role based on jwt token
-// Even if we can bypass this, we still need to communicate with the server for data fetching
 export async function checkSession(request: NextRequest) {
   const cookieStore = cookies();
   const accessToken = cookieStore.get("accessToken")?.value;
+
+  console.log(accessToken)
 
   // If there's no access token, allow access to non-matcher pages
   if (!accessToken) {
@@ -43,9 +43,9 @@ export async function checkSession(request: NextRequest) {
 }
 
 export function middleware(request: NextRequest) {
-  return checkSession(request);
+  // checkSession(request);
 }
 
 export const config = {
-  matcher: ["/favorite", "/cart", "/admin/:path*"], // These are the protected paths
+  matcher: ["/favorite/:path*", "/cart", "/admin/:path*"], // These are the protected paths
 };

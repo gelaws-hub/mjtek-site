@@ -98,6 +98,7 @@ export const getClientProducts = async (req: Request, res: Response) => {
       product_name: product.product_name,
       price: parseFloat(product.price.toString()),
       media_source: product.media[0]?.source || null, // Get the first media source or null
+      category_id: product.category?.id || null,
       category_name: product.category?.category_name || "Unknown",
     }));
 

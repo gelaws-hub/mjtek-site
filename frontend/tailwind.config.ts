@@ -12,7 +12,7 @@ const config: Config = {
   theme: {
   	fontFamily: {
 		poppins: ['Poppins', ...defaultTheme.fontFamily.sans],
-  	},
+	},
   	screens: {
   		'2xsm': '375px',
   		xsm: '425px',
@@ -32,7 +32,8 @@ const config: Config = {
                     ...colors.red,
   				DEFAULT: '#FB5454'
   			},
-  			body: '#0F1312',
+  			title: '#0F1312',
+  			body: '#333333',
   			bodydark: '#AEB7C0',
   			bodydark1: '#DEE4EE',
   			bodydark2: '#8A99AF',

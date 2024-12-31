@@ -3,10 +3,8 @@
 import { useEffect, useState } from "react";
 import { Heart, Share2, Facebook, Instagram } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
 import { ImageGallery } from "./components/ImageGallery";
-import { ProductRecommendation } from "./components/ProductRecommendation";
+import { ProductRecommendation } from "../../../components/product/ProductRecommendation";
 import {
   Popover,
   PopoverContent,
@@ -16,6 +14,8 @@ import { usePathname } from "next/navigation";
 import { ProductCardItemProps } from "@/components/product/ProductInterface";
 import QuantitySelector from "@/components/product/QtySelector";
 import { ShoppingCart02Icon } from "@/components/icons/ShoppingCart02Icon";
+import AddToCartButton from "@/components/product/AddToCartButton";
+import FavoriteButton from "@/components/product/FavoriteButton";
 
 function formatPrice(price: number) {
   return new Intl.NumberFormat("id-ID", {
@@ -27,7 +27,7 @@ function formatPrice(price: number) {
 export default function ProductDetailPage() {
   const [showShareOptions, setShowShareOptions] = useState(false);
   const pathname = usePathname();
-  const [qty, setQty] = useState(0);
+  const [qty, setQty] = useState(1);
 
   const [product, setProduct] = useState<any>(null);
   const productId = pathname.split("-").pop();
@@ -146,26 +146,28 @@ export default function ProductDetailPage() {
       </div>
 
       {/* Order Section */}
-      <div className="fixed bottom-0 left-0 right-0 border-t bg-white shadow-lg">
+      <div className="fixed bottom-0 left-0 right-0 border bg-white shadow-lg m-2 mb-1 rounded-md bg-opacity-50 backdrop-blur-lg">
         <div className="container mx-auto max-w-7xl px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="">
-              <h3 className="truncate font-semibold hidden lg:block">{product.product_name}</h3>
-              <p className="text-base md:text-lg font-bold">{formatPrice(product.price)}</p>
+              <h3 className="hidden truncate font-semibold lg:block">
+                {product.product_name}
+              </h3>
+              <p className="text-sm font-bold md:text-lg">
+               Rp. {(product.price * qty).toLocaleString("id-ID")}
+              </p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 h-5">
               <QuantitySelector
                 qty={qty}
                 onQtyChange={setQty}
                 maxQty={product.stock}
               />
-              <Button>
-                <ShoppingCart02Icon className="text-white"  /> <span className="hidden md:block">Add to Cart</span>
-              </Button>
-              <Button variant="outline">
-                <Heart className="h-4 w-4" />
-              </Button>
-
+              <AddToCartButton className="bg-inherit border" product_id={product.id}>
+                <ShoppingCart02Icon className="" />{" "}
+                <span className="hidden md:block">Add to Cart</span>
+              </AddToCartButton>
+                <FavoriteButton height="10" productId={product.id} />
               {/* Share */}
               <Popover
                 open={showShareOptions}

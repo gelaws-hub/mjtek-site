@@ -10,7 +10,7 @@ import { PencilEdit02Icon } from "@/components/icons/PencilEdit02Icon";
 import { DeletePutBackIcon } from "@/components/icons/DeletePutBackIcon";
 import { useRefreshContext } from "./refreshContext";
 import DeleteAlert from "./DeleteAlert";
-import { deleteToast, errorToast } from "./reactToastify";
+import { deleteToast, errorToast } from "../../../../components/toast/reactToastify";
 import Link from "next/link";
 
 function ProductTables() {

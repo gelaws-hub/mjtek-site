@@ -1,5 +1,5 @@
 import express from "express";
-import { addToCart, clearCart, getAllCartByUserId, removeFromCart, updateCartItem } from "../controllers/transaksi/cartController";
+import { addToCart, clearCart, getAllCartByUserId, partialUpdateCart, removeFromCart, toggleCartSelection } from "../controllers/transaksi/cartController";
 
 import {
   getAllFavoritesByUserId,
@@ -25,8 +25,10 @@ const transaksiRoutes = express.Router();
 transaksiRoutes.get("/cart", ensureCorrectUser, getAllCartByUserId);
 transaksiRoutes.get("/cart/detail/:id", clearCart);
 transaksiRoutes.post("/cart", ensureCorrectUser, addToCart);
-transaksiRoutes.put("/cart/:id", updateCartItem);
-transaksiRoutes.delete("/cart/:id", removeFromCart);
+transaksiRoutes.patch("/cart/:product_id", ensureCorrectUser, partialUpdateCart);
+transaksiRoutes.put("/cart", ensureCorrectUser, toggleCartSelection);
+transaksiRoutes.delete("/cart/:product_id",ensureCorrectUser, removeFromCart);
+transaksiRoutes.delete("/cart",ensureCorrectUser, clearCart);
 
 //ensureCorrectUser has to take :user_id as a param to make sure it's the correct user
 transaksiRoutes.get("/favorite", ensureCorrectUser, getAllFavoritesByUserId);

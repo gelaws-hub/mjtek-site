@@ -10,7 +10,7 @@ import TextareaAutosize from "react-textarea-autosize";
 import { useRefreshContext } from "./refreshContext";
 import { Combobox } from "./comboBox";
 import { inputStyle, inputStyleNumber } from "./styleFormat";
-import { successToast, errorToast } from "./reactToastify";
+import { successToast, errorToast } from "../../../../components/toast/reactToastify";
 
 interface ProductDetailProps {
   product: Product;

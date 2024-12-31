@@ -4,8 +4,8 @@ import {
   getProductById,
   partialUpdateProduct,
   updateProduct,
-} from "../controllers/productController";
-import { getAllProducts } from "../controllers/productSearchController";
+} from "../controllers/product_controllers/productController";
+import { getAllProducts } from "../controllers/product_controllers/productSearchController";
 import { createFullDetailProduct } from "../controllers/image_uploader/createFullDetailProduct";
 import { authorize, ensureAuthenticated } from "../auth/userController";
 import { getClientProducts } from "../controllers/product_controllers/getClientProducts";

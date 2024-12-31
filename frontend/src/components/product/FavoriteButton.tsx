@@ -5,20 +5,22 @@ import { FavouriteIcon } from "@/components/icons/FavouriteIcon";
 import useCheckSession from "@/app/(authentication)/auth/useCheckSession";
 import { useRouter } from "next/navigation";
 import { useGoToLogin } from "@/lib/goToLogin";
+import { errorToast, successToast } from "../toast/reactToastify";
+import { Button } from "../ui/button";
 
 interface FavoriteButtonProps {
-  productId: string;
+  productId: number;
   text?: string;
+  height?: string;
 }
 
-const FavoriteButton = ({ productId, text }: FavoriteButtonProps) => {
+const FavoriteButton = ({ productId, text, height="" }: FavoriteButtonProps) => {
   const [isFavourite, setIsFavourite] = useState<boolean>(false);
-  const { loading, error, isAuthenticated } = useCheckSession();
+  const { isAuthenticated } = useCheckSession();
   const router = useRouter();
   const { goToLogin } = useGoToLogin();
 
   const checkFavoriteStatus = async () => {
-    if (!isAuthenticated) return;
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/isfavorite/${productId}`,
@@ -36,8 +38,6 @@ const FavoriteButton = ({ productId, text }: FavoriteButtonProps) => {
     } catch (error) {
       console.error("Failed to check favorite status:", error);
     }
-
-    setIsFavourite(false);
   };
 
   useEffect(() => {
@@ -68,18 +68,28 @@ const FavoriteButton = ({ productId, text }: FavoriteButtonProps) => {
 
       if (response.ok) {
         setIsFavourite((prev) => !prev);
+        successToast(
+          isFavourite
+            ? "Berhasil dihapus dari favorit"
+            : "Berhasil ditambahkan ke favorit",
+          "top-left",
+        );
       } else {
         console.error("Failed to update favorite status.");
+        errorToast("Gagal memperbarui status favorit", "top-left");
       }
     } catch (error) {
       console.error("An error occurred while toggling favorite:", error);
+      errorToast("Gagal memperbarui status favorit", "top-left");
     }
   };
 
   return (
-    <button
+    <Button
+      variant="outline"
+      size="sm"
       onClick={handleFavoriteToggle}
-      className="flex items-center rounded-lg p-2 font-medium text-gray-700 hover:bg-slate-100"
+      className={`flex items-center rounded-lg p-3 font-medium text-gray-700 h-${height} w-${height}`}
     >
       {isFavourite ? (
         <FavouriteIcon height={16} className="text-blue-950" fill="#172554" />
@@ -87,7 +97,7 @@ const FavoriteButton = ({ productId, text }: FavoriteButtonProps) => {
         <FavouriteIcon height={16} className="text-blue-950" />
       )}
       {text && <span className="text-xs">{text}</span>}
-    </button>
+    </Button>
   );
 };
 

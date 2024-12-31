@@ -8,7 +8,7 @@ export const useGoToLogin = () => {
   // Custom function to redirect to login with current path
   const goToLogin = () => {
     const currentPath = window.location.pathname;  // Get the current page's pathname
-    router.push(`/login?redirectTo=${encodeURIComponent(currentPath)}`);
+    // router.push(`/login?redirectTo=${encodeURIComponent(currentPath)}`);
   };
 
   return { goToLogin };
