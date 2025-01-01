@@ -30,7 +30,7 @@ export const productImage = async (req: Request, res: Response) => {
     // Save the media record in the database
     const media = await prisma.media.create({
       data: {
-        product_id: parseInt(productId), // Ensure productId is an integer
+        product_id: productId, // Ensure productId is an integer
         source: fileUrl, // Store the file URL for future access
         file_type: fileType, // Store the file type (MIME type)
       },

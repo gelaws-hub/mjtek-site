@@ -8,7 +8,7 @@ datasource db {
 }
 
 model product {
-  id               Int     @id @default(autoincrement())
+  id               String     @id
   category_id      Int
   sub_category_id  Int?
   brand_id         Int
@@ -68,7 +68,7 @@ model socket {
 
 model product_socket {
   id         Int     @id @default(autoincrement())
-  product_id Int
+  product_id String
   socket_id  Int
   product    product @relation(fields: [product_id], references: [id])
   socket     socket  @relation(fields: [socket_id], references: [id])
@@ -82,7 +82,7 @@ model ram_type {
 
 model product_ram_type {
   id          Int      @id @default(autoincrement())
-  product_id  Int
+  product_id  String
   ram_type_id Int
   product     product  @relation(fields: [product_id], references: [id])
   ram_type    ram_type @relation(fields: [ram_type_id], references: [id])
@@ -103,7 +103,7 @@ model simulation {
 model simulation_detail {
   id            Int        @id @default(autoincrement())
   simulation_id Int
-  product_id    Int
+  product_id    String
   simulation    simulation @relation(fields: [simulation_id], references: [id])
   product       product    @relation(fields: [product_id], references: [id])
 
@@ -145,7 +145,7 @@ model user_refresh_token {
 
 model cart {
   id          Int      @id @default(autoincrement())
-  product_id  Int
+  product_id  String
   user_id     String
   quantity    Int      @default(1)
   date        DateTime
@@ -184,7 +184,7 @@ model transaction {
 
 model transaction_detail {
   id             Int         @id @default(autoincrement())
-  product_id     Int
+  product_id     String
   transaction_id String
   quantity       Int
   total_price    Decimal     @db.Decimal(10, 2)
@@ -196,7 +196,7 @@ model transaction_detail {
 
 model favorite {
   id         Int     @id @default(autoincrement())
-  product_id Int
+  product_id String
   user_id    String
   product    product @relation(fields: [product_id], references: [id])
   user       user    @relation(fields: [user_id], references: [id])
@@ -204,7 +204,7 @@ model favorite {
 
 model media {
   id         Int     @id @default(autoincrement())
-  product_id Int
+  product_id String
   source     String
   file_type  String
   product    product @relation(fields: [product_id], references: [id])

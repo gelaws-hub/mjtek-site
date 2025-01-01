@@ -6,7 +6,7 @@ import {
   updateProduct,
 } from "../controllers/product_controllers/productController";
 import { getAllProducts } from "../controllers/product_controllers/productSearchController";
-import { createFullDetailProduct } from "../controllers/image_uploader/createFullDetailProduct";
+import { createFullDetailProduct } from "../controllers/product_controllers/createFullDetailProduct";
 import { authorize, ensureAuthenticated } from "../auth/userController";
 import { getClientProducts } from "../controllers/product_controllers/getClientProducts";
 

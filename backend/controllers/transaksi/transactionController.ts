@@ -89,7 +89,10 @@ export const createTransaction = async (req: Request, res: Response) => {
   }
 };
 
-export const getAllTransactionsFromUser = async (req: Request, res: Response) => {
+export const getAllTransactionsFromUser = async (
+  req: Request,
+  res: Response
+) => {
   const user = (req as CustomRequest).user;
 
   if (!user) {
@@ -271,11 +274,9 @@ export const cancelTransaction = async (req: Request, res: Response) => {
 
     // Ensure the transaction belongs to the user
     if (transaction.user_id !== user.id) {
-      return res
-        .status(403)
-        .json({
-          message: "Forbidden: Transaction does not belong to the user.",
-        });
+      return res.status(403).json({
+        message: "Forbidden: Transaction does not belong to the user.",
+      });
     }
 
     // Check if the status allows cancellation
@@ -338,6 +339,21 @@ export const updateTransactionStatus = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Transaction not found." });
     }
 
+    // Check if the transaction is already completed
+    if (transaction.transaction_status.id === 99) {
+      return res
+        .status(400)
+        .json({ message: "Transaction is finished, cannot be updated." });
+    }
+
+    // Check if the transaction status is updatable
+    const nonUpdatableStatuses = [0];
+    if (nonUpdatableStatuses.includes(transaction.transaction_status.id)) {
+      return res.status(400).json({
+        message: `Transaction with status ${transaction.transaction_status.name} cannot be updated.`,
+      });
+    }
+
     // Update the status of the transaction
     const updatedTransaction = await prisma.transaction.update({
       where: {
@@ -357,5 +373,27 @@ export const updateTransactionStatus = async (req: Request, res: Response) => {
     return res
       .status(500)
       .json({ message: "Failed to update transaction status." });
+  }
+};
+
+export const getTransactionStatuses = async (req: Request, res: Response) => {
+  const user = (req as CustomRequest).user;
+
+  if (!user) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  try {
+    const transactionStatuses = await prisma.transaction_status.findMany();
+    return res.status(200).json({
+      statusCode: 200,
+      message: "Transaction statuses fetched successfully.",
+      transactionStatuses,
+    });
+  } catch (error) {
+    console.error("Error fetching transaction statuses:", error);
+    return res
+      .status(500)
+      .json({ message: "Failed to fetch transaction statuses." });
   }
 };

@@ -87,13 +87,12 @@ export const addToCart = async (req: Request, res: Response) => {
   }
 
   try {
-    const productId = parseInt(product_id);
     const requestedQuantity = quantity ? parseInt(quantity) : 1;
 
     // Fetch the product to check its stock
     const product = await prisma.product.findUnique({
       where: {
-        id: productId,
+        id: product_id,
       },
     });
 
@@ -112,7 +111,7 @@ export const addToCart = async (req: Request, res: Response) => {
     // Check if the product is already in the cart for the user
     const existingKeranjang = await prisma.cart.findFirst({
       where: {
-        product_id: productId,
+        product_id: product_id,
         user_id: user.id,
       },
     });
@@ -146,7 +145,7 @@ export const addToCart = async (req: Request, res: Response) => {
       // Ensure the requested quantity does not exceed stock for a new cart entry
       const newKeranjang = await prisma.cart.create({
         data: {
-          product_id: productId,
+          product_id: product_id,
           user_id: user.id,
           quantity: requestedQuantity,
           date: new Date(),
@@ -207,7 +206,7 @@ export const removeFromCart = async (req: Request, res: Response) => {
     // Use deleteMany since we're matching on multiple fields
     const deleteResult = await prisma.cart.deleteMany({
       where: {
-        product_id: parseInt(product_id), // Ensure product_id is an integer
+        product_id: product_id, // Ensure product_id is an integer
         user_id: user.id,
       },
     });
@@ -258,7 +257,7 @@ export const partialUpdateCart = async (req: Request, res: Response) => {
     const cartItem = await prisma.cart.findFirst({
       where: {
         user_id: user.id,
-        product_id: parseInt(product_id),
+        product_id: product_id,
       },
       include: {
         product: true, // Include the related product details

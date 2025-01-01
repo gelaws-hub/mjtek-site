@@ -93,7 +93,7 @@ export const isProductFavorite = async (req: Request, res: Response) => {
 
     const favoriteExists = await prisma.favorite.findFirst({
       where: {
-        AND: [{ user_id: user.id }, { product_id: parseInt(product_id) }],
+        AND: [{ user_id: user.id }, { product_id: product_id }],
       },
     });
 

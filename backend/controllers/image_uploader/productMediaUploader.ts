@@ -14,7 +14,7 @@ const storage = multer.diskStorage({
 
       // Fetch product and its category
       const product = await prisma.product.findUnique({
-        where: { id: parseInt(productId) },
+        where: { id: productId },
         include: {
           category: true, // Include category relation
         },
@@ -49,7 +49,7 @@ const storage = multer.diskStorage({
 
       // Fetch product to get the product name and ensure the file name is unique
       const product = await prisma.product.findUnique({
-        where: { id: parseInt(productId) },
+        where: { id: productId },
       });
 
       if (!product) {
@@ -58,7 +58,7 @@ const storage = multer.diskStorage({
 
       // Count existing files for the product to append the correct iteration
       const existingFiles = await prisma.media.count({
-        where: { product_id: parseInt(productId) },
+        where: { product_id: productId },
       });
 
       const extension = path.extname(file.originalname);

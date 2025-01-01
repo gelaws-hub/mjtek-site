@@ -1,12 +1,13 @@
 import { Request, Response } from "express";
 import prisma from "../../utils/database";
+import crypto from "crypto"; // For generating random characters
 
 export const getProductById = async (req: Request, res: Response) => {
   const { id } = req.params;
 
   try {
-    const produk = await prisma.product.findUnique({
-      where: { id: parseInt(id) },
+    const product = await prisma.product.findUnique({
+      where: { id: id },
       include: {
         category: true,
         sub_category: true,
@@ -31,101 +32,106 @@ export const getProductById = async (req: Request, res: Response) => {
       },
     });
 
-    if (!produk) {
+    if (!product) {
       return res
         .status(404)
-        .json({ status_code: 404, message: "Produk not found" });
+        .json({ status_code: 404, message: "Product not found" });
     }
 
-    const formattedProduk = {
-      id: produk.id,
-      product_name: produk.product_name,
-      price: parseFloat(produk.price.toString()),
-      estimated_weight: produk.estimated_weight,
-      description: produk.description,
-      stock: produk.stock,
-      category: produk.category || null,
-      sub_category: produk.sub_category || null,
-      brand: produk.brand || null,
-      product_ram_type: produk.product_ram_type,
-      product_socket: produk.product_socket,
+    const formattedProduct = {
+      id: product.id,
+      product_name: product.product_name,
+      price: parseFloat(product.price.toString()),
+      estimated_weight: product.estimated_weight,
+      description: product.description,
+      stock: product.stock,
+      category: product.category || null,
+      sub_category: product.sub_category || null,
+      brand: product.brand || null,
+      product_ram_type: product.product_ram_type,
+      product_socket: product.product_socket,
       media:
-        produk.media.length > 0
-          ? produk.media.map((media: any) => media)
+        product.media.length > 0
+          ? product.media.map((media) => ({
+              ...media,
+              source: media.source.startsWith("/")
+                ? `${process.env.BASE_URL}${media.source}`
+                : media.source,
+            }))
           : null,
-      is_deleted: produk.is_deleted,
+      is_deleted: product.is_deleted,
     };
 
     res.status(200).json({
       status_code: 200,
       message: "success fetching product",
-      data: formattedProduk,
+      data: formattedProduct,
     });
   } catch (error: any) {
-    console.error("Error fetching Produk by ID:", error.message);
+    console.error("Error fetching Product by ID:", error.message);
     res
       .status(500)
       .json({ status_code: 500, message: "Internal server error" });
   }
 };
 
-export const createProduct = async (req: Request, res: Response) => {
-  const {
-    product_name,
-    category_id,
-    sub_category_id = null,
-    brand_id,
-    price,
-    estimated_weight,
-    description,
-    stock,
-    media = [],
-    product_ram_type = [], // Default to an empty array if not provided
-    product_socket = [], // Default to an empty array if not provided
-  } = req.body;
+// export const createProduct = async (req: Request, res: Response) => {
+//   const {
+//     product_name,
+//     category_id,
+//     sub_category_id = null,
+//     brand_id,
+//     price,
+//     estimated_weight,
+//     description,
+//     stock,
+//     media = [],
+//     product_ram_type = [], // Default to an empty array if not provided
+//     product_socket = [], // Default to an empty array if not provided
+//   } = req.body;
 
-  try {
-    const newProduk = await prisma.product.create({
-      data: {
-        product_name,
-        category_id,
-        sub_category_id,
-        brand_id,
-        price,
-        estimated_weight,
-        description,
-        stock,
-        media: {
-          create: media.map((m: any) => ({
-            source: m.source,
-            file_type: m.file_type,
-          })),
-        },
-        product_ram_type: product_ram_type.length
-          ? {
-              create: product_ram_type.map((id: number) => ({ id })),
-            }
-          : undefined,
-        product_socket: product_socket.length
-          ? {
-              create: product_socket.map((id: number) => ({ id })),
-            }
-          : undefined,
-      },
-    });
+//   try {
+//     const newProduct = await prisma.product.create({
+//       data: {
+//         product_name,
+//         category_id,
+//         sub_category_id,
+//         brand_id,
+//         price,
+//         estimated_weight,
+//         description,
+//         stock,
+//         media: {
+//           create: media.map((m: any) => ({
+//             source: m.source,
+//             file_type: m.file_type,
+//           })),
+//         },
+//         product_ram_type: product_ram_type.length
+//           ? {
+//               create: product_ram_type.map((id: number) => ({ id })),
+//             }
+//           : undefined,
+//         product_socket: product_socket.length
+//           ? {
+//               create: product_socket.map((id: number) => ({ id })),
+//             }
+//           : undefined,
+//       },
+//     });
 
-    res.status(201).json({
-      status_code: 201,
-      message: "success adding product",
-      data: newProduk,
-    });
-  } catch (error: any) {
-    console.error("Error adding product:", error.message);
-    res
-      .status(500)
-      .json({ status_code: 500, message: "Internal server error" });
-  }
-};
+//     res.status(201).json({
+//       status_code: 201,
+//       message: "success adding product",
+//       data: newProduct,
+//     });
+//   } catch (error: any) {
+//     console.error("Error adding product:", error.message);
+//     res
+//       .status(500)
+//       .json({ status_code: 500, message: "Internal server error" });
+//   }
+// };
 
 export const updateProduct = async (req: Request, res: Response) => {
   const { id } = req.params;
@@ -143,8 +149,8 @@ export const updateProduct = async (req: Request, res: Response) => {
     product_socket,
   } = req.body;
   try {
-    const updatedProduk = await prisma.product.update({
-      where: { id: Number(id) },
+    const updatedProduct = await prisma.product.update({
+      where: { id: id },
       data: {
         product_name,
         category_id,
@@ -179,7 +185,7 @@ export const updateProduct = async (req: Request, res: Response) => {
     res.json({
       status_code: 200,
       message: "success updating product",
-      data: updatedProduk,
+      data: updatedProduct,
     });
   } catch (error: any) {
     console.error("Error updating product:", error.message);
@@ -250,7 +256,7 @@ export const partialUpdateProduct = async (req: Request, res: Response) => {
     }
 
     const updatedProduct = await prisma.product.update({
-      where: { id: Number(id) },
+      where: { id: id },
       data: updateData,
       include: {
         product_ram_type: { include: { ram_type: true } },
@@ -276,7 +282,7 @@ export const deleteProduct = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
     await prisma.product.update({
-      where: { id: Number(id) },
+      where: { id: id },
       data: { is_deleted: true },
     });
 

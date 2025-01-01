@@ -3,17 +3,16 @@ import prisma from "../../utils/database";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import crypto from "crypto";
 
 const storage = multer.diskStorage({
   destination: async (req, file, cb) => {
     try {
-      // Parse and validate the `category_id` from the request body
       const category_id = parseInt(req.body.category_id);
       if (isNaN(category_id)) {
         return cb(new Error("Invalid or missing category_id"), "");
       }
 
-      // Fetch the category name from the database
       const category = await prisma.category.findUnique({
         where: { id: category_id },
       });
@@ -26,7 +25,6 @@ const storage = multer.diskStorage({
         .toLowerCase()
         .replace(/\s+/g, "-");
 
-      // Construct the upload directory path based on the category name
       const uploadsDir = path.join(
         process.cwd(),
         "uploads",
@@ -34,13 +32,12 @@ const storage = multer.diskStorage({
         categoryName
       );
 
-      // Check if the directory exists; if not, create it
       if (!fs.existsSync(uploadsDir)) {
         fs.mkdirSync(uploadsDir, { recursive: true });
         console.log(`Directory created: ${uploadsDir}`);
       }
 
-      cb(null, uploadsDir); // Specify the directory for multer
+      cb(null, uploadsDir);
     } catch (error: any) {
       cb(error, "");
     }
@@ -94,7 +91,6 @@ export const createFullDetailProduct = async (req: Request, res: Response) => {
     }
 
     try {
-      // Parse the product data from the request body
       const {
         product_name,
         category_id,
@@ -119,9 +115,49 @@ export const createFullDetailProduct = async (req: Request, res: Response) => {
         return res.status(400).json({ error: "Missing required fields." });
       }
 
+      // Fetch the category name to generate the custom product ID
+      const category = await prisma.category.findUnique({
+        where: { id: parseInt(category_id) },
+      });
+
+      if (!category) {
+        return res.status(400).json({ error: "Category not found" });
+      }
+
+      const categoryName = category.category_name;
+
+      // Generate the prefix for the product ID
+      let prefix = "";
+      if (categoryName.length >= 3) {
+        prefix =
+          categoryName[0].toUpperCase() +
+          categoryName[Math.floor(categoryName.length / 2)].toUpperCase() +
+          categoryName[categoryName.length - 1].toUpperCase();
+      } else {
+        prefix = categoryName.toUpperCase().padEnd(3, "0");
+      }
+
+      // Generate random 4-character suffix
+      const randomSuffix = crypto.randomBytes(2).toString("hex").toUpperCase();
+
+      // Combine prefix and suffix to create the custom product ID
+      const productId = `${prefix}${randomSuffix}`;
+
+      // Ensure the product ID is unique
+      const existingProduct = await prisma.product.findUnique({
+        where: { id: productId },
+      });
+
+      if (existingProduct) {
+        return res.status(409).json({
+          error: "Product ID collision. Please try again.",
+        });
+      }
+
       // Create the product in the database
       const product = await prisma.product.create({
         data: {
+          id: productId, // Use the custom product ID
           product_name,
           category_id: parseInt(category_id),
           sub_category_id: sub_category_id ? parseInt(sub_category_id) : null,
@@ -139,21 +175,12 @@ export const createFullDetailProduct = async (req: Request, res: Response) => {
       if (Array.isArray(req.files) && req.files.length > 0) {
         const files = req.files as Express.Multer.File[];
 
-        // Fetch the category_name based on category_id
-        const category = await prisma.category.findUnique({
-          where: { id: parseInt(req.body.category_id) },
-        });
-
-        if (!category) {
-          return res.status(400).json({ error: "Category not found" });
-        }
-
-        const categoryName = category.category_name
+        const categorySlug = category.category_name
           .toLowerCase()
           .replace(/\s+/g, "-");
 
         for (const file of files) {
-          const fileUrl = `/uploads/products/${categoryName}/${file.filename}`;
+          const fileUrl = `/uploads/products/${categorySlug}/${file.filename}`;
           const media = await prisma.media.create({
             data: {
               product_id: product.id,

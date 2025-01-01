@@ -8,7 +8,7 @@ import {
   removeFromFavorites,
 } from "../controllers/transaksi/favoriteController";
 
-import { cancelTransaction, createTransaction, getAllTransactionsFromUser, getTransactionById, updateTransactionStatus } from '../controllers/transaksi/transactionController';
+import { cancelTransaction, createTransaction, getAllTransactionsFromUser, getTransactionById, getTransactionStatuses, updateTransactionStatus } from '../controllers/transaksi/transactionController';
 
 import { authorize, ensureAuthenticated } from "../auth/userController";
 import { getAllTransactions } from "../controllers/transaksi/searchTransactionController";
@@ -37,6 +37,7 @@ transaksiRoutes.patch('/transaction/:transactionId', ensureAuthenticated, author
 
 // Admin Transaksi routes
 transaksiRoutes.patch('/admin/transaction/:transactionId', ensureAuthenticated, authorize(["admin", "owner"]), updateTransactionStatus);
-transaksiRoutes.get('/admin/transaction/', ensureAuthenticated, authorize(["admin", "owner"]), getAllTransactions);
+transaksiRoutes.get('/admin/transaction', ensureAuthenticated, authorize(["admin", "owner"]), getAllTransactions);
+transaksiRoutes.get('/admin/transaction-status', ensureAuthenticated, authorize(["admin", "owner"]), getTransactionStatuses);
 
 export default transaksiRoutes;
