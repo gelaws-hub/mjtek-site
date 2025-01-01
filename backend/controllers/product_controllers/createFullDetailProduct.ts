@@ -101,6 +101,7 @@ export const createFullDetailProduct = async (req: Request, res: Response) => {
         description,
         stock,
         isDeleted,
+        imageUrls,
       } = req.body;
 
       if (
@@ -172,6 +173,7 @@ export const createFullDetailProduct = async (req: Request, res: Response) => {
 
       const savedMedia = [];
 
+      // Handle file uploads
       if (Array.isArray(req.files) && req.files.length > 0) {
         const files = req.files as Express.Multer.File[];
 
@@ -186,6 +188,25 @@ export const createFullDetailProduct = async (req: Request, res: Response) => {
               product_id: product.id,
               source: fileUrl,
               file_type: file.mimetype.startsWith("image") ? "image" : "video",
+            },
+          });
+          savedMedia.push(media);
+        }
+      }
+
+      // Handle image URLs
+      if (imageUrls) {
+        const urls = imageUrls
+          .split(",")
+          .map((url: string) => url.trim())
+          .filter((url: string) => url.length > 0);
+
+        for (const url of urls) {
+          const media = await prisma.media.create({
+            data: {
+              product_id: product.id,
+              source: url,
+              file_type: "image",
             },
           });
           savedMedia.push(media);

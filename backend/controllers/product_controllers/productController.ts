@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import prisma from "../../utils/database";
-import crypto from "crypto"; // For generating random characters
 
 export const getProductById = async (req: Request, res: Response) => {
   const { id } = req.params;
