@@ -146,7 +146,7 @@ export default function ProductDetailPage() {
       </div>
 
       {/* Order Section */}
-      <div className="fixed bottom-0 left-0 right-0 border bg-white shadow-lg m-2 mb-1 rounded-md bg-opacity-50 backdrop-blur-lg">
+      <div className="fixed bottom-0 left-0 right-0 m-2 mb-1 rounded-md border bg-white bg-opacity-50 shadow-lg backdrop-blur-lg">
         <div className="container mx-auto max-w-7xl px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="">
@@ -154,20 +154,23 @@ export default function ProductDetailPage() {
                 {product.product_name}
               </h3>
               <p className="text-sm font-bold md:text-lg">
-               Rp. {(product.price * qty).toLocaleString("id-ID")}
+                Rp. {(product.price * qty).toLocaleString("id-ID")}
               </p>
             </div>
-            <div className="flex items-center gap-1 h-5">
+            <div className="flex h-5 items-center gap-1">
               <QuantitySelector
                 qty={qty}
                 onQtyChange={setQty}
                 maxQty={product.stock}
               />
-              <AddToCartButton className="bg-inherit border" product_id={product.id}>
+              <AddToCartButton
+                className="border bg-inherit"
+                product_id={product.id}
+              >
                 <ShoppingCart02Icon className="" />{" "}
                 <span className="hidden md:block">Add to Cart</span>
               </AddToCartButton>
-                <FavoriteButton height="10" productId={product.id} />
+              <FavoriteButton height="10" productId={product.id} />
               {/* Share */}
               <Popover
                 open={showShareOptions}
