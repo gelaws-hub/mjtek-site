@@ -1,84 +1,97 @@
-'use client'
+"use client";
 
-import { useState, useRef, useEffect } from 'react'
-import Image from 'next/image'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { AdvancedImageGallery } from './AdvancedImageGallery'
+import { useState, useRef, useEffect } from "react";
+import Image from "next/image";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { AdvancedImageGallery } from "./AdvancedImageGallery";
 
 interface ImageGalleryProps {
-  images: { id: number; source: string; file_type: string }[]
+  images: { id: number; source: string; file_type: string }[];
 }
 
 export function ImageGallery({ images }: ImageGalleryProps) {
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [showAdvanced, setShowAdvanced] = useState(false)
-  const scrollRef = useRef<HTMLDivElement>(null)
-  const [showLeftArrow, setShowLeftArrow] = useState(false)
-  const [showRightArrow, setShowRightArrow] = useState(true)
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [showLeftArrow, setShowLeftArrow] = useState(false);
+  const [showRightArrow, setShowRightArrow] = useState(true);
 
   useEffect(() => {
     const updateArrows = () => {
       if (scrollRef.current) {
-        setShowLeftArrow(scrollRef.current.scrollLeft > 0)
+        setShowLeftArrow(scrollRef.current.scrollLeft > 0);
         setShowRightArrow(
-          scrollRef.current.scrollLeft < scrollRef.current.scrollWidth - scrollRef.current.clientWidth
-        )
+          scrollRef.current.scrollLeft <
+            scrollRef.current.scrollWidth - scrollRef.current.clientWidth,
+        );
       }
-    }
+    };
 
-    updateArrows()
-    window.addEventListener('resize', updateArrows)
-    return () => window.removeEventListener('resize', updateArrows)
-  }, [])
+    updateArrows();
+    window.addEventListener("resize", updateArrows);
+    return () => window.removeEventListener("resize", updateArrows);
+  }, []);
 
   const nextImage = () => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length)
-  }
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
+  };
 
   const prevImage = () => {
-    setCurrentIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length)
-  }
+    setCurrentIndex(
+      (prevIndex) => (prevIndex - 1 + images.length) % images.length,
+    );
+  };
 
-  const scroll = (direction: 'left' | 'right') => {
+  const scroll = (direction: "left" | "right") => {
     if (scrollRef.current) {
-      const scrollAmount = direction === 'left' ? -200 : 200
-      scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' })
+      const scrollAmount = direction === "left" ? -200 : 200;
+      scrollRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
 
       setTimeout(() => {
         if (scrollRef.current) {
-          setShowLeftArrow(scrollRef.current.scrollLeft > 0)
+          setShowLeftArrow(scrollRef.current.scrollLeft > 0);
           setShowRightArrow(
-            scrollRef.current.scrollLeft < scrollRef.current.scrollWidth - scrollRef.current.clientWidth
-          )
+            scrollRef.current.scrollLeft <
+              scrollRef.current.scrollWidth - scrollRef.current.clientWidth,
+          );
         }
-      }, 100)
+      }, 100);
     }
-  }
+  };
 
   return (
     <div className="space-y-4">
-      <div className="relative aspect-square overflow-hidden rounded-lg cursor-pointer" onClick={() => setShowAdvanced(true)}>
+      <div
+        className="relative aspect-square cursor-pointer overflow-hidden rounded-lg"
+        onClick={() => setShowAdvanced(true)}
+      >
         <Image
           src={images[currentIndex].source}
           alt={`Product image ${currentIndex + 1}`}
           width={1024}
           height={1024}
-          className="object-cover"
+          className="rounded-md object-contain h-full w-full"
         />
         <Button
           variant="outline"
           size="icon"
-          className="absolute top-1/2 left-2 transform -translate-y-1/2"
-          onClick={(e) => { e.stopPropagation(); prevImage(); }}
+          className="absolute left-0 top-1/2 h-full w-16 -translate-y-1/2 transform rounded-none border-none transition-all duration-300 ease-in-out hover:-left-4 hover:bg-gray-900 hover:bg-opacity-15 hover:shadow-lg"
+          onClick={(e) => {
+            e.stopPropagation();
+            prevImage();
+          }}
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
         <Button
           variant="outline"
           size="icon"
-          className="absolute top-1/2 right-2 transform -translate-y-1/2"
-          onClick={(e) => { e.stopPropagation(); nextImage(); }}
+          className="absolute right-0 top-1/2 h-full w-16 -translate-y-1/2 transform rounded-none border-none transition-all duration-300 ease-in-out hover:-right-4 hover:bg-gray-900 hover:bg-opacity-15 hover:shadow-lg"
+          onClick={(e) => {
+            e.stopPropagation();
+            nextImage();
+          }}
         >
           <ChevronRight className="h-4 w-4" />
         </Button>
@@ -86,14 +99,14 @@ export function ImageGallery({ images }: ImageGalleryProps) {
       <div className="relative">
         <div
           ref={scrollRef}
-          className="flex space-x-2 overflow-x-auto scrollbar-hide"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          className="scrollbar-hide flex space-x-2 overflow-x-auto"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           {images.map((image, index) => (
             <button
               key={image.id}
-              className={`flex-shrink-0 w-20 h-20 rounded-md overflow-hidden ${
-                index === currentIndex ? 'ring-2 ring-primary' : ''
+              className={`m-1 h-20 w-20 flex-shrink-0 overflow-hidden rounded-md ${
+                index === currentIndex ? "ring-2 ring-primary" : ""
               }`}
               onClick={() => setCurrentIndex(index)}
             >
@@ -102,7 +115,7 @@ export function ImageGallery({ images }: ImageGalleryProps) {
                 alt={`Thumbnail ${index + 1}`}
                 width={80}
                 height={80}
-                className="object-cover w-full h-full"
+                className="h-full w-full object-cover"
               />
             </button>
           ))}
@@ -111,8 +124,8 @@ export function ImageGallery({ images }: ImageGalleryProps) {
           <Button
             variant="outline"
             size="icon"
-            className="absolute left-2 top-1/2 transform -translate-y-1/2"
-            onClick={() => scroll('left')}
+            className="absolute -left-2 top-1/2 -translate-y-1/2 transform bg-white w-8 h-8"
+            onClick={() => scroll("left")}
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -121,17 +134,19 @@ export function ImageGallery({ images }: ImageGalleryProps) {
           <Button
             variant="outline"
             size="icon"
-            className="absolute right-2 top-1/2 transform -translate-y-1/2"
-            onClick={() => scroll('right')}
+            className="absolute -right-2 top-1/2 -translate-y-1/2 transform bg-white w-8 h-8"
+            onClick={() => scroll("right")}
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
         )}
       </div>
       {showAdvanced && (
-        <AdvancedImageGallery images={images} onClose={() => setShowAdvanced(false)} />
+        <AdvancedImageGallery
+          images={images}
+          onClose={() => setShowAdvanced(false)}
+        />
       )}
     </div>
-  )
+  );
 }
-

@@ -24,7 +24,7 @@ export default function Sidebar({ sidebarData }: SidebarProps) {
   };
 
   return (
-    <ul className="flex flex-col ml-auto gap-4 p-2 w-[60%] border-r-2 border-gray-100 pt-8">
+    <ul className="flex flex-col ml-auto gap-4 p-2 border-r-2 border-gray-100 pt-8 pr-4">
       {sidebarData.map((item) => (
         <li key={item.name}>
           {item.subItems ? (

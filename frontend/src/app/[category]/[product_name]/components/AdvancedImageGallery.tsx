@@ -65,9 +65,9 @@ export function AdvancedImageGallery({
 
   return (
     <>
-      <div className="absolute inset-0 z-[99] flex items-center justify-center bg-black bg-opacity-50"></div>
+      <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black bg-opacity-50"></div>
       <div className="fixed inset-0 z-[999] m-4 flex items-center justify-center bg-opacity-20 backdrop-blur-sm">
-        <Card className="flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden bg-white">
+        <Card className="z-[999] flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden bg-white">
           <div className="flex items-center justify-between p-4">
             <h2 className="text-2xl font-bold">Image Gallery</h2>
             <Button variant="ghost" size="icon" onClick={onClose}>

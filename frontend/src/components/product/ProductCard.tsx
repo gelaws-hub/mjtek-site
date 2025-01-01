@@ -24,7 +24,7 @@ export default function ProductCard() {
   }, []);
 
   return (
-    <div className="grid md:grid-cols-[repeat(auto-fit,minmax(146px,1fr))] grid-cols-2">
+    <div className="grid md:grid-cols-[repeat(auto-fit,minmax(146px,1fr))] grid-cols-2 max-w-[90%] md:max-w-full mx-auto gap-2 md:gap-4">
       {products &&
         products.map((product) => (
           <ProductCardItem key={product.id} product={product} />
