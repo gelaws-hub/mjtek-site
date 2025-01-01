@@ -21,6 +21,7 @@
     "@types/node-cache": "^4.2.5",
     "@types/otplib": "^10.0.0",
     "@types/qrcode": "^1.5.5",
+    "@types/uuid": "^10.0.0",
     "prisma": "^6.0.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.2"

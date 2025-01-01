@@ -173,7 +173,7 @@ export const login = async (req: Request, res: Response) => {
         httpOnly: false, // Prevent client-side access
         // secure: isProduction, // Use HTTPS in production
         // sameSite: isProduction ? "none" : "strict", // Prevent CSRF attacks
-        maxAge: 3600 * 1000, // 1 hour expiration
+        maxAge: 86400 * 1000, // 1 day expiration
       });
 
       return res.status(200).json({
@@ -328,7 +328,7 @@ export const authorize = (roles: string[]) => {
       });
 
       if (!user || !roles.includes(user.role_name)) {
-        return res.status(403).json({ message: "Access denied 2" });
+        return res.status(403).json({ message: "Access denied" });
       }
 
       // Jika user memiliki role yang diizinkan, lanjutkan ke endpoint berikutnya

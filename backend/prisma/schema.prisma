@@ -158,14 +158,24 @@ model cart {
   @@map("cart")
 }
 
+model transaction_status {
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
+  description String?
+
+  transaction transaction[]
+}
+
 model transaction {
-  id                 Int                  @id @default(autoincrement())
-  user_id            String
-  total_items        Int
-  total_price        Decimal              @db.Decimal(10, 2)
-  status             String
-  start_time         DateTime             @default(now())
-  end_time           DateTime?
+  id          String       @id @default(uuid())
+  user_id     String
+  total_items Int
+  total_price Decimal   @db.Decimal(10, 2)
+  start_time  DateTime  @default(now())
+  end_time    DateTime?
+  status_id   Int       @default(1)
+
+  transaction_status transaction_status   @relation(fields: [status_id], references: [id])
   user               user                 @relation(fields: [user_id], references: [id])
   transaction_detail transaction_detail[]
 
@@ -175,7 +185,7 @@ model transaction {
 model transaction_detail {
   id             Int         @id @default(autoincrement())
   product_id     Int
-  transaction_id Int
+  transaction_id String
   quantity       Int
   total_price    Decimal     @db.Decimal(10, 2)
   product        product     @relation(fields: [product_id], references: [id])
