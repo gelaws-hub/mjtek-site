@@ -8,14 +8,14 @@ export default function AddToCartButton({
   afterAddToCart,
   className = "",
 }: {
-  product_id: number;
+  product_id: string;
   children?: React.ReactNode;
   afterAddToCart?: React.Dispatch<React.SetStateAction<boolean>>;
   className?: string;
 }) {
   const [isLoading, setIsLoading] = useState(false);
 
-  const toCart = async (product_id: number, quantity = 1) => {
+  const toCart = async (product_id: string, quantity = 1) => {
     setIsLoading(true);
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/cart`, {

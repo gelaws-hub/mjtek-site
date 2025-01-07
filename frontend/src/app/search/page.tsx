@@ -87,20 +87,20 @@ function SearchResultsComponent() {
 
   return (
     <div className="grid grid-cols-[25%_75%] mt-0 bg-white min-h-screen">
-      <div className="flex flex-col ml-20 border-r-2 border-r-gray-200 ">
-        <h2 className="text-3xl font-bold text-blue-900 mb-4 pt-6">Filter</h2>
+      <div className="flex flex-col lg:ml-20 border-r border-r-gray-200 ">
+        <h2 className="text-lg md:text-3xl font-bold text-blue-900 mb-4 pt-6">Filter</h2>
         <div>
-          <h3 className="text-xl font-semibold mb-2">Kategori</h3>
-          <ul className="ml-4">
+          <h3 className="text-md md:text-xl font-semibold mb-2">Kategori</h3>
+          <ul className="text-xs md:text-sm px-1">
             {categories.map((category) => (
-              <li key={category.id} className="flex items-center mb-2">
+              <li key={category.id} className="flex items-center mb-2 truncate">
                 <input
                   type="checkbox"
                   id={`category-${category.id}`}
                   value={category.id}
                   checked={selectedCategories.includes(category.id)}
                   onChange={() => handleCategoryChange(category.id)}
-                  className="mr-2"
+                  className="mr-1 w-2 rounded-full h-2 bg-blue-900"
                 />
                 <label
                   htmlFor={`category-${category.id}`}
@@ -113,14 +113,14 @@ function SearchResultsComponent() {
           </ul>
         </div>
       </div>
-      <div className="container mr-auto py-4 pl-8 pr-28 max-w-[968px]">
-        <h1 className="text-2xl font-bold mb-4">
-          <span className="border-x-8 border-blue-900 border-solid mx-4 rounded-md"></span>
+      <div className="mr-auto py-4 pl-8 max-w-[968px]">
+        <h1 className="text-md lg:text-2xl font-bold mb-4">
+          <span className="border-x-6 border-blue-900 border-solid lg:mx-4 rounded-md mr-1"></span>
           Menampilkan {totalCount} produk untuk{" "}
           <strong className="text-blue-900">{query}</strong>
         </h1>
         <div className="border-l-8"></div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
           {products.length > 0 ? (
             products.map((product: ProductCardItemProps) => (
               <ProductCardItem key={product.id} product={product} />

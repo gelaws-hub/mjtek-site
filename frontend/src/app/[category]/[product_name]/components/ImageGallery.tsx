@@ -61,9 +61,9 @@ export function ImageGallery({ images }: ImageGalleryProps) {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="">
       <div
-        className="relative aspect-square cursor-pointer overflow-hidden rounded-lg"
+        className="relative aspect-square cursor-pointer rounded-lg"
         onClick={() => setShowAdvanced(true)}
       >
         <Image

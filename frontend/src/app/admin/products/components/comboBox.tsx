@@ -58,7 +58,7 @@ export function Combobox({
                 return (
                   <CommandItem
                     keywords={[option.label, option.value]}
-                    className="cursor-pointer hover:text-gray-900 dark:hover:text-slate-100"
+                    className="cursor-pointer dark:text-slate-200 hover:text-gray-900 dark:hover:text-white"
                     key={option.value}
                     value={option.value}
                     onSelect={(currentValue: any) => {

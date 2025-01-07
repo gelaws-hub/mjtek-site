@@ -80,8 +80,8 @@ export const menuGroups = [
               />
             </svg>
           ),
-          label: "Calendar",
-          route: "/admin/calendar",
+          label: "Transaksi",
+          route: "/admin/transactions",
         },
         {
           icon: (

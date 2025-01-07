@@ -1,11 +1,13 @@
 import { Button } from "@/components/ui/button";
 
 interface CartFooterProps {
+  onCheckout: () => void;
   totalPrice: number;
   totalItems: number;
 }
 
 export default function CartFooter({
+  onCheckout,
   totalPrice,
   totalItems = 0,
 }: CartFooterProps) {
@@ -19,7 +21,7 @@ export default function CartFooter({
           </p>
           <p className="text-xl font-bold">Rp {totalPrice.toLocaleString()}</p>
         </div>
-        <Button size="lg">Checkout</Button>
+        <Button size="lg" onClick={onCheckout}>Checkout</Button>
       </div>
     </div>
   );

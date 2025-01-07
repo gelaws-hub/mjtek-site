@@ -9,7 +9,7 @@ import { errorToast, successToast } from "../toast/reactToastify";
 import { Button } from "../ui/button";
 
 interface FavoriteButtonProps {
-  productId: number;
+  productId: string;
   text?: string;
   height?: string;
 }

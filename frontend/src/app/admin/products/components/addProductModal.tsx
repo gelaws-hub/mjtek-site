@@ -37,6 +37,7 @@ export default function AddProductModal({
     mediaFiles: [] as File[],
     product_ram_type_ids: [],
     product_socket_ids: [],
+    imageUrls: "",
   });
 
   const [refresh, setRefresh] = useRefreshContext();
@@ -91,6 +92,7 @@ export default function AddProductModal({
         "product_socket",
         formData.product_socket_ids.join(","),
       );
+      uploadData.append("imageUrls", formData.imageUrls);
       formData.mediaFiles.forEach((file) => uploadData.append("media", file));
 
       const response = await fetch(
@@ -339,6 +341,22 @@ export default function AddProductModal({
                 updateFormData("product_ram_type_ids", value)
               }
             />
+            <div>
+              <label
+                htmlFor="imageUrls"
+                className="mb-3 block text-sm font-medium text-black dark:text-white"
+              >
+                URL Gambar Produk (Beri tanda koma jika lebih dari satu)
+              </label>
+              <input
+                type="text"
+                id="imageUrls"
+                value={formData.imageUrls}
+                onChange={handleInputChange}
+                placeholder="Masukkan Nama Produk..."
+                className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+              />
+            </div>
             <div>
               <ImageUploader onFileSelect={handleMediaFileChange} />
             </div>

@@ -102,10 +102,10 @@ export default function ProductDetailPage() {
   }
 
   return (
-    <div className="container mx-auto max-w-7xl bg-white px-6 py-8">
+    <div className="mx-auto w-full bg-white pb-8">
       <div className="flex flex-col gap-8 lg:flex-row">
         {/* Product Image Gallery */}
-        <div className="lg:sticky lg:top-[9.8rem] lg:w-1/2 lg:self-start">
+        <div className="lg:sticky lg:top-[9rem] lg:w-1/3 lg:self-start">
           <ImageGallery images={product.media} />
         </div>
 
@@ -146,7 +146,7 @@ export default function ProductDetailPage() {
       </div>
 
       {/* Order Section */}
-      <div className="fixed bottom-0 left-0 right-0 m-2 mb-1 rounded-md border bg-white bg-opacity-50 shadow-lg backdrop-blur-lg">
+      <div className="z-[99] fixed bottom-0 left-0 right-0 m-2 mb-1 rounded-md border bg-white bg-opacity-50 shadow-lg backdrop-blur-lg md:backdrop-blur-none md:bg-opacity-100">
         <div className="container mx-auto max-w-7xl px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="">
@@ -168,7 +168,6 @@ export default function ProductDetailPage() {
                 product_id={product.id}
               >
                 <ShoppingCart02Icon className="" />{" "}
-                <span className="hidden md:block">Add to Cart</span>
               </AddToCartButton>
               <FavoriteButton height="10" productId={product.id} />
               {/* Share */}

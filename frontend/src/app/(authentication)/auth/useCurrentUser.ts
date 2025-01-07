@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 
 export interface User {
-  id: string;
-  name: string;
-  email: string;
-  role_name: "buyer" | "owner" | "admin";
-  profile_pic: string;
+  id: string
+  role_name: string
+  name: string
+  email: string
+  password: string
+  address: string
+  phone_number: string
+  profile_pic: string
 }
 
 export default function useCurrentUser() {

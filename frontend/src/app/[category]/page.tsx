@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation"; // Import usePathname
 import { useEffect, useState } from "react";
 import axios from "axios";
 import ProductCardItem from "@/components/product/ProductCardItem";
+import { ProductCardItemProps } from "@/components/product/ProductInterface";
 
 interface Media {
   source: string;
@@ -29,7 +30,7 @@ interface Category {
 export default function CategoryPage() {
   const pathname = usePathname(); // Use usePathname to get the current path
   const categoryName = pathname.split("/")[1].toLowerCase(); // Convert categoryName to lowercase
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<ProductCardItemProps[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
@@ -77,7 +78,7 @@ export default function CategoryPage() {
       </h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-[60%] mx-auto">
         {products.length > 0 ? (
-          products.map((product: Product) => (
+          products.map((product: ProductCardItemProps) => (
             <ProductCardItem key={product.id} product={product} />
           ))
         ) : (

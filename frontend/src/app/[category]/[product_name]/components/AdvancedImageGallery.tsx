@@ -65,8 +65,8 @@ export function AdvancedImageGallery({
 
   return (
     <>
-      <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black bg-opacity-50"></div>
-      <div className="fixed inset-0 z-[999] m-4 flex items-center justify-center bg-opacity-20 backdrop-blur-sm">
+      <div className="top-0 fixed h-screen inset-0 z-[999] flex items-center justify-center bg-black bg-opacity-50 m-0"></div>
+      <div className="fixed inset-0 z-[999] m-4 flex items-center justify-center bg-opacity-40">
         <Card className="z-[999] flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden bg-white">
           <div className="flex items-center justify-between p-4">
             <h2 className="text-2xl font-bold">Image Gallery</h2>
@@ -100,10 +100,10 @@ export function AdvancedImageGallery({
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
-          <div className="relative p-4">
+          <div className="relative p-2">
             <div
               ref={scrollRef}
-              className="scrollbar-hide flex space-x-2 overflow-x-auto"
+              className="scrollbar-hide flex space-x-2 overflow-x-auto p-1"
               style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
             >
               {images.map((image, index) => (

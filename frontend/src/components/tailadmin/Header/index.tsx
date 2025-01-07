@@ -60,8 +60,9 @@ const Header = (props: {
             <Image
               width={32}
               height={32}
-              src={"/images/logo/logo-icon.svg"}
+              src={"/logo_mjtek.png"}
               alt="Logo"
+              className="dark:fill-white rounded-lg"
             />
           </Link>
         </div>

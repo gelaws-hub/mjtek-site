@@ -34,7 +34,7 @@ export default function Navbar() {
   };
 
   return (
-    <ol className="justify-center flex flex-row gap-4 md:justify-start items-center">
+    <ol className="flex flex-row gap-4 justify-start items-center">
       {categories && categories.slice(0, 5).map((category) => {
         const categoryUrl = `/${formatCategoryName(category.category_name)}`;
         const isActive = pathname === categoryUrl;

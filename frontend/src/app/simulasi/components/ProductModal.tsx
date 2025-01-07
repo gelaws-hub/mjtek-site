@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { Product } from "./Interfaces";
+import { Search01Icon } from "@/components/icons/Search01Icon";
+import Image from "next/image";
 
 interface ProductModalProps {
   categoryId: string;
@@ -25,7 +27,7 @@ export default function ProductModal({
 
   const fetchProducts = useCallback(async () => {
     try {
-      let query = `${process.env.NEXT_PUBLIC_API_URL}/product?q=${searchQuery}&categories=${categoryId}&page=${currentPage}`;
+      let query = `${process.env.NEXT_PUBLIC_API_URL}/sim-product?q=${searchQuery}&categories=${categoryId}&page=${currentPage}`;
       if (socketId) query += `&socket_id=${socketId}`;
       if (ramTypeId) query += `&ram_type_id=${ramTypeId}`;
 
@@ -39,7 +41,7 @@ export default function ProductModal({
 
   useEffect(() => {
     fetchProducts();
-  }, [fetchProducts]);
+  }, []);
 
   const handleSelection = (product: Product) => {
     onAddToSimulation(product);
@@ -56,28 +58,66 @@ export default function ProductModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-        <h3 className="text-xl font-semibold text-gray-800 mb-4">Search Products</h3>
-        
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={handleSearchChange}
-          placeholder="Search by product name..."
-          className="w-full p-2 border border-gray-300 rounded-md mb-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-        />
+    <button
+      onClick={onClose}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-gray-500 bg-opacity-50"
+      style={{ touchAction: "none" }}
+    >
+      <div
+        className="max-w-[90vw] rounded-lg bg-white p-6 shadow-lg z-99"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <label
+          htmlFor="search"
+          className="mb-4 text-xl font-semibold text-gray-800"
+        >
+          Cari produk
+        </label>
 
-        <ul className="space-y-2 max-h-60 overflow-y-auto">
+        <div
+          id="search"
+          className="relative mb-4 flex items-center justify-between"
+        >
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={handleSearchChange}
+            placeholder="Cari produk..."
+            className="w-full rounded-md border border-gray-300 p-2 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+          <button
+            onClick={() => fetchProducts()}
+            className="absolute right-2 rounded-md px-2 py-1"
+          >
+            <Search01Icon className="h-5 w-5" />
+          </button>
+        </div>
+
+        <ul className="max-h-60 space-y-2 overflow-y-auto">
           {components.length > 0 ? (
             components.map((component) => (
               <li
                 key={component.id}
-                className="flex justify-between items-center p-2 border-b border-gray-200 hover:bg-gray-100 cursor-pointer"
-                onClick={() => handleSelection(component)}
+                className="flex items-center gap-1 border-b border-gray-200 p-1"
               >
-                <span>{component.product_name}</span>
-                <span className="text-gray-500">Rp {component.price.toLocaleString()}</span>
+                <div className="flex h-16 w-16">
+                  <Image
+                    src={component.media[0].source}
+                    alt={component.product_name}
+                    width={100}
+                    height={100}
+                    className="aspect-square h-full w-full rounded-md object-cover"
+                  />
+                </div>
+                <div
+                  className="flex w-full cursor-pointer items-center justify-between text-left text-xs hover:bg-gray-100 md:text-sm"
+                  onClick={() => handleSelection(component)}
+                >
+                  <p>{component.product_name} </p>
+                  <p className="text-gray-500">
+                    Rp {component.price.toLocaleString()}
+                  </p>
+                </div>
               </li>
             ))
           ) : (
@@ -86,19 +126,21 @@ export default function ProductModal({
         </ul>
 
         {/* Pagination Controls */}
-        <div className="flex justify-between items-center mt-4">
+        <div className="mt-4 flex items-center justify-between">
           <button
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
-            className="px-2 py-1 border rounded-md bg-gray-200 text-gray-600 hover:bg-gray-300 disabled:opacity-50"
+            className="rounded-md border bg-gray-200 px-2 py-1 text-gray-600 hover:bg-gray-300 disabled:opacity-50"
           >
             Previous
           </button>
-          <span>Page {currentPage} of {totalPages}</span>
+          <span>
+            Page {currentPage} of {totalPages}
+          </span>
           <button
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className="px-2 py-1 border rounded-md bg-gray-200 text-gray-600 hover:bg-gray-300 disabled:opacity-50"
+            className="rounded-md border bg-gray-200 px-2 py-1 text-gray-600 hover:bg-gray-300 disabled:opacity-50"
           >
             Next
           </button>
@@ -106,11 +148,11 @@ export default function ProductModal({
 
         <button
           onClick={onClose}
-          className="mt-4 w-full py-2 px-4 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none"
+          className="mt-4 w-full rounded-md bg-gray-600 px-4 py-2 text-white hover:bg-gray-700 focus:outline-none"
         >
           Close
         </button>
       </div>
-    </div>
+    </button>
   );
 }

@@ -15,10 +15,10 @@ export default function Header() {
   if (hideHeaderPaths.some((path) => pathname?.startsWith(path))) return null;
   return (
     <header className="sticky top-0 border-b-2 border-b-gray-100 bg-white z-50 ">
-      <div className="grid grid-cols-[15%_70%_15%] md:grid-cols-[25%_50%_25%] mx-auto pt-6 md:pb-4 w-[96%]">
+      <div className="grid grid-cols-[10%_60%_30%] md:grid-cols-[25%_50%_25%] mx-auto pt-6 md:pb-4 w-[96%]">
         <Link
           href="/"
-          className="col-start-1  my-0 md:flex flex-row items-center gap-4 justify-center md:justify-end md:mr-4 lg:mr-[20%]"
+          className="col-start-1 my-0 md:flex flex-row items-center gap-4 justify-center md:justify-end md:mr-4 lg:mr-[20%]"
         >
           <Image
             key="logo-mjtek"
@@ -26,7 +26,7 @@ export default function Header() {
             alt="logo-mjtek"
             width={50}
             height={40}
-            className="lg:max-h-[50px] md:max-h-[30px] md:max-w-[30px] max-h-[50px]"
+            className="md:flex lg:max-h-[50px] md:max-h-[30px] md:max-w-[30px] max-h-8 max-w-8 m-auto md:m-0"
           />
           <h1 className="hidden md:block text-lg xl:text-2xl font-bold text-blue-900">
             MJ Teknologi
@@ -36,7 +36,7 @@ export default function Header() {
           <SearchBar />
         </div>
         <UserProfile />
-        <div className="relative py-2 col-span-2 md:col-start-2 row-start-2 md:flex overflow-hidden px-4 md:py-0 md:mt-2">
+        <div className="relative py-2 col-span-3 md:col-span-2 md:col-start-2 row-start-2 md:flex overflow-auto px-4 md:py-0 md:mt-2 scrollbar-none">
           <Navbar />
         </div>
       </div>

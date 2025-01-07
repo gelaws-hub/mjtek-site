@@ -8,6 +8,7 @@ import CartFooter from "./components/cartFooter";
 import { ProductCardItemProps } from "@/components/product/ProductInterface";
 import { ProductRecommendation } from "@/components/product/ProductRecommendation";
 import { errorToast, successToast } from "@/components/toast/reactToastify";
+import { redirect, useRouter } from "next/navigation";
 
 export default function CartPage() {
   const [cartItems, setCartItems] = useState<CartItemType[]>([]);
@@ -37,6 +38,8 @@ export default function CartPage() {
   const [recommendedProducts, setRecommendedProducts] = useState<
     ProductCardItemProps[]
   >([]);
+
+  const router = useRouter();
 
   // Fetch recommended products
   useEffect(() => {
@@ -159,15 +162,19 @@ export default function CartPage() {
         }),
         credentials: "include",
       });
-  
+
       const data = await response.json();
-  
+
       if (response.ok) {
         setCartItems((items) =>
           items.map((item) => {
-            const updatedItem = data.cartItems.find((cartItem: any) => cartItem.product_id === item.product_id);
-            return updatedItem ? { ...item, is_selected: updatedItem.is_selected } : item;
-          })
+            const updatedItem = data.cartItems.find(
+              (cartItem: any) => cartItem.product_id === item.product_id,
+            );
+            return updatedItem
+              ? { ...item, is_selected: updatedItem.is_selected }
+              : item;
+          }),
         );
       } else {
         console.error("Failed to update cart items:", data.message);
@@ -178,7 +185,6 @@ export default function CartPage() {
       setIsLoading(false);
     }
   };
-  
 
   const handleDelete = async (product_id?: number) => {
     try {
@@ -213,6 +219,34 @@ export default function CartPage() {
     console.log(`Added product ${product_id} to favorites`);
   };
 
+  const handleCheckout = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/transaction`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        },
+      );
+      const data = await response.json();
+
+      if (response.ok) {
+        successToast("Checkout berhasil", "top-left");
+        router.push(`/transactions/${data.transactionId}`);
+        setRefresh((refresh) => !refresh);
+      } else {
+        errorToast("Checkout gagal", "top-left");
+        setRefresh((refresh) => !refresh);
+      }
+    } catch (error) {
+      errorToast("Checkout gagal", "top-left");
+      setRefresh((refresh) => !refresh);
+    }
+  };
+
   if (!cartItems) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -222,7 +256,7 @@ export default function CartPage() {
   }
 
   return (
-    <div className="mx-auto flex min-h-screen flex-col lg:max-w-[70%]">
+    <div className="flex min-h-screen flex-col">
       <CartHeader
         totalItems={totalItems}
         totalWeight={totalWeight}
@@ -263,6 +297,7 @@ export default function CartPage() {
         />
       </div>
       <CartFooter
+        onCheckout={handleCheckout}
         totalPrice={checkedTotalPrice}
         totalItems={checkedTotalItems}
       />

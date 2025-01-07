@@ -1,11 +1,9 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProductCardItemProps } from "@/components/product/ProductInterface";
-import Link from "next/link";
 import ProductCardItem from "./ProductCardItem";
 
 export function ProductRecommendation({
@@ -65,8 +63,8 @@ export function ProductRecommendation({
   if (!products) return null;
 
   return (
-    <div className="relative pb-10">
-      <div ref={scrollRef} className="grid grid-cols-[repeat(auto-fit,minmax(146px,1fr))]">
+    <div className="relative pb-10 w-[90%] mx-auto">
+      <div ref={scrollRef} className="grid gap-2 grid-cols-[repeat(auto-fit,minmax(146px,1fr))]">
         {products.map((product) => (
           <ProductCardItem key={product.id} product={product} afterAddToCart={afterAddToCart} />
         ))}

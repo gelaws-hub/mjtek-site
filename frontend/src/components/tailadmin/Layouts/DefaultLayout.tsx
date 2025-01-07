@@ -13,7 +13,6 @@ export default function DefaultLayout({
     <>
       <div className="flex">
         <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-
         <div className="relative flex flex-1 flex-col lg:ml-72.5">
           <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
           <main>
