@@ -23,12 +23,12 @@ import {
   deleteBrand,
 } from "../controllers/produk_details/brandController";
 
-import {
-  createMedia,
-  deleteMedia,
-  getAllMedia,
-  getMediaById,
-} from "../controllers/produk_details/productMediaController";
+// import {
+//   createMedia,
+//   deleteMedia,
+//   getAllMedia,
+//   getMediaById,
+// } from "../controllers/produk_details/productMediaController";
 import { getCategoryBrand } from "../controllers/produk_details/categoryBrandController";
 
 const produkDetailRoutes = express.Router();
@@ -57,10 +57,10 @@ produkDetailRoutes.delete("/brand/:id", deleteBrand);
 // Category, sub-category, and brand routes
 produkDetailRoutes.get("/category-brand", getCategoryBrand);
 
-// Media routes
-produkDetailRoutes.get("/media", getAllMedia);
-produkDetailRoutes.get("/media/:id", getMediaById);
-produkDetailRoutes.post("/media", createMedia);
-produkDetailRoutes.delete("/media/:id", deleteMedia);
+// // Media routes
+// produkDetailRoutes.get("/media", getAllMedia);
+// produkDetailRoutes.get("/media/:id", getMediaById);
+// produkDetailRoutes.post("/media", createMedia);
+// produkDetailRoutes.delete("/media/:id", deleteMedia);
 
 export default produkDetailRoutes;

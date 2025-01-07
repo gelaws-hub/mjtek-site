@@ -12,11 +12,11 @@ import { cancelTransaction, createTransaction, getAllTransactionsFromUser, getTr
 
 import { authorize, ensureAuthenticated } from "../auth/userController";
 import { getAllTransactions } from "../controllers/transaksi/searchTransactionController";
+import { uploadTransactionProof } from "../controllers/transaksi/uploadPaymentProof";
 
 const transaksiRoutes = express.Router();
 
 transaksiRoutes.get("/cart", ensureAuthenticated, authorize(["buyer"]), getAllCartByUserId);
-transaksiRoutes.get("/cart/detail/:id", clearCart);
 transaksiRoutes.post("/cart", ensureAuthenticated, authorize(["buyer"]), addToCart);
 transaksiRoutes.patch("/cart/:product_id", ensureAuthenticated, authorize(["buyer"]), partialUpdateCart);
 transaksiRoutes.put("/cart", ensureAuthenticated, authorize(["buyer"]), toggleCartSelection);
@@ -34,6 +34,7 @@ transaksiRoutes.get('/transaction', ensureAuthenticated, authorize(["buyer"]), g
 transaksiRoutes.get('/transaction/:transactionId', ensureAuthenticated, authorize(["buyer"]), getTransactionById);
 transaksiRoutes.post('/transaction', ensureAuthenticated, authorize(["buyer"]), createTransaction);
 transaksiRoutes.patch('/transaction/:transactionId', ensureAuthenticated, authorize(["buyer"]), cancelTransaction);
+transaksiRoutes.patch('/transaction-proof/:transactionId', ensureAuthenticated, authorize(["buyer"]), uploadTransactionProof);
 
 // Admin Transaksi routes
 transaksiRoutes.patch('/admin/transaction/:transactionId', ensureAuthenticated, authorize(["admin", "owner"]), updateTransactionStatus);

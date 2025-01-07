@@ -173,6 +173,17 @@ export const login = async (req: Request, res: Response) => {
         httpOnly: false, // Prevent client-side access
         // secure: isProduction, // Use HTTPS in production
         // sameSite: isProduction ? "none" : "strict", // Prevent CSRF attacks
+        sameSite: "none",
+        secure: true,
+        maxAge: 86400 * 1000, // 1 day expiration
+      });
+
+      res.cookie("refreshToken", refreshToken, {
+        httpOnly: true, // Prevent client-side access
+        // secure: isProduction, // Use HTTPS in production
+        // sameSite: isProduction ? "none" : "strict", // Prevent CSRF attacks
+        sameSite: "none",
+        secure: true,
         maxAge: 86400 * 1000, // 1 day expiration
       });
 
@@ -267,13 +278,6 @@ export const getCurrentUser = async (req: ValidationRequest, res: Response) => {
   try {
     const user = await prisma.user.findUnique({
       where: { id: req.user?.id },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role_name: true,
-        profile_pic: true,
-      },
     });
 
     if (!user) {

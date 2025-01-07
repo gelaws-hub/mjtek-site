@@ -65,6 +65,7 @@ app.use((req, res) => {
   res.status(404).send("Not Found");
 });
 
+
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
   console.log(uploadsDir);

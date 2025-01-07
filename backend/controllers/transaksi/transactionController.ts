@@ -103,7 +103,7 @@ export const getAllTransactionsFromUser = async (
   }
 
   try {
-    // Raw SQL query to fetch transactions
+    // Raw SQL query to fetch transactions with product media
     const transactions: Array<any> = await prisma.$queryRaw`
       SELECT 
         t.id AS transaction_id,
@@ -112,17 +112,23 @@ export const getAllTransactionsFromUser = async (
         t.total_price,
         t.start_time,
         t.end_time,
+        t.payment_proof,
+        ts.id AS status_id,
         ts.name AS status_name,
+        ts.description AS status_description,
         td.product_id,
         p.product_name,
         td.quantity,
         p.price AS product_price,
-        td.total_price AS product_total_price
+        td.total_price AS product_total_price,
+        m.source AS media_source
       FROM transaction t
       JOIN transaction_status ts ON t.status_id = ts.id
       JOIN transaction_detail td ON t.id = td.transaction_id
       JOIN product p ON td.product_id = p.id
+      LEFT JOIN media m ON p.id = m.product_id AND m.file_type = 'image'
       WHERE t.user_id = ${user.id}
+      GROUP BY t.id, td.id, p.id, m.source
     `;
 
     // Transform the raw data into the desired format
@@ -136,18 +142,30 @@ export const getAllTransactionsFromUser = async (
             total_price: row.total_price,
             start_time: row.start_time,
             end_time: row.end_time,
-            status: row.status_name,
+            payment_proof: row.payment_proof ? `${process.env.BASE_URL}${row.payment_proof}` : null,
+            status: {
+              status_id: row.status_id,
+              status_name: row.status_name,
+              status_description: row.status_description,
+            },
             products: [],
           };
         }
 
-        acc[row.transaction_id].products.push({
-          product_id: row.product_id,
-          product_name: row.product_name,
-          quantity: row.quantity,
-          price: Number(row.product_price),
-          total_price: Number(row.product_total_price),
-        });
+        const existingProduct = acc[row.transaction_id].products.find(
+          (product: any) => product.product_id === row.product_id
+        );
+
+        if (!existingProduct) {
+          acc[row.transaction_id].products.push({
+            product_id: row.product_id,
+            product_name: row.product_name,
+            quantity: row.quantity,
+            price: Number(row.product_price),
+            total_price: Number(row.product_total_price),
+            media_source: row.media_source || null, // Include the media source
+          });
+        }
 
         return acc;
       }, {})
@@ -179,17 +197,9 @@ export const getTransactionById = async (req: Request, res: Response) => {
     });
   }
 
-  const transactionId = parseInt(req.params.id); // Get the transaction id from URL params
-
-  if (isNaN(transactionId)) {
-    return res.status(400).json({
-      statusCode: 400,
-      message: "Invalid transaction ID format",
-    });
-  }
+  const { transactionId } = req.params;
 
   try {
-    // Raw SQL query to fetch the specific transaction
     const transaction: Array<any> = await prisma.$queryRaw`
       SELECT 
         t.id AS transaction_id,
@@ -198,16 +208,21 @@ export const getTransactionById = async (req: Request, res: Response) => {
         t.total_price,
         t.start_time,
         t.end_time,
+        t.payment_proof,
+        ts.id AS status_id,
+        ts.description AS status_description,
         ts.name AS status_name,
         td.product_id,
         p.product_name,
         td.quantity,
         p.price AS product_price,
-        td.total_price AS product_total_price
+        td.total_price AS product_total_price,
+        m.source AS media_source
       FROM transaction t
       JOIN transaction_status ts ON t.status_id = ts.id
       JOIN transaction_detail td ON t.id = td.transaction_id
       JOIN product p ON td.product_id = p.id
+      LEFT JOIN media m ON p.id = m.product_id AND m.file_type = 'image'
       WHERE t.id = ${transactionId} AND t.user_id = ${user.id}
     `;
 
@@ -218,7 +233,6 @@ export const getTransactionById = async (req: Request, res: Response) => {
       });
     }
 
-    // Transform the raw data into the desired format
     const transformed = {
       id: transaction[0].transaction_id,
       user_id: transaction[0].user_id,
@@ -226,17 +240,22 @@ export const getTransactionById = async (req: Request, res: Response) => {
       total_price: transaction[0].total_price,
       start_time: transaction[0].start_time,
       end_time: transaction[0].end_time,
-      status: transaction[0].status_name,
+      payment_proof: transaction[0].payment_proof ? `${process.env.BASE_URL}${transaction[0].payment_proof}` : null,
+      status: {
+        status_id: transaction[0].status_id,
+        status_name: transaction[0].status_name,
+        status_description: transaction[0].status_description,
+      },
       products: transaction.map((row: any) => ({
         product_id: row.product_id,
         product_name: row.product_name,
         quantity: row.quantity,
         price: Number(row.product_price),
         total_price: Number(row.product_total_price),
+        media_source: row.media_source || null,
       })),
     };
 
-    // Return the transformed transaction in the response
     return res.status(200).json({
       statusCode: 200,
       message: "Transaction fetched successfully",
@@ -294,6 +313,7 @@ export const cancelTransaction = async (req: Request, res: Response) => {
         id: transactionId,
       },
       data: {
+        end_time: new Date().toISOString(),
         status_id: 0, // Set status to 0 (cancelled)
       },
     });

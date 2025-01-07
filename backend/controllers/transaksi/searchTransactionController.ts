@@ -10,10 +10,7 @@ interface CustomRequest extends Request {
   };
 }
 
-export const getAllTransactions = async (
-  req: Request,
-  res: Response
-) => {
+export const getAllTransactions = async (req: Request, res: Response) => {
   const user = (req as CustomRequest).user;
 
   if (!user) {
@@ -29,93 +26,106 @@ export const getAllTransactions = async (
   const skip = (page - 1) * limit;
   const searchProduct = (req.query.searchProduct as string) || "";
   const searchUser = (req.query.searchUser as string) || "";
+  const sortBy = (req.query.sortBy as string) || "start_time"; // Default to `start_time`
+  const sortOrder = (req.query.sortOrder as string) || "desc"; // Default to descending
 
   try {
-    // Raw SQL query to fetch transactions with pagination and search by product_name
-    const transactions: Array<any> = await prisma.$queryRaw`
-        SELECT 
-          t.id AS transaction_id,
-          t.user_id,
-          u.name,
-          u.email,
-          u.address,
-          u.phone_number,
-          t.total_items,
-          t.total_price,
-          t.start_time,
-          t.end_time,
-          ts.name AS status_name,
-          td.product_id,
-          p.product_name,
-          td.quantity,
-          p.price AS product_price,
-          td.total_price AS product_total_price
-        FROM transaction t
-        JOIN transaction_status ts ON t.status_id = ts.id
-        JOIN transaction_detail td ON t.id = td.transaction_id
-        JOIN product p ON td.product_id = p.id
-        JOIN user u ON t.user_id = u.id
-        WHERE 
-        p.product_name LIKE ${`%${searchProduct}%`} AND u.name LIKE ${`%${searchUser}%`}
-        LIMIT ${limit} OFFSET ${skip}
-      `;
+    // Fetch total transaction count for pagination
+    const totalTransactions = await prisma.transaction.count({
+      where: {
+        user: {
+          name: {
+            contains: searchUser,
+          },
+        },
+        transaction_detail: {
+          some: {
+            product: {
+              product_name: {
+                contains: searchProduct,
+              },
+            },
+          },
+        },
+      },
+    });
 
-    if (transactions.length === 0) {
+    if (totalTransactions === 0) {
       return res.status(404).json({
         statusCode: 404,
         message: "No transactions found.",
       });
     }
 
-    // Raw SQL query to count the total number of unique transactions
-    const totalTransactionsResult: Array<{ count: BigInt }> = await prisma.$queryRaw`
-        SELECT COUNT(DISTINCT t.id) as count
-        FROM transaction t
-        JOIN transaction_status ts ON t.status_id = ts.id
-        JOIN transaction_detail td ON t.id = td.transaction_id
-        JOIN product p ON td.product_id = p.id
-        JOIN user u ON t.user_id = u.id
-        WHERE 
-        p.product_name LIKE ${`%${searchProduct}%`} AND u.name LIKE ${`%${searchUser}%`}
-      `;
-
-    // Convert BigInt to number
-    const totalTransactions = Number(totalTransactionsResult[0]?.count || 0);
-
-    const transformed = Object.values(
-      transactions.reduce((acc: any, row: any) => {
-        if (!acc[row.transaction_id]) {
-          acc[row.transaction_id] = {
-            id: row.transaction_id,
-            user: {
-              id: row.user_id,
-              name: row.name,
-              email: row.email,
-              address: row.address,
-              phone_number: row.phone_number,
+    // Fetch paginated and sorted transactions with relations
+    const transactions = await prisma.transaction.findMany({
+      skip,
+      take: limit,
+      where: {
+        user: {
+          name: {
+            contains: searchUser,
+          },
+        },
+        transaction_detail: {
+          some: {
+            product: {
+              product_name: {
+                contains: searchProduct,
+              },
             },
-            total_items: row.total_items,
-            total_price: row.total_price,
-            start_time: row.start_time,
-            end_time: row.end_time,
-            status: row.status_name,
-            products: [],
-          };
-        }
+          },
+        },
+      },
+      orderBy: {
+        [sortBy]: sortOrder as "asc" | "desc", // Dynamic ordering
+      },
+      include: {
+        user: true,
+        transaction_status: true,
+        transaction_detail: {
+          include: {
+            product: {
+              include: {
+                media: {
+                  where: { file_type: "image" },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
 
-        acc[row.transaction_id].products.push({
-          product_id: row.product_id,
-          product_name: row.product_name,
-          quantity: row.quantity,
-          price: Number(row.product_price),
-          total_price: Number(row.product_total_price),
-        });
+    // Transform the transactions to the desired structure
+    const transformed = transactions.map((transaction) => ({
+      id: transaction.id,
+      user: {
+        id: transaction.user_id,
+        name: transaction.user.name,
+        email: transaction.user.email,
+        address: transaction.user.address,
+        phone_number: transaction.user.phone_number,
+      },
+      total_items: transaction.total_items,
+      total_price: transaction.total_price,
+      start_time: transaction.start_time,
+      end_time: transaction.end_time,
+      status: {
+        id: transaction.status_id,
+        name: transaction.transaction_status.name,
+      },
+      products: transaction.transaction_detail.map((detail) => ({
+        product_id: detail.product_id,
+        product_name: detail.product.product_name,
+        quantity: detail.quantity,
+        price: detail.product.price,
+        total_price: detail.total_price,
+        media_source: detail.product.media[0]?.source || null,
+      })),
+    }));
 
-        return acc;
-      }, {})
-    );
-
-    // Return the transformed transactions along with pagination data
+    // Return the response with pagination metadata
     return res.status(200).json({
       statusCode: 200,
       message: "Transactions fetched successfully",

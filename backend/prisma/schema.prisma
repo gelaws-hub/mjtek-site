@@ -8,20 +8,24 @@ datasource db {
 }
 
 model product {
-  id               String     @id
+  id               String    @id
   category_id      Int
   sub_category_id  Int?
   brand_id         Int
   product_name     String
-  price            Decimal @db.Decimal(10, 2)
-  description      String? @db.Text
-  estimated_weight Decimal @db.Decimal(10, 2)
+  price            Decimal   @db.Decimal(10, 2)
+  description      String?   @db.Text
+  estimated_weight Decimal   @db.Decimal(10, 2)
   stock            Int
-  is_deleted       Boolean @default(false)
+  is_deleted       Boolean   @default(false)
+  createdTime      DateTime  @default(now())
+  editedTime       DateTime?
+  user_id          String    @default("admin-root-id")
 
   category           category             @relation(fields: [category_id], references: [id])
   sub_category       sub_category?        @relation(fields: [sub_category_id], references: [id])
   brand              brand                @relation(fields: [brand_id], references: [id])
+  user               user                 @relation(fields: [user_id], references: [id]) // Relation to user
   cart               cart[]
   favorite           favorite[]
   media              media[]
@@ -33,6 +37,7 @@ model product {
   @@index([category_id])
   @@index([sub_category_id])
   @@index([brand_id])
+  @@index([user_id]) 
 }
 
 model category {
@@ -126,6 +131,7 @@ model user {
   transaction    transaction[]
   cart           cart[]
   favorite       favorite[]
+  products       product[]
 
   role role @relation(fields: [role_name], references: [role_name])
 
@@ -167,13 +173,14 @@ model transaction_status {
 }
 
 model transaction {
-  id          String       @id @default(uuid())
-  user_id     String
-  total_items Int
-  total_price Decimal   @db.Decimal(10, 2)
-  start_time  DateTime  @default(now())
-  end_time    DateTime?
-  status_id   Int       @default(1)
+  id            String    @id @default(uuid())
+  user_id       String
+  total_items   Int
+  total_price   Decimal   @db.Decimal(10, 2)
+  start_time    DateTime  @default(now())
+  end_time      DateTime?
+  payment_proof String?
+  status_id     Int       @default(1)
 
   transaction_status transaction_status   @relation(fields: [status_id], references: [id])
   user               user                 @relation(fields: [user_id], references: [id])

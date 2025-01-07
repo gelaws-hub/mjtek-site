@@ -50,6 +50,7 @@ export const getClientProducts = async (req: Request, res: Response) => {
         id: true,
         product_name: true,
         price: true,
+        stock: true,
         media: {
           select: {
             source: true,
@@ -97,6 +98,7 @@ export const getClientProducts = async (req: Request, res: Response) => {
       id: product.id,
       product_name: product.product_name,
       price: parseFloat(product.price.toString()),
+      stock: product.stock,
       media_source:
         product.media[0]?.source?.startsWith("/")
           ? `${process.env.BASE_URL}${product.media[0]?.source}`

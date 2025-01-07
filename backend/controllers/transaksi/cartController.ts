@@ -222,27 +222,6 @@ export const removeFromCart = async (req: Request, res: Response) => {
   }
 };
 
-// Update an item in Keranjang
-// export const updateCartItem = async (req: Request, res: Response) => {
-//   const { id } = req.params; // id refers to id_keranjang
-//   const { product_id } = req.body;
-//   try {
-//     const updatedKeranjang = await prisma.cart.update({
-//       where: {
-//         id: parseInt(id),
-//       },
-//       data: {
-//         product_id: parseInt(product_id),
-//         date: new Date(),
-//       },
-//     });
-//     res.status(200).json(updatedKeranjang);
-//   } catch (error: any) {
-//     console.error("Error updating Keranjang item:", error.message);
-//     res.status(500).json({ error: "Internal server error" });
-//   }
-// };
-
 export const partialUpdateCart = async (req: Request, res: Response) => {
   const user = (req as CustomRequest).user;
   const { product_id } = req.params;
