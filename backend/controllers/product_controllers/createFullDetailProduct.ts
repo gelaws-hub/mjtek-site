@@ -4,7 +4,9 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import crypto from "crypto";
+import { uploadToCloudinary } from "../../utils/cloudinary"; // Reusable Cloudinary module
 
+// Configure multer for local file storage
 const storage = multer.diskStorage({
   destination: async (req, file, cb) => {
     try {
@@ -127,7 +129,7 @@ export const createFullDetailProduct = async (req: Request, res: Response) => {
 
       const categoryName = category.category_name;
 
-      // Generate the prefix for the product ID
+      // Generate custom product ID
       let prefix = "";
       if (categoryName.length >= 3) {
         prefix =
@@ -138,13 +140,9 @@ export const createFullDetailProduct = async (req: Request, res: Response) => {
         prefix = categoryName.toUpperCase().padEnd(3, "0");
       }
 
-      // Generate random 4-character suffix
       const randomSuffix = crypto.randomBytes(2).toString("hex").toUpperCase();
-
-      // Combine prefix and suffix to create the custom product ID
       const productId = `${prefix}${randomSuffix}`;
 
-      // Ensure the product ID is unique
       const existingProduct = await prisma.product.findUnique({
         where: { id: productId },
       });
@@ -158,7 +156,7 @@ export const createFullDetailProduct = async (req: Request, res: Response) => {
       // Create the product in the database
       const product = await prisma.product.create({
         data: {
-          id: productId, // Use the custom product ID
+          id: productId,
           product_name,
           category_id: parseInt(category_id),
           sub_category_id: sub_category_id ? parseInt(sub_category_id) : null,
@@ -183,10 +181,18 @@ export const createFullDetailProduct = async (req: Request, res: Response) => {
 
         for (const file of files) {
           const fileUrl = `/uploads/products/${categorySlug}/${file.filename}`;
+
+          // Upload to Cloudinary
+          const cloudinaryResult = await uploadToCloudinary(
+            fs.readFileSync(file.path),
+            `products/${categorySlug}`,
+            file.filename
+          );
+
           const media = await prisma.media.create({
             data: {
               product_id: product.id,
-              source: fileUrl,
+              source: cloudinaryResult.secure_url, // Local URL
               file_type: file.mimetype.startsWith("image") ? "image" : "video",
             },
           });
