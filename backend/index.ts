@@ -53,9 +53,9 @@ app.use("/", mediaUploaderRouter);
 // Serve the uploads directory
 const uploadsDir = path.join(
   process.cwd(),
-  process.env.PRODUCT_UPLOADS_DIR || "uploads/products"
+  process.env.PRODUCT_UPLOADS_DIR || "uploads"
 );
-app.use("/uploads/products", express.static(uploadsDir));
+app.use("/uploads", express.static(uploadsDir));
 
 app.get("/", (req, res) => {
   res.send("API is running");
