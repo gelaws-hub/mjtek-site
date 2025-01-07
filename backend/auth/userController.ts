@@ -32,6 +32,7 @@ export const ensureAuthenticated: RequestHandler = async (req, res, next) => {
 
   // If no token is found in cookies, return 401 Unauthorized
   if (!token) {
+    console.log("Access token not found in cookies");
     return res.status(401).json({ message: "Access token not found" });
   }
 
@@ -122,18 +123,6 @@ export const login = async (req: Request, res: Response) => {
       return res.status(401).json({ message: "Email or password is invalid" });
     }
 
-    if (user.fa_enable) {
-      const tempToken = crypto.randomUUID();
-      cache.set(
-        `tempToken_${tempToken}`,
-        user.id,
-        parseInt(process.env.CACHE_TEMP_TOKEN_EXPIRATION!)
-      );
-      return res.status(200).json({
-        tempToken,
-        expiresInSeconds: process.env.CACHE_TEMP_TOKEN_EXPIRATION,
-      });
-    } else {
       const accessToken = jwt.sign(
         {
           id: user.id,
@@ -195,7 +184,7 @@ export const login = async (req: Request, res: Response) => {
         // accessToken, // access token is received via http only cookie
         // refreshToken, this should never be delivered to client
       });
-    }
+    
   } catch (error: any) {
     return res.status(500).json({ message: error.message });
   }
@@ -298,13 +287,26 @@ export const getUsers = async (_req: ValidationRequest, res: Response) => {
 };
 
 // Logout User
-export const logoutUser: RequestHandler = (req, res) => {
+export const logoutUser: RequestHandler = async (req, res) => {
   try {
-    // Clear the cookie storing the access token
+    const userId = (req as any).user?.id;
+
+    if (userId) {
+      await prisma.user_refresh_token.deleteMany({
+        where: { user_id: userId },
+      });
+    }
+
     res.clearCookie("accessToken", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // Use secure cookies in production
-      sameSite: "strict", // Prevent CSRF attacks
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
     });
 
     return res.status(200).json({ message: "Successfully logged out." });
@@ -332,6 +334,7 @@ export const authorize = (roles: string[]) => {
       });
 
       if (!user || !roles.includes(user.role_name)) {
+        console.log(`User ${userId} has role ${user?.role_name}, access denied`);
         return res.status(403).json({ message: "Access denied" });
       }
 
@@ -349,7 +352,8 @@ export const validateSession = (req: ValidationRequest, res: Response) => {
   const token = req.cookies.accessToken;
 
   if (!token) {
-    return res.status(401).json({ message: "Unauthorized" });
+    console.log("Access token not found in cookies");
+    return res.status(401).json({ message: "Access token not found" });
   }
 
   try {
