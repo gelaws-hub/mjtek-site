@@ -2,6 +2,7 @@ import { Request, Response, NextFunction, RequestHandler } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { PrismaClient } from "@prisma/client";
+import { sendActivationEmail } from "../utils/mailer";
 import crypto from "crypto";
 import NodeCache from "node-cache";
 import dotenv from "dotenv";
@@ -39,7 +40,13 @@ export const ensureAuthenticated: RequestHandler = async (req, res, next) => {
   try {
     // Verify the token using the secret
     const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!) as any;
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.id },
+    });
 
+    if (!user?.is_active) {
+      return res.status(403).json({ message: 'Please activate your account first' });
+    }
     // Attach the user data to the request
     (req as any).user = {
       id: decoded.id,
@@ -79,6 +86,9 @@ export const registerUser = async (req: Request, res: Response) => {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Generate activation token
+    const activationToken = crypto.randomBytes(32).toString('hex');
+
     // Buat user
     const user = await prisma.user.create({
       data: {
@@ -87,18 +97,56 @@ export const registerUser = async (req: Request, res: Response) => {
         password: hashedPassword,
         address,
         phone_number,
+        activation_token: activationToken,
+        is_active: false,
         role_name: "buyer", // Set default role sebagai user biasa(pembeli)
         profile_pic:
           "https://raw.githubusercontent.com/gelaws-hub/mjtek-site/refs/heads/main/frontend/public/image.png",
       },
     });
 
-    res.status(201).json({ message: "User registered successfully", user });
+    // Kirim email aktivasi
+    const activationLink = `${process.env.BASE_URL}/activate?token=${activationToken}`;
+    await sendActivationEmail(email, activationLink);
+
+    res.status(201).json({
+      message: 'User registered successfully. Please check your email to activate your account.',
+      user,
+    });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: 'Server error' });
   }
 };
+
+//Aktivasi Akun
+export const activateUser = async (req: Request, res: Response) => {
+  const { token } = req.body;
+
+  try {
+    const user = await prisma.user.findFirst({
+      where: { activation_token: token },
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid or expired activation token' });
+    }
+
+    // Aktifkan akun
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        is_active: true,
+        activation_token: null,  // Hapus token setelah aktivasi
+      },
+    });
+
+    res.status(200).json({ message: 'Account activated successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 
 // Login user
 export const login = async (req: Request, res: Response) => {
@@ -121,6 +169,10 @@ export const login = async (req: Request, res: Response) => {
 
     if (!passwordMatch) {
       return res.status(401).json({ message: "Email or password is invalid" });
+    }
+
+    if (!user.is_active) {
+      return res.status(403).json({ message: "Please activate your account first" });
     }
 
       const accessToken = jwt.sign(
