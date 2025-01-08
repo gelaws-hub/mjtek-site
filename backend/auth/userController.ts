@@ -106,7 +106,7 @@ export const registerUser = async (req: Request, res: Response) => {
     });
 
     // Kirim email aktivasi
-    const activationLink = `${process.env.BASE_URL}/activate?token=${activationToken}`;
+    const activationLink = `${process.env.CORS_ALLOWED_ORIGINS}/activate?token=${activationToken}`;
     await sendActivationEmail(email, activationLink);
 
     res.status(201).json({

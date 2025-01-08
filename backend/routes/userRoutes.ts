@@ -1,6 +1,7 @@
 import express from 'express';
 import { 
-    registerUser, 
+    registerUser,
+    activateUser, 
     login,  
     refreshToken,
     getCurrentUser,
@@ -18,6 +19,9 @@ const userRoutes = express.Router();
 // REGISTER USER
 userRoutes.post('/register', registerUser);
 
+// ACTIVATE USER
+userRoutes.post('/activate', activateUser);
+
 // LOGIN USER
 userRoutes.post('/login', login);
 
@@ -27,11 +31,6 @@ userRoutes.post('/login', login);
 // REFRESH TOKEN
 userRoutes.post('/refresh-token', refreshToken);
 
-// GENERATE 2FA QR CODE (Protected route - user must be authenticated)
-// userRoutes.get('/2fa/qrcode', ensureAuthenticated, generate2FAQRCode);
-
-// VALIDATE 2FA (Protected route - user must be authenticated)
-// userRoutes.post('/2fa/validate', ensureAuthenticated, validate2FA);
 
 // GET CURRENT USER (Protected route - user must be authenticated)
 userRoutes.get('/me', ensureAuthenticated, getCurrentUser);
