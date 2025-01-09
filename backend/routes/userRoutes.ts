@@ -2,7 +2,9 @@ import express from 'express';
 import { 
     registerUser,
     activateUser, 
-    login,  
+    login,
+    requestResetPassword,
+    resetPassword,  
     refreshToken,
     getCurrentUser,
     getUsers, 
@@ -25,12 +27,14 @@ userRoutes.post('/activate', activateUser);
 // LOGIN USER
 userRoutes.post('/login', login);
 
-// LOGIN 2FA
-// userRoutes.post('/login-2fa', login2FA);
+// RESET PASSWORD REQUEST
+userRoutes.post('/request-reset-password', requestResetPassword);
+
+// SAVE NEW PASSWORD
+userRoutes.post('/reset-password', resetPassword);
 
 // REFRESH TOKEN
 userRoutes.post('/refresh-token', refreshToken);
-
 
 // GET CURRENT USER (Protected route - user must be authenticated)
 userRoutes.get('/me', ensureAuthenticated, getCurrentUser);
