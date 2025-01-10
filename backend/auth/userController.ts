@@ -2,6 +2,7 @@ import { Request, Response, NextFunction, RequestHandler } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { PrismaClient } from "@prisma/client";
+import { sendActivationEmail, sendResetPasswordEmail } from "../utils/mailer";
 import crypto from "crypto";
 import NodeCache from "node-cache";
 import dotenv from "dotenv";
@@ -32,13 +33,20 @@ export const ensureAuthenticated: RequestHandler = async (req, res, next) => {
 
   // If no token is found in cookies, return 401 Unauthorized
   if (!token) {
+    console.log("Access token not found in cookies");
     return res.status(401).json({ message: "Access token not found" });
   }
 
   try {
     // Verify the token using the secret
     const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!) as any;
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.id },
+    });
 
+    if (!user?.is_active) {
+      return res.status(403).json({ message: 'Please activate your account first' });
+    }
     // Attach the user data to the request
     (req as any).user = {
       id: decoded.id,
@@ -78,6 +86,9 @@ export const registerUser = async (req: Request, res: Response) => {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Generate activation token
+    const activationToken = crypto.randomBytes(32).toString('hex');
+
     // Buat user
     const user = await prisma.user.create({
       data: {
@@ -86,18 +97,57 @@ export const registerUser = async (req: Request, res: Response) => {
         password: hashedPassword,
         address,
         phone_number,
+        activation_token: activationToken,
+        reset_password_token: null,
+        is_active: false,
         role_name: "buyer", // Set default role sebagai user biasa(pembeli)
         profile_pic:
           "https://raw.githubusercontent.com/gelaws-hub/mjtek-site/refs/heads/main/frontend/public/image.png",
       },
     });
 
-    res.status(201).json({ message: "User registered successfully", user });
+    // Kirim email aktivasi
+    const activationLink = `${process.env.CORS_ALLOWED_ORIGINS}/activate?token=${activationToken}`;
+    await sendActivationEmail(email, activationLink);
+
+    res.status(201).json({
+      message: 'User registered successfully. Please check your email to activate your account.',
+      user,
+    });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: 'Server error' });
   }
 };
+
+//Aktivasi Akun
+export const activateUser = async (req: Request, res: Response) => {
+  const { token } = req.body;
+
+  try {
+    const user = await prisma.user.findFirst({
+      where: { activation_token: token },
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid or expired activation token' });
+    }
+
+    // Aktifkan akun
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        is_active: true,
+        activation_token: null,  // Hapus token setelah aktivasi
+      },
+    });
+
+    res.status(200).json({ message: 'Account activated successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 
 // Login user
 export const login = async (req: Request, res: Response) => {
@@ -122,18 +172,10 @@ export const login = async (req: Request, res: Response) => {
       return res.status(401).json({ message: "Email or password is invalid" });
     }
 
-    if (user.fa_enable) {
-      const tempToken = crypto.randomUUID();
-      cache.set(
-        `tempToken_${tempToken}`,
-        user.id,
-        parseInt(process.env.CACHE_TEMP_TOKEN_EXPIRATION!)
-      );
-      return res.status(200).json({
-        tempToken,
-        expiresInSeconds: process.env.CACHE_TEMP_TOKEN_EXPIRATION,
-      });
-    } else {
+    if (!user.is_active) {
+      return res.status(403).json({ message: "Please activate your account first" });
+    }
+
       const accessToken = jwt.sign(
         {
           id: user.id,
@@ -195,7 +237,7 @@ export const login = async (req: Request, res: Response) => {
         // accessToken, // access token is received via http only cookie
         // refreshToken, this should never be delivered to client
       });
-    }
+    
   } catch (error: any) {
     return res.status(500).json({ message: error.message });
   }
@@ -298,13 +340,26 @@ export const getUsers = async (_req: ValidationRequest, res: Response) => {
 };
 
 // Logout User
-export const logoutUser: RequestHandler = (req, res) => {
+export const logoutUser: RequestHandler = async (req, res) => {
   try {
-    // Clear the cookie storing the access token
+    const userId = (req as any).user?.id;
+
+    if (userId) {
+      await prisma.user_refresh_token.deleteMany({
+        where: { user_id: userId },
+      });
+    }
+
     res.clearCookie("accessToken", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // Use secure cookies in production
-      sameSite: "strict", // Prevent CSRF attacks
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
     });
 
     return res.status(200).json({ message: "Successfully logged out." });
@@ -312,6 +367,99 @@ export const logoutUser: RequestHandler = (req, res) => {
     return res
       .status(500)
       .json({ message: "Failed to log out.", error: error.message });
+  }
+};
+
+// Meminta reset password
+export const requestResetPassword = async (req: Request, res: Response) => {
+  const { email } = req.body;
+
+  try {
+    const user = await prisma.user.findUnique({ where: { email } });
+
+    if (user) {
+      // Generate reset token
+      const resetToken = crypto.randomBytes(32).toString("hex");
+      const expires = new Date();
+      expires.setHours(expires.getHours() + 1);
+
+      // Update token di database
+      await prisma.user.update({
+        where: { email },
+        data: {
+          reset_password_token: resetToken,
+          reset_password_expires: expires,
+        },
+      });
+
+      // Kirim email reset password
+      const resetLink = `${process.env.CORS_ALLOWED_ORIGINS}/reset-password?token=${resetToken}`;
+      await sendResetPasswordEmail(user.email, resetLink);
+    }
+
+    // Selalu kirim respons sukses meskipun email tidak ditemukan
+    res.status(200).json({
+      message: "Jika email terdaftar, link reset password akan dikirim.",
+    });
+  } catch (error: any) {
+    console.error("Error on reset password request:", error.message);
+    res.status(500).json({
+      message: "Terjadi kesalahan saat memproses permintaan reset password.",
+    });
+  }
+};
+
+// Validasi token reset password
+export const validateResetPasswordToken = async (token: string) => {
+  const user = await prisma.user.findFirst({
+    where: {
+      reset_password_token: token,
+      reset_password_expires: { gt: new Date() }, // Token belum kadaluwarsa
+    },
+  });
+
+  if (!user) {
+    throw new Error('Invalid or expired reset token');
+  }
+
+  return user;
+};
+
+// Reset password
+export const resetPassword = async (req: Request, res: Response) => {
+  try {
+    const { token, newPassword } = req.body;
+
+    if (!token || !newPassword) {
+      return res
+        .status(400)
+        .json({ message: 'Token and new password are required.' });
+    }
+
+    // Validasi token
+    const user = await validateResetPasswordToken(token);
+
+    // Hash password baru
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update password user
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        password: hashedPassword,
+        reset_password_token: null,
+        reset_password_expires: null,
+      },
+    });
+
+    res.status(200).json({ message: 'Password berhasil diubah.' });
+  } catch (error: any) {
+    console.error('Reset password error:', error.message);
+
+    res.status(500).json({
+      message:
+        error.message || 'Terjadi kesalahan server saat mengubah password.',
+    });
   }
 };
 
@@ -332,6 +480,7 @@ export const authorize = (roles: string[]) => {
       });
 
       if (!user || !roles.includes(user.role_name)) {
+        console.log(`User ${userId} has role ${user?.role_name}, access denied`);
         return res.status(403).json({ message: "Access denied" });
       }
 
@@ -349,7 +498,8 @@ export const validateSession = (req: ValidationRequest, res: Response) => {
   const token = req.cookies.accessToken;
 
   if (!token) {
-    return res.status(401).json({ message: "Unauthorized" });
+    console.log("Access token not found in cookies");
+    return res.status(401).json({ message: "Access token not found" });
   }
 
   try {

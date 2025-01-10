@@ -124,8 +124,11 @@ model user {
   address        String
   phone_number   String
   profile_pic    String
-  fa_enable      Boolean              @default(false)
-  fa_secret      String?
+  is_active      Boolean             @default(false)
+  activation_token        String?
+  reset_password_token    String?
+  reset_password_expires  DateTime?
+  created_at     DateTime @default(now())
   refresh_tokens user_refresh_token[]
   simulation     simulation[]
   transaction    transaction[]
