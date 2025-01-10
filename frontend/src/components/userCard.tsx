@@ -34,6 +34,42 @@ export default function UserCard({
 }) {
   const [loading, setLoading] = useState(false);
 
+  const handleProfilePictureChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!event.target.files || event.target.files.length === 0) {
+      return;
+    }
+  
+    const file = event.target.files[0];
+    const formData = new FormData();
+    formData.append("profile_pic", file);
+  
+    setLoading(true);
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/${userData.id}/upload-profile-picture`, {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      });
+  
+      if (response.ok) {
+        const responseData = await response.json();
+        toast.success("Foto profil berhasil diunggah!");
+        // Update UI with the new profile picture
+        window.location.reload(); // Reload the page to reflect the new profile picture
+      } else {
+        const errorResponse = await response.json();
+        console.error("Error dari backend:", errorResponse);
+        toast.error(errorResponse.message || "Gagal mengunggah foto profil.");
+      }
+    } catch (error: any) {
+      console.error("Error dari backend:", error.message);
+      toast.error("Terjadi kesalahan. Silakan coba lagi.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+
   const handleChangePassword = async () => {
     setLoading(true);
     try {
@@ -69,19 +105,28 @@ export default function UserCard({
         </DialogHeader>
         <div className="space-y-6">
           <div className="flex flex-col items-center gap-4">
-            <Avatar className="h-32 w-32">
-              <AvatarImage src={userData.profile_pic} alt="Profile picture" />
-              <AvatarFallback>
-                <User className="h-16 w-16" />
-              </AvatarFallback>
-            </Avatar>
-            <Button variant="outline" className="w-full max-w-[200px]">
+          <Avatar className="h-32 w-32">
+            <AvatarImage src={userData.profile_pic} alt="Profile picture" />
+            <AvatarFallback>
+              <User className="h-16 w-16" />
+            </AvatarFallback>
+          </Avatar>
+          <Button asChild variant="outline" className="w-full max-w-[200px]">
+            <label htmlFor="upload-photo">
               Choose Photo
-            </Button>
-            <p className="text-muted-foreground text-center text-xs">
-              Besar file: maksimum 1 MB. Ekstensi file yang diperbolehkan: JPG,
-              JPEG, PNG
-            </p>
+              <input
+                id="upload-photo"
+                type="file"
+                accept="image/jpeg, image/png"
+                className="hidden-input"
+                onChange={handleProfilePictureChange}
+              />
+            </label>
+          </Button>
+          <p className="text-muted-foreground text-center text-xs">
+            Besar file: maksimum 1 MB. Ekstensi file yang diperbolehkan: JPG, JPEG, PNG
+          </p>
+
           </div>
 
           <div className="space-y-4">
