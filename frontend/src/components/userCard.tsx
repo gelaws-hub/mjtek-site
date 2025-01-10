@@ -37,22 +37,23 @@ export default function UserCard({
   const handleChangePassword = async () => {
     setLoading(true);
     try {
-      const response = await fetch("/api/auth/request-password-reset", {
+      console.log("Mengirim permintaan ke backend..."); // Debug log
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/change-password`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`, // Pastikan token dikirim
-        },
-        body: JSON.stringify({ userId: userData.id }), // Opsional jika ID diperlukan
+        credentials: "include",
       });
-
+  
       if (response.ok) {
-        toast.success("Email untuk reset password telah dikirim!");
+        const responseData = await response.json(); // Parse the response data as JSON
+        console.log("Respons dari backend:", responseData); // Debug log
+        toast.success("Email untuk ganti password telah dikirim!");
       } else {
-        const errorData = await response.json();
-        toast.error(errorData.message || "Gagal mengirim email reset password.");
+        const errorResponse = await response.json();
+        console.error("Error dari backend:", errorResponse); // Debug log
+        toast.error(errorResponse.message || "Gagal mengirim email ganti password.");
       }
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Error dari backend:", error.response?.data || error.message); // Debug log
       toast.error("Terjadi kesalahan. Silakan coba lagi.");
     } finally {
       setLoading(false);
