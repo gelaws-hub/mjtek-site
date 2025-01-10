@@ -68,5 +68,5 @@ app.use((req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
-  console.log(uploadsDir);
+  // console.log(uploadsDir);
 });

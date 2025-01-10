@@ -183,6 +183,15 @@ export default function Login() {
                   Buat akun
                 </Link>
               </p>
+              <p className="text-sm font-light text-gray-500">
+                Lupa Password?{" "}
+                <Link
+                  href="/forgetPassword"
+                  className="text-primary-600 font-medium hover:underline"
+                >
+                  Ubah Password
+                </Link>
+              </p>
             </form>
           </div>
         </section>

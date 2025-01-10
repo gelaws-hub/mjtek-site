@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,6 +10,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { User } from "lucide-react";
+import { toast } from "react-toastify"; // Gunakan library untuk notifikasi
 
 interface UserData {
   id: string;
@@ -33,12 +32,36 @@ export default function UserCard({
   userData: UserData;
   onLogout?: () => void;
 }) {
+  const [loading, setLoading] = useState(false);
+
+  const handleChangePassword = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("/api/auth/request-password-reset", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Pastikan token dikirim
+        },
+        body: JSON.stringify({ userId: userData.id }), // Opsional jika ID diperlukan
+      });
+
+      if (response.ok) {
+        toast.success("Email untuk reset password telah dikirim!");
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData.message || "Gagal mengirim email reset password.");
+      }
+    } catch (error) {
+      toast.error("Terjadi kesalahan. Silakan coba lagi.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Dialog>
-      <DialogTrigger asChild>
-        {/* <Button variant="outline">View Profile</Button> */}
-        {btnTrigger}
-      </DialogTrigger>
+      <DialogTrigger asChild>{btnTrigger}</DialogTrigger>
       <DialogContent className="w-[90%] max-w-md rounded-md bg-inherit">
         <DialogHeader>
           <DialogTitle>Biodata Diri</DialogTitle>
@@ -108,8 +131,13 @@ export default function UserCard({
             </div>
           </div>
           <div className="space-y-2">
-            <Button variant="outline" className="w-full">
-              Change Password
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={handleChangePassword}
+              disabled={loading}
+            >
+              {loading ? "Processing..." : "Change Password"}
             </Button>
             <Button onClick={onLogout} variant="outline" className="w-full">
               Logout
