@@ -30,12 +30,12 @@ export default function ProductCardItem({
     <div className="group relative overflow-visible">
       <div
         className={cn(
-          "relative flex max-w-[250px] flex-col rounded-lg border bg-white transition-all duration-300 ease-in-out [box-shadow:0px_-2px_5px_rgba(0,0,0,0.03),0px_2px_5px_rgba(0,0,0,0.03)] group-hover:z-10 group-hover:scale-[102%] group-hover:[box-shadow:0px_-4px_10px_rgba(0,0,0,0.1),0px_4px_10px_rgba(0,0,0,0.1)] lg:group-hover:absolute",
+          "relative flex max-w-[250px] flex-col rounded-lg border bg-white transition-all duration-300 ease-in-out [box-shadow:0px_-2px_5px_rgba(0,0,0,0.03),0px_2px_5px_rgba(0,0,0,0.03)] group-hover:z-10 group-hover:scale-[102%]",
           className,
         )}
       >
         {product.media_source && (
-          <Link href={productUrl} className="relative flex aspect-[1/1]">
+          <Link href={productUrl} className="relative flex aspect-[1/1] overflow-hidden">
             <Image
               src={product.media_source}
               alt={product.product_name}

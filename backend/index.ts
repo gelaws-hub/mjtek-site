@@ -17,8 +17,8 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(cookieParser());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json({ limit: '10mb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 
 // Get the allowed origins from the environment variables (comma-separated)
 const allowedOrigins = process.env.CORS_ALLOWED_ORIGINS
@@ -64,7 +64,6 @@ app.get("/", (req, res) => {
 app.use((req, res) => {
   res.status(404).send("Not Found");
 });
-
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

@@ -171,10 +171,10 @@ export const login = async (req: Request, res: Response) => {
 
       res.cookie("accessToken", accessToken, {
         httpOnly: false, // Prevent client-side access
-        // secure: isProduction, // Use HTTPS in production
-        // sameSite: isProduction ? "none" : "strict", // Prevent CSRF attacks
-        sameSite: "none",
-        secure: true,
+        secure: isProduction, // Use HTTPS in production
+        sameSite: isProduction ? "none" : "strict", // Prevent CSRF attacks
+        // sameSite: "none",
+        // secure: true,
         maxAge: 86400 * 1000, // 1 day expiration
       });
 
