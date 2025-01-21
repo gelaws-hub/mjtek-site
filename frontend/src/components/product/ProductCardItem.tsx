@@ -30,7 +30,7 @@ export default function ProductCardItem({
     <div className="group relative overflow-visible">
       <div
         className={cn(
-          "relative flex max-w-[250px] flex-col rounded-lg border bg-white transition-all duration-300 ease-in-out [box-shadow:0px_-2px_5px_rgba(0,0,0,0.03),0px_2px_5px_rgba(0,0,0,0.03)] group-hover:z-10 group-hover:scale-[102%]",
+          "relative flex max-w-[300px] flex-col rounded-lg border bg-white transition-all duration-300 ease-in-out [box-shadow:0px_-2px_5px_rgba(0,0,0,0.03),0px_2px_5px_rgba(0,0,0,0.03)] group-hover:z-10 group-hover:scale-[102%]",
           className,
         )}
       >
@@ -59,7 +59,7 @@ export default function ProductCardItem({
         </Link>
         <div className="items-center justify-between p-2 group-hover:flex">
           <AddToCardButton
-            className="w-full h-8"
+            className="w-full h-9 bg-blue-900 hover:bg-blue-950"
             product_id={product.id}
             afterAddToCart={afterAddToCart}
           >

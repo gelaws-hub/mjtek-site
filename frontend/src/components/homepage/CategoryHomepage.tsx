@@ -18,7 +18,6 @@ export default function CategoryHomepage({
         <span className="border-x-[6px] border-blue-900 border-solid mx-4 rounded-md"></span>
         kategori
       </h1>
-      <h1 className="text-2xl font-bold mb-4">Cari berdasarkan kategori</h1>
       <div className="flex gap-2 items-center overflow-x-scroll scrollbar-none">
         {categoryData.map((c) => (
           <Link

@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import Breadcrumb from "@/components/BreadCrump"; // Import Breadcrumb
 import "react-toastify/dist/ReactToastify.min.css";
 import { ToastContainer } from "react-toastify";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "MJ Teknologi Semarang",
@@ -25,7 +26,10 @@ export default function RootLayout({
       <body>
         <ToastContainer />
         <Header />
-        <div className="min-h-screen">{children}</div>
+        <div className="min-h-screen">
+          {children}
+          <Toaster />
+        </div>
         <Footer />
       </body>
     </html>

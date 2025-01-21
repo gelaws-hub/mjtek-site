@@ -11,12 +11,12 @@ export default function DefaultLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   return (
     <>
-      <div className="flex">
+      <div className="flex dark:bg-boxdark-2 dark:text-bodydark min-h-screen w-full">
         <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-        <div className="relative flex flex-1 flex-col lg:ml-72.5">
+        <div className="relative flex flex-col lg:pl-72.5 w-full">
           <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-          <main>
-            <div className="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
+          <main className="w-full h-full">
+            <div className="mx-auto p-2 md:p-3 2xl:p-4 w-full">
               {children}
             </div>
           </main>

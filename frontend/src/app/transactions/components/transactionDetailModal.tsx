@@ -13,11 +13,13 @@ import InvoicePDF from "../../../components/transaction/invoicePdf";
 interface TransactionDetailModalProps {
   transaction: Transaction;
   onClose: () => void;
+  AccentColor?: string;
 }
 
 export default function TransactionDetailModal({
   transaction,
   onClose,
+  AccentColor = "",
 }: TransactionDetailModalProps) {
   const formatPrice = (price: string | number) => {
     return new Intl.NumberFormat("id-ID", {
@@ -38,19 +40,20 @@ export default function TransactionDetailModal({
 
   return (
     <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="max-w-[90%] rounded-lg bg-white md:max-w-[620px]">
+      <DialogContent className="max-h-[90vh] max-w-[90%] overflow-y-auto rounded-lg bg-white scrollbar-thin md:max-w-[620px]">
         <DialogHeader className="flex flex-col items-start">
           <DialogTitle>Detail Transaksi</DialogTitle>
           <DialogDescription className="text-left">
             Transaction ID: {transaction.id}
           </DialogDescription>
         </DialogHeader>
-        <div>
+        <div className="h-full">
           <div className="mb-4 flex items-center justify-between">
             <span
-              className={`rounded-full bg-blue-500 px-3 py-1 text-sm font-semibold text-white ${transaction.status.status_id === 0 && "bg-red-500"}`}
+              className={`rounded-full px-3 py-1 text-xs text-white md:text-sm bg-${AccentColor}
+              `}
             >
-              {transaction.status.status_name}
+              {transaction.status.status_description}
             </span>
           </div>
 
@@ -62,24 +65,30 @@ export default function TransactionDetailModal({
               Selesai: {formatDate(transaction.end_time)}
             </p>
           )}
-          <h3 className="mb-2 text-lg font-semibold">Bukti Pembayaran</h3>
           {transaction.payment_proof && (
+            <div className="flex flex-col rounded-lg border p-2">
+              <h3 className="mb-2 text-base font-semibold md:text-lg">
+                Bukti Pembayaran
+              </h3>
               <a
                 href={transaction.payment_proof}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="h-24 w-24 flex items-center justify-center"
+                className="flex h-24 w-full items-center justify-center"
               >
                 <Image
                   src={transaction.payment_proof}
                   alt="Proof"
                   width={100}
                   height={100}
-                  className="rounded object-contain w-full h-full"
+                  className="h-full w-full rounded object-cover"
                 />
               </a>
+            </div>
           )}
-          <h3 className="mb-2 text-lg font-semibold">Produk</h3>
+          <h3 className="mb-2 mt-2 text-base font-semibold md:text-lg">
+            Produk
+          </h3>
           <div className="max-h-[300px] space-y-4 overflow-y-auto pb-2 scrollbar-thin">
             {transaction.products.map((product) => (
               <div
@@ -96,23 +105,23 @@ export default function TransactionDetailModal({
                   />
                 </div>
                 <div className="w-full">
-                  <p className="line-clamp-2 font-medium">
+                  <p className="line-clamp-2 text-xs font-medium md:text-sm">
                     {product.product_name}
                   </p>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-xs text-gray-600 md:text-sm">
                     Jumlah: {product.quantity}
                   </p>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-xs text-gray-600 md:text-sm">
                     Harga: {formatPrice(product.price)}
                   </p>
-                  <p className="text-sm font-semibold">
+                  <p className="text-xs font-semibold md:text-sm">
                     Total: {formatPrice(product.total_price)}
                   </p>
                 </div>
               </div>
             ))}
           </div>
-          <p className="mb-2 flex border-t pt-2 text-xl font-bold">
+          <p className="text-md mb-2 flex border-t pt-2 font-bold md:text-lg">
             Total:{" "}
             <span className="ml-auto">
               {formatPrice(transaction.total_price)}

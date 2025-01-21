@@ -9,15 +9,22 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import CancelTransactionBtn from "./cancelTransactionBtn";
+import { cn } from "@/lib/utils";
 
 interface TransactionCardProps {
   transaction: Transaction;
   onOpenModal: () => void;
+  className?: string;
+  AccentColor?: string;
+  children?: React.ReactNode;
 }
 
 export default function TransactionCard({
   transaction,
   onOpenModal,
+  className = "",
+  AccentColor = "",
+  children = null,
 }: TransactionCardProps) {
   const formatPrice = (price: string | number) => {
     return new Intl.NumberFormat("id-ID", {
@@ -39,12 +46,12 @@ export default function TransactionCard({
   const firstProduct = transaction.products[0];
 
   return (
-    <div className="rounded-lg border bg-white shadow-sm">
+    <div className={cn("rounded-lg border bg-white shadow-sm flex flex-col relative", className)}>
       {/* Header */}
       <div className="flex flex-row items-center justify-between border-b p-4">
         <div className="flex w-full flex-col items-start justify-start gap-2 md:flex-row md:items-center">
           <div className="flex flex-col items-start">
-            <p className="w-full text-sm text-blue-900">
+            <p className={`w-full text-sm text-${AccentColor || "blue-600"}`}>
               {formatDate(transaction.start_time)}
               {transaction.end_time && (
                 <span>
@@ -56,9 +63,9 @@ export default function TransactionCard({
             <p className="ml-auto text-xs text-gray-500">{transaction.id}</p>
           </div>
           <p
-            className={`ml-auto rounded bg-blue-100 px-2 py-0.5 text-xs font-medium ${transaction.status.status_id === 0 ? "text-red-700" : "text-blue-700"}`}
+            className={`ml-auto rounded bg-slate-100 px-2 py-0.5 text-xs font-medium text-${AccentColor || "blue-600"}`}
           >
-            {transaction.status.status_name}
+            {transaction.status.status_description}
           </p>
         </div>
       </div>
@@ -88,11 +95,13 @@ export default function TransactionCard({
         </div>
       </div>
 
+      {children}
+
       {/* Actions */}
       <div className="flex items-center justify-between border-t px-4 py-3">
         <Button
           variant="link"
-          className="p-0 text-blue-600"
+          className={`p-0 text-${AccentColor?.startsWith("gray") ? "blue-600" : AccentColor || "blue-600"}`}
           onClick={onOpenModal}
         >
           Lihat Detail Transaksi
@@ -101,7 +110,7 @@ export default function TransactionCard({
           <Button
             variant="default"
             size="sm"
-            className="w-full bg-blue-600 hover:bg-blue-700"
+            className={`w-full bg-${AccentColor?.startsWith("gray") ? "blue-600" : AccentColor || "blue-600"}`}
           >
             Beli Lagi
           </Button>

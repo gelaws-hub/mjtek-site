@@ -24,14 +24,14 @@ export default function Sidebar({ sidebarData }: SidebarProps) {
   };
 
   return (
-    <ul className="flex flex-col ml-auto gap-4 p-2 border-r-2 border-gray-100 pt-8 pr-4">
+    <ul className="flex flex-col ml-auto gap-4 p-2 border-r-2 border-gray-100 pt-8 pr-4 w-full">
       {sidebarData.map((item) => (
         <li key={item.name}>
           {item.subItems ? (
             <div className="">
               <button
                 onClick={() => toggleExpand(item.name)}
-                className="hover:text-blue-950 hover:font-semibold flex justify-between w-full items-center pr-2"
+                className="hover:text-blue-950 flex justify-between w-full items-center pr-2"
               >
                 <p>{item.name}</p>
                 <div
@@ -50,7 +50,7 @@ export default function Sidebar({ sidebarData }: SidebarProps) {
                 {item.subItems.map((subItem) => (
                   <li key={subItem.name}>
                     <Link
-                      className="hover:text-blue-950 hover:font-bold w-full py-2"
+                      className="hover:text-blue-950 w-full py-2"
                       href={subItem.url!}
                     >
                       {subItem.name}
@@ -61,7 +61,7 @@ export default function Sidebar({ sidebarData }: SidebarProps) {
             </div>
           ) : (
             <Link
-              className="hover:text-blue-950 hover:font-bold"
+              className="hover:text-blue-950 hover:underline"
               href={item.url!}
             >
               {item.name}

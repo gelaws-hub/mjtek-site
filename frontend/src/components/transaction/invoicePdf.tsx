@@ -7,6 +7,7 @@ import {
   Image,
 } from "@react-pdf/renderer";
 import { Transaction } from "@/types/transaction";
+import { Link } from "lucide-react";
 
 // Define styles
 const styles = StyleSheet.create({
@@ -51,6 +52,10 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "right",
   },
+  link: {
+    color: "blue",
+    textDecoration: "none",
+  },
 });
 
 interface InvoicePDFProps {
@@ -78,7 +83,10 @@ export default function InvoicePDF({ transaction }: InvoicePDFProps) {
     <Document>
       <Page style={styles.page}>
         {/* Header */}
-        <Image src={"/logo_mjtek_transparent.png"} style={styles.productImage} />
+        <Image
+          src={"/logo_mjtek_transparent.png"}
+          style={styles.productImage}
+        />
         <Text style={styles.header}>Invoice</Text>
         <View style={styles.section}>
           <Text>ID Transaksi : {transaction.id}</Text>
@@ -88,19 +96,28 @@ export default function InvoicePDF({ transaction }: InvoicePDFProps) {
             <Text>Selesai : {formatDate(transaction.end_time)}</Text>
           )}
         </View>
+        <View>
+          <Text>Nama Pengguna : {transaction.user.name}</Text>
+          <Text>Email : {transaction.user.email}</Text>
+          <Text>No. Telepon : {transaction.user.phone_number}</Text>
+          <Text>Alamat : {transaction.user.address}</Text>
+          {transaction.payment_proof && (
+            <>
+              <Text>Bukti Pembayaran : {transaction.payment_proof}</Text>
+              <Link href={transaction.payment_proof} />
+              <Image src={transaction.payment_proof} style={styles.logoImage} />
+            </>
+          )}
+        </View>
 
         {/* Products */}
         <Text style={styles.header}>Products</Text>
         {transaction.products.map((product) => (
           <View key={product.product_id} style={styles.productContainer}>
             {/* Product Image */}
-            <Image
-              src={product.media_source}
-            //   alt={product.product_name}
-              style={styles.productImage}
-            />
+            <Image src={product.media_source} style={styles.productImage} />
             <View style={styles.productDetails}>
-              <Text style={styles.productName}>{product.product_name}</Text>
+              <Text style={styles.productName}>{product.product_name} - {product.product_id}</Text>
               <Text>Kuantitas : {product.quantity}</Text>
               <Text>Harga : {formatPrice(product.price)}</Text>
               <Text>Total : {formatPrice(product.total_price)}</Text>

@@ -51,13 +51,15 @@ export default function CategoryPage() {
   useEffect(() => {
     if (categoryName) {
       const categoryId = categories.find(
-        (cat) => cat.category_name.toLowerCase() === categoryName // Compare in lowercase
+        (cat) =>
+          cat.category_name.toLowerCase().replace(/\s+/g, "-") === categoryName
       )?.id;
       if (categoryId) {
         fetchProducts(categoryId);
       }
     }
   }, [categoryName, categories]);
+  
 
   const fetchProducts = async (categoryId: number) => {
     try {
@@ -74,9 +76,9 @@ export default function CategoryPage() {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">
-        Products in Category: {categoryName}
+        Produk Dengan Kategori <span className="text-blue-900">{categoryName.charAt(0).toUpperCase() + categoryName.slice(1)}</span>
       </h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-[60%] mx-auto">
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(150px,200px))] gap-6 mx-auto">
         {products.length > 0 ? (
           products.map((product: ProductCardItemProps) => (
             <ProductCardItem key={product.id} product={product} />

@@ -30,13 +30,13 @@ export default function RecommendationSlider({
   }, []);
 
   return (
-    <div className={cn("w-full overflow-x-scroll scrollbar-none", className)}>
+    <div className={cn("w-full max-w-[95vw] overflow-x-scroll scrollbar-none border rounded-md", className)}>
       <div className="flex gap-2">
         {products.map((product) => (
           <ProductCardItem
             key={product.id}
             product={product}
-            className="w-[150px]"
+            className="md:w-[170px] w-[150px] max-w-[200px]"
           />
         ))}
       </div>

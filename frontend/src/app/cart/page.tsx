@@ -186,7 +186,7 @@ export default function CartPage() {
     }
   };
 
-  const handleDelete = async (product_id?: number) => {
+  const handleDelete = async (product_id?: string) => {
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/cart${product_id ? `/${product_id}` : ""}`,
@@ -282,7 +282,7 @@ export default function CartPage() {
             item={item}
             onQuantityChange={handleQuantityChange}
             onCheckItem={handleCheckItem}
-            onDeleteItem={handleDelete}
+            onDeleteItem={() => handleDelete}
             onAddToFavorite={handleAddToFavorite}
             isLoading={isLoading}
           />
@@ -290,7 +290,7 @@ export default function CartPage() {
       </div>
       {/* Product Recommendations */}
       <div className="mt-12 space-y-4">
-        <h2 className="mb-4 text-2xl font-bold">Recommended Products</h2>
+        <h2 className="mb-4 text-2xl font-bold">Rekomendasi Produk lainnya</h2>
         <ProductRecommendation
           products={recommendedProducts}
           afterAddToCart={setRefresh}
