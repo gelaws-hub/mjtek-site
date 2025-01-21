@@ -1,10 +1,31 @@
 import { Request, Response } from "express";
 import multer from "multer";
-import prisma from "../../utils/database"; // Adjust this path as needed
-import { uploadToCloudinary } from "../../utils/cloudinary"; // Import the reusable module
+import path from "path";
+import fs from "fs";
+import prisma from "../../utils/database";
 
-// Configure multer to handle file uploads in memory
-const storage = multer.memoryStorage();
+// Configure multer for local file storage
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadsDir = path.join(process.cwd(), "uploads", "transactions");
+
+    // Ensure the directory exists
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+      console.log(`Directory created: ${uploadsDir}`);
+    }
+
+    cb(null, uploadsDir);
+  },
+  filename: (req, file, cb) => {
+    const transactionId = req.params.transactionId || "unknown";
+    const timestamp = Date.now();
+    const extension = path.extname(file.originalname);
+    const fileName = `${transactionId}-${timestamp}${extension}`;
+    cb(null, fileName);
+  },
+});
+
 const fileFilter = (
   req: Request,
   file: Express.Multer.File,
@@ -17,6 +38,7 @@ const fileFilter = (
     cb(new Error("Unsupported file type. Only JPEG, PNG, and PDF are allowed."));
   }
 };
+
 const upload = multer({ storage, fileFilter }).single("proof");
 
 // Controller function
@@ -43,18 +65,22 @@ export const uploadTransactionProof = async (req: Request, res: Response) => {
         return res.status(404).json({ error: "Transaction not found." });
       }
 
-      // Upload the file to Cloudinary using the reusable module
-      const uploadResult = await uploadToCloudinary(
-        req.file.buffer,
-        "transactions", // Specify Cloudinary folder
-        `${transactionId}-${Date.now()}` // Optional custom public ID
-      );
+      // Delete the existing proof file if it exists
+      if (transaction.payment_proof) {
+        const existingFilePath = path.join(process.cwd(), transaction.payment_proof);
+        if (fs.existsSync(existingFilePath)) {
+          fs.unlinkSync(existingFilePath);
+          // console.log(`Deleted existing file: ${existingFilePath}`);
+        }
+      }
 
-      // Update the transaction record with the Cloudinary URL
+      // Save the new file path to the database
+      const filePath = `/uploads/transactions/${req.file.filename}`;
       const updatedTransaction = await prisma.transaction.update({
         where: { id: transactionId },
         data: {
-          payment_proof: uploadResult.secure_url, // Save the Cloudinary URL
+          payment_proof: filePath,
+          status_id: 3,
         },
       });
 

@@ -33,7 +33,6 @@ export const ensureAuthenticated: RequestHandler = async (req, res, next) => {
 
   // If no token is found in cookies, return 401 Unauthorized
   if (!token) {
-    console.log("Access token not found in cookies");
     return res.status(401).json({ message: "Access token not found" });
   }
 
@@ -498,7 +497,6 @@ export const validateSession = (req: ValidationRequest, res: Response) => {
   const token = req.cookies.accessToken;
 
   if (!token) {
-    console.log("Access token not found in cookies");
     return res.status(401).json({ message: "Access token not found" });
   }
 

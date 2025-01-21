@@ -36,7 +36,37 @@ export const createTransaction = async (req: Request, res: Response) => {
         .json({ message: "No selected items in the cart.", user: user.name });
     }
 
-    // 2. Calculate the total items and total price
+    // 2 Check the quantity of the selected products
+    const outOfStocks = selectedCarts.filter(
+      (cartItem) => cartItem.product.stock < cartItem.quantity
+    );
+    if (outOfStocks.length > 0) {
+      return res.status(400).json({
+        message: "Not enough stock for the following products: ",
+        outOfStocks: outOfStocks.map(
+          (item) =>
+            `${item.product.product_name} - only ${item.product.stock} left.`
+        ),
+      });
+    }
+
+    // 3 Reduce stock of products based on the cart quantities
+    await Promise.all(
+      selectedCarts.map(async (cartItem) => {
+        await prisma.product.update({
+          where: {
+            id: cartItem.product_id,
+          },
+          data: {
+            stock: {
+              decrement: cartItem.quantity,
+            },
+          },
+        });
+      })
+    );
+
+    // 4. Calculate the total items and total price
     const totalItems = selectedCarts.reduce((total, cartItem) => {
       return total + cartItem.quantity; // Sum of quantities
     }, 0);
@@ -45,10 +75,10 @@ export const createTransaction = async (req: Request, res: Response) => {
       return total + cartItem.product.price.toNumber() * cartItem.quantity; // Price * quantity for total price
     }, 0);
 
-    // 3. Generate a UUIDv7 for the transaction ID
+    // 5. Generate a UUIDv7 for the transaction ID
     const transactionUuid = uuidv7();
 
-    // 4. Create the transaction record
+    // 6. Create the transaction record
     const transaction = await prisma.transaction.create({
       data: {
         id: transactionUuid, // Use the UUIDv7 as the transaction ID
@@ -58,7 +88,7 @@ export const createTransaction = async (req: Request, res: Response) => {
       },
     });
 
-    // 5. Create the transaction details
+    // 7. Create the transaction details
     const transactionDetails = selectedCarts.map((cartItem) => ({
       product_id: cartItem.product_id,
       transaction_id: transaction.id,
@@ -70,7 +100,7 @@ export const createTransaction = async (req: Request, res: Response) => {
       data: transactionDetails,
     });
 
-    // 6. Remove the processed carts
+    // 8. Remove the processed carts
     await prisma.cart.deleteMany({
       where: {
         id: {
@@ -94,6 +124,9 @@ export const getAllTransactionsFromUser = async (
   res: Response
 ) => {
   const user = (req as CustomRequest).user;
+  const status_request = req.query.status as string | undefined;
+  const page = parseInt(req.query.page as string) || 1;
+  const limit = parseInt(req.query.limit as string) || 10;
 
   if (!user) {
     return res.status(401).json({
@@ -102,80 +135,97 @@ export const getAllTransactionsFromUser = async (
     });
   }
 
+  const statuses: { [key: string]: number[] } = {
+    checking: [1, 2, 3],
+    processing: [4, 5],
+    shipping: [6, 7, 8, 9],
+    dispute: [10, 99],
+    finished: [0, 11],
+  };
+
+  // Determine the status IDs to filter by
+  const statusIds = status_request ? statuses[status_request] : undefined;
+
   try {
-    // Raw SQL query to fetch transactions with product media
-    const transactions: Array<any> = await prisma.$queryRaw`
-      SELECT 
-        t.id AS transaction_id,
-        t.user_id,
-        t.total_items,
-        t.total_price,
-        t.start_time,
-        t.end_time,
-        t.payment_proof,
-        ts.id AS status_id,
-        ts.name AS status_name,
-        ts.description AS status_description,
-        td.product_id,
-        p.product_name,
-        td.quantity,
-        p.price AS product_price,
-        td.total_price AS product_total_price,
-        m.source AS media_source
-      FROM transaction t
-      JOIN transaction_status ts ON t.status_id = ts.id
-      JOIN transaction_detail td ON t.id = td.transaction_id
-      JOIN product p ON td.product_id = p.id
-      LEFT JOIN media m ON p.id = m.product_id AND m.file_type = 'image'
-      WHERE t.user_id = ${user.id}
-      GROUP BY t.id, td.id, p.id, m.source
-    `;
-
-    // Transform the raw data into the desired format
-    const transformed = Object.values(
-      transactions.reduce((acc: any, row: any) => {
-        if (!acc[row.transaction_id]) {
-          acc[row.transaction_id] = {
-            id: row.transaction_id,
-            user_id: row.user_id,
-            total_items: row.total_items,
-            total_price: row.total_price,
-            start_time: row.start_time,
-            end_time: row.end_time,
-            payment_proof: row.payment_proof ? `${process.env.BASE_URL}${row.payment_proof}` : null,
-            status: {
-              status_id: row.status_id,
-              status_name: row.status_name,
-              status_description: row.status_description,
+    // Fetch transactions with Prisma
+    const transactions = await prisma.transaction.findMany({
+      where: {
+        user_id: user.id,
+        ...(statusIds && { status_id: { in: statusIds } }),
+      },
+      orderBy: {
+        start_time: "desc",
+      },
+      include: {
+        user: true,
+        transaction_status: true,
+        transaction_detail: {
+          include: {
+            product: {
+              include: {
+                media: {
+                  where: {
+                    file_type: "image",
+                  },
+                  select: {
+                    source: true,
+                  },
+                },
+              },
             },
-            products: [],
-          };
-        }
+          },
+        },
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
 
-        const existingProduct = acc[row.transaction_id].products.find(
-          (product: any) => product.product_id === row.product_id
-        );
+    // Count the total transactions for pagination
+    const totalTransactions = await prisma.transaction.count({
+      where: {
+        user_id: user.id,
+        ...(statusIds && { status_id: { in: statusIds } }),
+      },
+    });
 
-        if (!existingProduct) {
-          acc[row.transaction_id].products.push({
-            product_id: row.product_id,
-            product_name: row.product_name,
-            quantity: row.quantity,
-            price: Number(row.product_price),
-            total_price: Number(row.product_total_price),
-            media_source: row.media_source || null, // Include the media source
-          });
-        }
-
-        return acc;
-      }, {})
-    );
+    // Transform the data into the desired format
+    const transformed = transactions.map((transaction) => ({
+      id: transaction.id,
+      user_id: transaction.user_id,
+      user: transaction.user,
+      total_items: transaction.total_items,
+      total_price: transaction.total_price,
+      start_time: transaction.start_time,
+      end_time: transaction.end_time,
+      payment_proof: transaction.payment_proof
+        ? `${process.env.BASE_URL}${transaction.payment_proof}`
+        : null,
+      status: {
+        status_id: transaction.transaction_status.id,
+        status_name: transaction.transaction_status.name,
+        status_description: transaction.transaction_status.description,
+      },
+      products: transaction.transaction_detail.map((detail) => ({
+        product_id: detail.product.id,
+        product_name: detail.product.product_name,
+        quantity: detail.quantity,
+        price: detail.product.price.toNumber(),
+        total_price: detail.total_price.toNumber(),
+        media_source: detail.product.media[0]?.source || null,
+      })),
+    }));
 
     // Return the transformed transactions in the response
     return res.status(200).json({
       statusCode: 200,
       message: "Transactions fetched successfully",
       transactions: transformed,
+      pagination: {
+        total: totalTransactions,
+        page,
+        limit,
+        totalPages: Math.ceil(totalTransactions / limit),
+      },
     });
   } catch (error: any) {
     console.error("Error fetching transactions:", error);
@@ -200,33 +250,27 @@ export const getTransactionById = async (req: Request, res: Response) => {
   const { transactionId } = req.params;
 
   try {
-    const transaction: Array<any> = await prisma.$queryRaw`
-      SELECT 
-        t.id AS transaction_id,
-        t.user_id,
-        t.total_items,
-        t.total_price,
-        t.start_time,
-        t.end_time,
-        t.payment_proof,
-        ts.id AS status_id,
-        ts.description AS status_description,
-        ts.name AS status_name,
-        td.product_id,
-        p.product_name,
-        td.quantity,
-        p.price AS product_price,
-        td.total_price AS product_total_price,
-        m.source AS media_source
-      FROM transaction t
-      JOIN transaction_status ts ON t.status_id = ts.id
-      JOIN transaction_detail td ON t.id = td.transaction_id
-      JOIN product p ON td.product_id = p.id
-      LEFT JOIN media m ON p.id = m.product_id AND m.file_type = 'image'
-      WHERE t.id = ${transactionId} AND t.user_id = ${user.id}
-    `;
+    const transaction = await prisma.transaction.findUnique({
+      where: { id: transactionId },
+      include: {
+        user: true,
+        transaction_status: true,
+        transaction_detail: {
+          include: {
+            product: {
+              include: {
+                media: {
+                  where: { file_type: "image" },
+                  select: { source: true },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
 
-    if (transaction.length === 0) {
+    if (!transaction || transaction.user_id !== user.id) {
       return res.status(404).json({
         statusCode: 404,
         message: "Transaction not found for this user.",
@@ -234,25 +278,28 @@ export const getTransactionById = async (req: Request, res: Response) => {
     }
 
     const transformed = {
-      id: transaction[0].transaction_id,
-      user_id: transaction[0].user_id,
-      total_items: transaction[0].total_items,
-      total_price: transaction[0].total_price,
-      start_time: transaction[0].start_time,
-      end_time: transaction[0].end_time,
-      payment_proof: transaction[0].payment_proof ? `${process.env.BASE_URL}${transaction[0].payment_proof}` : null,
+      id: transaction.id,
+      user_id: transaction.user_id,
+      user: transaction.user,
+      total_items: transaction.total_items,
+      total_price: transaction.total_price.toNumber(),
+      start_time: transaction.start_time,
+      end_time: transaction.end_time,
+      payment_proof: transaction.payment_proof
+        ? `${process.env.BASE_URL}${transaction.payment_proof}`
+        : null,
       status: {
-        status_id: transaction[0].status_id,
-        status_name: transaction[0].status_name,
-        status_description: transaction[0].status_description,
+        status_id: transaction.transaction_status.id,
+        status_name: transaction.transaction_status.name,
+        status_description: transaction.transaction_status.description,
       },
-      products: transaction.map((row: any) => ({
-        product_id: row.product_id,
-        product_name: row.product_name,
-        quantity: row.quantity,
-        price: Number(row.product_price),
-        total_price: Number(row.product_total_price),
-        media_source: row.media_source || null,
+      products: transaction.transaction_detail.map((detail) => ({
+        product_id: detail.product.id,
+        product_name: detail.product.product_name,
+        quantity: detail.quantity,
+        price: detail.product.price.toNumber(),
+        total_price: detail.total_price.toNumber(),
+        media_source: detail.product.media[0]?.source || null,
       })),
     };
 
@@ -270,6 +317,7 @@ export const getTransactionById = async (req: Request, res: Response) => {
     });
   }
 };
+
 
 export const cancelTransaction = async (req: Request, res: Response) => {
   const user = (req as CustomRequest).user;
@@ -417,3 +465,4 @@ export const getTransactionStatuses = async (req: Request, res: Response) => {
       .json({ message: "Failed to fetch transaction statuses." });
   }
 };
+
