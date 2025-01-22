@@ -35,7 +35,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               alt="Logo"
               className="rounded-lg dark:fill-white"
             />
-            <h2 className="text-lg text-blue-900 dark:text-white">
+            <h2 className="text-lg text-white font-semibold">
               MJ teknologi
             </h2>
           </Link>

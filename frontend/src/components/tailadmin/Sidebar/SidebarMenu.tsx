@@ -1,8 +1,9 @@
 import { AdminIcon } from "@/components/icons/AdminIcon";
+import { HomeIcon } from "lucide-react";
 
 export const menuGroups = [
   {
-    name: "MENU",
+    name: "Admin Menu",
     menuItems: [
       {
         icon: (
@@ -107,11 +108,6 @@ export const menuGroups = [
         ),
         label: "Pelanggan",
         route: "/admin/buyers",
-      },
-      {
-        icon: <AdminIcon width={18} height={18} />,
-        label: "Admin",
-        route: "/admin/admins",
       },
       // {
       //   icon: (
@@ -243,6 +239,16 @@ export const menuGroups = [
       // },
     ],
   },
+  {
+    name: "Owner Menu",
+    menuItems: [
+      {
+        icon: <AdminIcon width={18} height={18} />,
+        label: "Admin",
+        route: "/admin/admins",
+      },
+    ],
+  }
   // {
   //   name: "OTHERS",
   //   menuItems: [

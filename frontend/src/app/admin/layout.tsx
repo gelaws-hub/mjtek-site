@@ -10,7 +10,6 @@ export default function AdminLayout({
 }>) {
   return (
     <Suspense>
-      <Breadcrumb />
       {children}
     </Suspense>
   );

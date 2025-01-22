@@ -1,51 +1,42 @@
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import jwt from "jsonwebtoken";
 
-export async function checkSession(request: NextRequest) {
-  const cookieStore = cookies();
-  const accessToken = cookieStore.get("accessToken")?.value;
+export function middleware(req: NextRequest) {
+  const token = req.cookies.get("accessToken")?.value;
 
-  console.log(accessToken)
+  const roleRoutes = {
+    buyer: [/^\/cart(\/.*)?$/, /^\/favorite(\/.*)?$/, /^\/cart(\/.*)?$/, /^\/transactions(\/.*)?$/],
+    admin: [/^\/admin(\/.*)?$/],
+  };
 
-  // If there's no access token, allow access to non-matcher pages
-  if (!accessToken) {
-    return NextResponse.redirect(new URL("/login", request.url));
+  console.log("Token:", token);
+
+  if (token) {
+    try {
+      const payload = JSON.parse(
+        Buffer.from(token.split(".")[1], "base64").toString("utf8"),
+      );
+
+      console.log("Payload:", payload);
+
+      const role = payload.role_name;
+      const pathname = req.nextUrl.pathname;
+      const allowedRoutes = roleRoutes[role as "buyer" | "admin"];
+      const isAuthorized = allowedRoutes?.some((route) => route.test(pathname));
+
+      if (isAuthorized) {
+        return NextResponse.next();
+      }
+
+      return NextResponse.redirect(new URL("/unauthorized", req.url));
+    } catch (err) {
+      return NextResponse.redirect(new URL("/login", req.url));
+    }
   }
 
-  try {
-    // Decode the JWT token
-    const decoded = jwt.decode(accessToken) as { role_name: string; [key: string]: any };
-
-    if (!decoded || !decoded.role_name) {
-      return NextResponse.redirect(new URL("/403", request.url));
-    }
-
-    const roleName = decoded.role_name;
-    const url = new URL(request.url).pathname;
-
-    // Check if the role is authorized for the requested URL
-    if (roleName === "buyer" && !["/favorite", "/cart"].includes(url)) {
-      return NextResponse.redirect(new URL("/403", request.url));
-    }
-
-    if (roleName === "admin" && !url.startsWith("/admin")) {
-      return NextResponse.redirect(new URL("/403", request.url));
-    }
-
-    return NextResponse.next();
-
-  } catch (error) {
-    console.error("Error decoding token:", error);
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
-}
-
-export function middleware(request: NextRequest) {
-  // checkSession(request);
+  return NextResponse.redirect(new URL("/login", req.url));
 }
 
 export const config = {
-  matcher: ["/favorite/:path*", "/cart", "/admin/:path*"], // These are the protected paths
+  matcher: ["/cart/:path*", "/favorite/:path*", "/admin/:path*"],
 };
