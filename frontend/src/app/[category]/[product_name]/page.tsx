@@ -16,6 +16,7 @@ import QuantitySelector from "@/components/product/QtySelector";
 import { ShoppingCart02Icon } from "@/components/icons/ShoppingCart02Icon";
 import AddToCartButton from "@/components/product/AddToCartButton";
 import FavoriteButton from "@/components/product/FavoriteButton";
+import { AdvancedImageGallery } from "./components/AdvancedImageGallery";
 
 function formatPrice(price: number) {
   return new Intl.NumberFormat("id-ID", {
@@ -31,6 +32,7 @@ export default function ProductDetailPage() {
 
   const [product, setProduct] = useState<any>(null);
   const productId = pathname.split("-").pop();
+  const [showAdvancedImage, setShowAdvancedImage] = useState(false);
 
   const [recommendedProducts, setRecommendedProducts] = useState<
     ProductCardItemProps[]
@@ -110,7 +112,7 @@ export default function ProductDetailPage() {
       <div className="flex flex-col gap-8 lg:flex-row">
         {/* Product Image Gallery */}
         <div className="lg:sticky lg:top-[9rem] lg:w-1/3 lg:self-start">
-          <ImageGallery images={product.media} />
+          <ImageGallery setShowAdvanced={setShowAdvancedImage} images={product.media} />
         </div>
 
         {/* Product Info and Order Section */}
@@ -217,6 +219,12 @@ export default function ProductDetailPage() {
           </div>
         </div>
       </div>
+      {showAdvancedImage && (
+        <AdvancedImageGallery
+          images={product.media}
+          onClose={() => setShowAdvancedImage(false)}
+        />
+      )}
     </div>
   );
 }

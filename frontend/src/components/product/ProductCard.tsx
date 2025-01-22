@@ -15,7 +15,7 @@ export default function ProductCard() {
       setLoading(true);
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/product?limit=16&page=1`,
+          `${process.env.NEXT_PUBLIC_API_URL}/product?limit=16&page=1&categories=5`,
         );
         setProducts(response.data.products);
         setLoading(false);

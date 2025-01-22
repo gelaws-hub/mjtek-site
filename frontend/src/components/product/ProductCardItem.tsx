@@ -47,7 +47,7 @@ export default function ProductCardItem({
             href={productUrl}
             className="relative flex aspect-[1/1] overflow-hidden"
           >
-            <Image
+            <img
               src={product.media_source}
               alt={product.product_name}
               width={300}
