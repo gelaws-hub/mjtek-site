@@ -47,8 +47,6 @@ export default function Navbar() {
     fetchCategories();
   }, []);
 
-  console.log(categories);
-
   const formatCategoryName = (name: string) => {
     return name.toLowerCase().replace(/\s+/g, "-"); // Convert to lowercase and replace spaces with hyphens
   };
@@ -65,7 +63,7 @@ export default function Navbar() {
               scroll={false}
               key={category.id}
               href={categoryUrl}
-              className={`whitespace-nowrap rounded-full px-2 py-1 text-xs hover:bg-gray-200 ${
+              className={`whitespace-nowrap hover:rounded-t-md px-2 py-1 text-xs hover:bg-gray-200 ${
                 isActive
                   ? "border-b-[0.5px] border-b-blue-900"
                   : "text-gray-700"

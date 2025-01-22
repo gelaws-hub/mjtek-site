@@ -29,7 +29,7 @@ export default function ProductCard() {
   }, []);
 
   return (
-    <div className="mx-auto grid max-w-[90%] grid-cols-2 gap-1 md:max-w-full md:grid-cols-[repeat(auto-fit,minmax(150px,200px))] md:gap-2 w-full">
+    <div className="mx-auto grid w-full grid-cols-2 gap-1 md:max-w-full md:grid-cols-[repeat(auto-fit,minmax(150px,1fr))] md:gap-2">
       {loading ? (
         Array.from({ length: 10 }).map((_, i) => <ProductSkeleton key={i} />)
       ) : (

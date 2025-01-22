@@ -18,7 +18,7 @@ export default function CategoryHomepage({
         <span className="border-x-[6px] border-blue-900 border-solid mx-4 rounded-md"></span>
         kategori
       </h1>
-      <div className="flex gap-2 items-center overflow-x-scroll scrollbar-none">
+      <div className="flex gap-4 items-center overflow-x-scroll scrollbar-none">
         {categoryData.map((c) => (
           <Link scroll={false}
             key={c.name}
