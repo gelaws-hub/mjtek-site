@@ -22,7 +22,7 @@
     "@radix-ui/react-separator": "^1.1.1",
     "@radix-ui/react-slot": "^1.1.1",
     "@radix-ui/react-tooltip": "^1.1.6",
-    "@react-pdf/renderer": "^4.1.6",
+    "@react-pdf/renderer": "^3.4.5",
     "@shadcn/ui": "^0.0.4",
     "apexcharts": "^4.1.0",
     "avatar": "^0.1.0",
