@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { ChevronRight, ChevronsLeftRightIcon } from "lucide-react";
 
 interface SidebarItem {
   name: string;
@@ -39,7 +40,7 @@ export default function Sidebar({ sidebarData }: SidebarProps) {
                     expanded[item.name] ? "rotate-90" : ""
                   }`}
                 >
-                  ›
+                  <ChevronRight width={16} height={16} />
                 </div>
               </button>
               <ul

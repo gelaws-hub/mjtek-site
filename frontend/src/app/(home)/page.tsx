@@ -9,7 +9,7 @@ import RecommendationSlider from "@/components/product/RecommendationSlider";
 
 export default function Home() {
   return (
-    <div className="mx-auto flex w-[90%] flex-col justify-center md:w-[80%] lg:w-[80%]">
+    <div className="mx-auto flex w-full flex-col justify-center max-w-[1200px]">
       <div className="mx-auto flex w-full flex-row md:grid md:grid-cols-[25%_75%]">
         <div className="hidden max-h-[40%] md:flex">
           <Sidebar sidebarData={DummySidebar.DummySidebar} />
@@ -19,7 +19,7 @@ export default function Home() {
             className="m-2"
             imageUrls={dummyBanner.DummyBanner}
             interval={3}
-            imageMaxWidth={1200}
+            imageMaxWidth={850}
             aspectRatio="2/1"
           />
         </div>
