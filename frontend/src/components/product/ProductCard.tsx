@@ -11,8 +11,8 @@ export default function ProductCard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
     const fetchProducts = async () => {
-      setLoading(true);
       try {
         const response = await axios.get(
           `${process.env.NEXT_PUBLIC_API_URL}/product?limit=16&page=1`,
@@ -28,7 +28,7 @@ export default function ProductCard() {
   }, []);
 
   return (
-    <div className="mx-auto grid max-w-[90%] grid-cols-2 gap-1 md:max-w-full md:grid-cols-[repeat(auto-fit,minmax(150px,200px))] md:gap-2">
+    <div className="mx-auto grid max-w-[90%] grid-cols-2 gap-1 md:max-w-full md:grid-cols-[repeat(auto-fit,minmax(150px,200px))] md:gap-2 w-full">
       {loading ? (
         Array.from({ length: 10 }).map((_, i) => <ProductSkeleton key={i} />)
       ) : (

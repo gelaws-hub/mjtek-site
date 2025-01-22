@@ -1,23 +1,22 @@
 import ProductCard from "@/components/product/ProductCard";
-import dummyBanner from "./dummy_data/DummyBanner.json";
-import DummySidebar from "./dummy_data/DummySidebar.json";
+import dummyBanner from "../dummy_data/DummyBanner.json";
+import DummySidebar from "../dummy_data/DummySidebar.json";
 import BannerSlider from "@/components/product/BannerCarousel";
 import Sidebar from "@/components/Sidebar";
 import CategoryHomepage from "@/components/homepage/CategoryHomepage";
 import CategoryData from "@/components/homepage/CategoryData.json";
 import RecommendationSlider from "@/components/product/RecommendationSlider";
-import ProductSekeleton from "@/components/product/productSkeleton";
 
 export default function Home() {
   return (
-    <div className="mx-auto flex w-[90%] flex-col justify-center md:w-[80%] lg:w-[75%]">
-      <div className="mx-auto flex w-[96%] flex-row md:grid md:grid-cols-[25%_75%]">
+    <div className="mx-auto flex w-[90%] flex-col justify-center md:w-[80%] lg:w-[80%]">
+      <div className="mx-auto flex w-full flex-row md:grid md:grid-cols-[25%_75%]">
         <div className="hidden max-h-[40%] md:flex">
           <Sidebar sidebarData={DummySidebar.DummySidebar} />
         </div>
         <div className="w-full bg-white">
           <BannerSlider
-            className="m-4"
+            className="m-2"
             imageUrls={dummyBanner.DummyBanner}
             interval={3}
             imageMaxWidth={1200}
