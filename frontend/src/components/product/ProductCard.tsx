@@ -11,20 +11,21 @@ export default function ProductCard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setLoading(true);
     const fetchProducts = async () => {
+      setLoading(true);
       try {
         const response = await axios.get(
           `${process.env.NEXT_PUBLIC_API_URL}/product?limit=16&page=1`,
         );
         setProducts(response.data.products);
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching products:", error);
+        setLoading(false);
       }
+      setLoading(false);
     };
-
     fetchProducts();
-    setLoading(false);
   }, []);
 
   return (

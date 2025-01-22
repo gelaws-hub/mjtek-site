@@ -45,8 +45,8 @@ export default function CartPage() {
 
   // Fetch recommended products
   useEffect(() => {
-    setRecommendationLoading(true);
     const fetchRecommendedProducts = async () => {
+      setRecommendationLoading(true);
       try {
         const categoryIds = cartItems.map((item) => item.category_id).join(",");
         const response = await fetch(
@@ -54,13 +54,15 @@ export default function CartPage() {
         );
         const data = await response.json();
         setRecommendedProducts(data.products);
+        setRecommendationLoading(false);
       } catch (error) {
         console.error("Error fetching products:", error);
+        setRecommendationLoading(false);
       }
+      setRecommendationLoading(false);
     };
 
     fetchRecommendedProducts();
-    setRecommendationLoading(false);
   }, []);
 
   const fetchCarts = async () => {
