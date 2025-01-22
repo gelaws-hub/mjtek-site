@@ -39,10 +39,13 @@ export default function CartPage() {
     ProductCardItemProps[]
   >([]);
 
+  const [reccomendationLoading, setRecommendationLoading] = useState(true);
+
   const router = useRouter();
 
   // Fetch recommended products
   useEffect(() => {
+    setRecommendationLoading(true);
     const fetchRecommendedProducts = async () => {
       try {
         const categoryIds = cartItems.map((item) => item.category_id).join(",");
@@ -57,6 +60,7 @@ export default function CartPage() {
     };
 
     fetchRecommendedProducts();
+    setRecommendationLoading(false);
   }, []);
 
   const fetchCarts = async () => {
@@ -294,6 +298,7 @@ export default function CartPage() {
         <ProductRecommendation
           products={recommendedProducts}
           afterAddToCart={setRefresh}
+          loading={reccomendationLoading}
         />
       </div>
       <CartFooter

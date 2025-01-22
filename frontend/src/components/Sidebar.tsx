@@ -49,7 +49,7 @@ export default function Sidebar({ sidebarData }: SidebarProps) {
               >
                 {item.subItems.map((subItem) => (
                   <li key={subItem.name}>
-                    <Link
+                    <Link scroll={false}
                       className="hover:text-blue-950 w-full py-2"
                       href={subItem.url!}
                     >
@@ -60,7 +60,7 @@ export default function Sidebar({ sidebarData }: SidebarProps) {
               </ul>
             </div>
           ) : (
-            <Link
+            <Link scroll={false}
               className="hover:text-blue-950 hover:underline"
               href={item.url!}
             >

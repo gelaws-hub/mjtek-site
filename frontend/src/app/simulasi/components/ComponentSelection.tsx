@@ -143,7 +143,7 @@ export default function ComponentSelection({
                       className="flex items-center justify-between top-0 right-20"
                       onClick={() => {}}
                     >
-                      <Link
+                      <Link scroll={false}
                         href={productUrl}
                         className="absolute top-2 right-2 md:relative text-xs flex items-center gap-1 md:text-sm text-muted-foreground hover:bg-gray-100 px-2 py-1 rounded"
                       >

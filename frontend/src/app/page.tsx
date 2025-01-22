@@ -6,10 +6,11 @@ import Sidebar from "@/components/Sidebar";
 import CategoryHomepage from "@/components/homepage/CategoryHomepage";
 import CategoryData from "@/components/homepage/CategoryData.json";
 import RecommendationSlider from "@/components/product/RecommendationSlider";
+import ProductSekeleton from "@/components/product/productSkeleton";
 
 export default function Home() {
   return (
-    <div className="flex flex-col justify-center mx-auto w-[90%] md:w-[80%] lg:w-[75%]">
+    <div className="mx-auto flex w-[90%] flex-col justify-center md:w-[80%] lg:w-[75%]">
       <div className="mx-auto flex w-[96%] flex-row md:grid md:grid-cols-[25%_75%]">
         <div className="hidden max-h-[40%] md:flex">
           <Sidebar sidebarData={DummySidebar.DummySidebar} />
@@ -24,8 +25,8 @@ export default function Home() {
           />
         </div>
       </div>
-      <div className="mx-auto flex flex-col w-full">
-        <h1 className="mb-4 mt-8 text-2xl font-bold w-fulll">
+      <div className="mx-auto flex w-full flex-col">
+        <h1 className="w-fulll mb-4 mt-8 text-2xl font-bold">
           <span className="mx-4 rounded-md border-x-[6px] border-solid border-blue-900"></span>
           Rekomendasi CPU
         </h1>

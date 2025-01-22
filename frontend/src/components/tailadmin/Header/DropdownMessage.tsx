@@ -11,7 +11,7 @@ const DropdownMessage = () => {
   return (
     <ClickOutside onClick={() => setDropdownOpen(false)} className="relative">
       <li className="relative">
-        <Link
+        <Link scroll={false}
           onClick={() => {
             setNotifying(false);
             setDropdownOpen(!dropdownOpen);
@@ -65,7 +65,7 @@ const DropdownMessage = () => {
 
             <ul className="flex h-auto flex-col overflow-y-auto">
               <li>
-                <Link
+                <Link scroll={false}
                   className="flex gap-4.5 border-t border-stroke px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4"
                   href="/messages"
                 >
@@ -92,7 +92,7 @@ const DropdownMessage = () => {
                 </Link>
               </li>
               <li>
-                <Link
+                <Link scroll={false}
                   className="flex gap-4.5 border-t border-stroke px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4"
                   href="/messages"
                 >
@@ -119,7 +119,7 @@ const DropdownMessage = () => {
                 </Link>
               </li>
               <li>
-                <Link
+                <Link scroll={false}
                   className="flex gap-4.5 border-t border-stroke px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4"
                   href="/messages"
                 >
@@ -146,7 +146,7 @@ const DropdownMessage = () => {
                 </Link>
               </li>
               <li>
-                <Link
+                <Link scroll={false}
                   className="flex gap-4.5 border-t border-stroke px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4"
                   href="/messages"
                 >
@@ -173,7 +173,7 @@ const DropdownMessage = () => {
                 </Link>
               </li>
               <li>
-                <Link
+                <Link scroll={false}
                   className="flex gap-4.5 border-t border-stroke px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4"
                   href="/messages"
                 >

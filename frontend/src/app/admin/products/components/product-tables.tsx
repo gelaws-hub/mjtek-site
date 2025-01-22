@@ -130,7 +130,7 @@ function ProductTables() {
           <p>Halaman yang anda cari tidak ada, </p>
           <span>
             &nbsp;
-            <Link className="text-blue-500" href={`/admin/products?page=1`}>
+            <Link scroll={false} className="text-blue-500" href={`/admin/products?page=1`}>
               kembali ke halaman awal
             </Link>
           </span>{" "}

@@ -5,13 +5,16 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProductCardItemProps } from "@/components/product/ProductInterface";
 import ProductCardItem from "./ProductCardItem";
+import ProductSkeleton from "./productSkeleton";
 
 export function ProductRecommendation({
   products,
   afterAddToCart,
+  loading = false,
 }: {
   products: ProductCardItemProps[];
   afterAddToCart?: React.Dispatch<React.SetStateAction<boolean>>;
+  loading?: boolean;
 }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
@@ -64,11 +67,19 @@ export function ProductRecommendation({
 
   return (
     <div className="relative pb-10 w-[90%] mx-auto">
-      <div ref={scrollRef} className="grid gap-2 grid-cols-[repeat(auto-fit,minmax(146px,1fr))]">
-        {products.map((product) => (
-          <ProductCardItem key={product.id} product={product} afterAddToCart={afterAddToCart} />
-        ))}
-      </div>
+      {loading ? (
+        <div className="grid gap-2 grid-cols-[repeat(auto-fit,minmax(146px,1fr))]">
+          {Array.from({ length: 10 }).map((_, i) => (
+            <ProductSkeleton key={i} />
+          ))}
+        </div>
+      ) : (
+        <div ref={scrollRef} className="grid gap-2 grid-cols-[repeat(auto-fit,minmax(146px,1fr))]">
+          {products.map((product) => (
+            <ProductCardItem key={product.id} product={product} afterAddToCart={afterAddToCart} />
+          ))}
+        </div>
+      )}
       {showLeftArrow && (
         <Button
           variant="outline"

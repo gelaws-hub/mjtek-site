@@ -40,7 +40,10 @@ export const getClientProducts = async (req: Request, res: Response) => {
     const products = await prisma.product.findMany({
       skip,
       take: limit,
-      orderBy: { id: "asc" },
+      orderBy: [
+        { stock: "desc" }, // Sort by stock (ascending)
+        { createdTime: "desc" }, // Secondary sort by id for consistent order
+      ],
       where: {
         is_deleted: false,
         ...categoryFilter,

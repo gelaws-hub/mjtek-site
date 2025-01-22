@@ -104,7 +104,7 @@ export default function InvoicePDF({ transaction }: InvoicePDFProps) {
           {transaction.payment_proof && (
             <>
               <Text>Bukti Pembayaran : {transaction.payment_proof}</Text>
-              <Link href={transaction.payment_proof} />
+              <Link scroll={false} href={transaction.payment_proof} />
               <Image src={transaction.payment_proof} style={styles.logoImage} />
             </>
           )}

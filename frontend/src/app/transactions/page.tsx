@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { Transaction } from "@/types/transaction";
 import TransactionCard from "./components/transactionCard";
 import TransactionDetailModal from "./components/transactionDetailModal";
-import Loading from "../loading";
+import Loading from "../removed_loading";
 import { Combobox } from "@/components/ui/combobox";
 import Link from "next/link";
 import ProofUploaderModal from "./components/proofUploaderModal";
@@ -239,7 +239,7 @@ export default function TransactionPage() {
                   <div
                     className={`m-1 flex items-center gap-2 rounded-md border border-dashed border-${status_color[3]} px-4`}
                   >
-                    <Link
+                    <Link scroll={false}
                       href={transaction.payment_proof}
                       className="m-1 mx-auto h-16 w-16 overflow-hidden"
                     >

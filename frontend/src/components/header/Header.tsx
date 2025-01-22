@@ -16,7 +16,7 @@ export default function Header() {
   return (
     <header className="sticky top-0 border-b-2 border-b-gray-100 bg-white z-50 ">
       <div className="grid grid-cols-[10%_60%_30%] md:grid-cols-[25%_50%_25%] mx-auto pt-6 md:pb-4 w-[96%]">
-        <Link
+        <Link scroll={false}
           href="/"
           className="col-start-1 my-0 md:flex flex-row items-center gap-4 justify-center md:justify-end md:mr-4 lg:mr-[20%]"
         >

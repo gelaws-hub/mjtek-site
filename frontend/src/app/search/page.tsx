@@ -2,6 +2,7 @@
 
 import ProductCardItem from "@/components/product/ProductCardItem";
 import { ProductCardItemProps } from "@/components/product/ProductInterface";
+import ProductSkeleton from "@/components/product/productSkeleton";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState, Suspense } from "react";
 
@@ -20,6 +21,7 @@ function SearchResultsComponent() {
   const [totalPages, setTotalPages] = useState<number>(1);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -40,6 +42,7 @@ function SearchResultsComponent() {
 
   useEffect(() => {
     const fetchProducts = async (searchTerm: string, categoryIds: number[]) => {
+      setLoading(true);
       try {
         const url = new URL(
           `${process.env.NEXT_PUBLIC_API_URL}/product?limit=10&page=${page}`
@@ -57,6 +60,7 @@ function SearchResultsComponent() {
       } catch (error) {
         console.error("Error fetching products:", error);
       }
+      setLoading(false);
     };
     if (query) {
       fetchProducts(query, selectedCategories);
@@ -121,7 +125,11 @@ function SearchResultsComponent() {
         </h1>
         <div className="border-l-8"></div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-          {products.length > 0 ? (
+          {loading ? (
+            Array.from({ length: 10 }).map((_, index) => (
+              <ProductSkeleton key={index} />
+            ))
+          ) : products.length > 0 ? (
             products.map((product: ProductCardItemProps) => (
               <ProductCardItem key={product.id} product={product} />
             ))

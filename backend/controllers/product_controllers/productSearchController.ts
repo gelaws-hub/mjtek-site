@@ -72,7 +72,10 @@ export const getAllProducts = async (req: Request, res: Response) => {
           },
           skip,
           take: limit,
-          orderBy: { id: "asc" },
+          orderBy: [
+            { stock: "desc" },
+            { createdTime: "desc" }, 
+          ],
           include: {
             category: true,
             sub_category: true,

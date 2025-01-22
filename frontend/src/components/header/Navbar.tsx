@@ -40,7 +40,7 @@ export default function Navbar() {
         const isActive = pathname === categoryUrl;
 
         return (
-          <Link
+          <Link scroll={false}
             key={category.id}
             href={categoryUrl}
             className={`text-xs px-[0.5] py-1 ${

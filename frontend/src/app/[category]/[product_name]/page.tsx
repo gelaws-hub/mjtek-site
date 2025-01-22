@@ -36,8 +36,11 @@ export default function ProductDetailPage() {
     ProductCardItemProps[]
   >([]);
 
+  const [reccomendationLoading, setRecommendationLoading] = useState(false);
+
   useEffect(() => {
     const fetchProducts = async () => {
+      setRecommendationLoading(true);
       try {
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/product?limit=10&page=1&categories=${product.category.id},${product.category.id + 1},${product.category.id - 1}`,
@@ -47,6 +50,7 @@ export default function ProductDetailPage() {
       } catch (error) {
         console.error("Error fetching products:", error);
       }
+      setRecommendationLoading(false);
     };
 
     fetchProducts();
@@ -142,7 +146,7 @@ export default function ProductDetailPage() {
       {/* Product Recommendations */}
       <div className="mt-12 space-y-4">
         <h2 className="mb-4 text-2xl font-bold">Recommended Products</h2>
-        <ProductRecommendation products={recommendedProducts} />
+        <ProductRecommendation products={recommendedProducts} loading={reccomendationLoading} />
       </div>
 
       {/* Order Section */}

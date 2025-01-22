@@ -9,7 +9,7 @@ const DropdownNotification = () => {
   return (
     <ClickOutside onClick={() => setDropdownOpen(false)} className="relative">
       <li>
-        <Link
+        <Link scroll={false}
           onClick={() => {
             setNotifying(false);
             setDropdownOpen(!dropdownOpen);
@@ -52,7 +52,7 @@ const DropdownNotification = () => {
 
             <ul className="flex h-auto flex-col overflow-y-auto">
               <li>
-                <Link
+                <Link scroll={false}
                   className="flex flex-col gap-2.5 border-t border-stroke px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4"
                   href="#"
                 >
@@ -68,7 +68,7 @@ const DropdownNotification = () => {
                 </Link>
               </li>
               <li>
-                <Link
+                <Link scroll={false}
                   className="flex flex-col gap-2.5 border-t border-stroke px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4"
                   href="#"
                 >
@@ -83,7 +83,7 @@ const DropdownNotification = () => {
                 </Link>
               </li>
               <li>
-                <Link
+                <Link scroll={false}
                   className="flex flex-col gap-2.5 border-t border-stroke px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4"
                   href="#"
                 >
@@ -99,7 +99,7 @@ const DropdownNotification = () => {
                 </Link>
               </li>
               <li>
-                <Link
+                <Link scroll={false}
                   className="flex flex-col gap-2.5 border-t border-stroke px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4"
                   href="#"
                 >

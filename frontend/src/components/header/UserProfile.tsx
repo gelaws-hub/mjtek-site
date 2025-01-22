@@ -58,13 +58,13 @@ export default function UserProfile() {
           </PopoverTrigger>
           <PopoverContent className="max-w-[100px] border-t-4 border-t-blue-950 bg-white p-1 shadow-md">
             <div className="z-[99] flex flex-col items-center justify-start gap-1">
-              <Link
+              <Link scroll={false}
                 className="rounded-md p-1 text-left text-sm hover:bg-slate-100"
                 href="/cart"
               >
                 Keranjang
               </Link>
-              <Link
+              <Link scroll={false}
                 className="rounded-md p-1 text-left text-sm hover:bg-slate-100"
                 href="/transactions"
               >
@@ -107,7 +107,7 @@ export default function UserProfile() {
         />
       ) : (
         <div className="flex items-center justify-center gap-2">
-          <Link
+          <Link scroll={false}
             href="/login"
             className="group flex w-12 cursor-pointer items-center justify-center rounded-xl border border-blue-950 py-1 transition-colors duration-300 ease-in-out hover:bg-blue-950 md:w-16 md:gap-2 md:px-3"
           >
@@ -115,7 +115,7 @@ export default function UserProfile() {
               Masuk
             </p>
           </Link>
-          <Link
+          <Link scroll={false}
             href="/register"
             className="hidden cursor-pointer items-center rounded-xl border-2 border-blue-900 bg-blue-900 hover:border-blue-950 hover:bg-blue-950 md:flex md:min-w-16 md:justify-center md:gap-2 md:py-[0.3rem]"
           >

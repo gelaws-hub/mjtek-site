@@ -176,7 +176,7 @@ export default function Login() {
               )}
               <p className="text-sm font-light text-gray-500">
                 Belum punya akun?{" "}
-                <Link
+                <Link scroll={false}
                   href="/register"
                   className="text-primary-600 font-medium hover:underline"
                 >
@@ -185,7 +185,7 @@ export default function Login() {
               </p>
               <p className="text-sm font-light text-gray-500">
                 Lupa Password?{" "}
-                <Link
+                <Link scroll={false}
                   href="/forgetPassword"
                   className="text-primary-600 font-medium hover:underline"
                 >

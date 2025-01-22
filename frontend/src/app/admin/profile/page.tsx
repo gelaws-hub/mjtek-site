@@ -158,7 +158,7 @@ const Profile = () => {
                   Follow me on
                 </h4>
                 <div className="flex items-center justify-center gap-3.5">
-                  <Link
+                  <Link scroll={false}
                     href="#"
                     className="hover:text-primary"
                     aria-label="social-icon"
@@ -184,7 +184,7 @@ const Profile = () => {
                       </defs>
                     </svg>
                   </Link>
-                  <Link
+                  <Link scroll={false}
                     href="#"
                     className="hover:text-primary"
                     aria-label="social-icon"
@@ -215,7 +215,7 @@ const Profile = () => {
                       </defs>
                     </svg>
                   </Link>
-                  <Link
+                  <Link scroll={false}
                     href="#"
                     className="hover:text-primary"
                     aria-label="social-icon"
@@ -246,7 +246,7 @@ const Profile = () => {
                       </defs>
                     </svg>
                   </Link>
-                  <Link
+                  <Link scroll={false}
                     href="#"
                     className="hover:text-primary"
                     aria-label="social-icon"
@@ -272,7 +272,7 @@ const Profile = () => {
                       </defs>
                     </svg>
                   </Link>
-                  <Link
+                  <Link scroll={false}
                     href="#"
                     className="hover:text-primary"
                     aria-label="social-icon"

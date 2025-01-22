@@ -157,7 +157,7 @@ const FormLayout = () => {
                     <p>Remember me</p>
                   </label>
 
-                  <Link
+                  <Link scroll={false}
                     href="#"
                     className="text-sm text-primary hover:underline"
                   >
