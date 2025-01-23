@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
@@ -26,24 +26,25 @@ export default function Login() {
       .min(6)
       .matches(
         /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{6,}$/,
-        "Password harus memiliki minimal 6 karakter, terdapat huruf besar, angka, dan karakter khusus"
+        "Password harus memiliki minimal 6 karakter, terdapat huruf besar, angka, dan karakter khusus",
       )
       .required("Password harus diisi"),
   });
 
   const handleLogin = async (values: any, actions: any) => {
     actions.setSubmitting(true);
-    // await fetch(`/api/login`, {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify({
-    //     email: values.email,
-    //     password: values.password,
-    //   }),
-    //   credentials: "include",
-    // })
+    // await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
+    await fetch(`/api/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: values.email,
+        password: values.password,
+      }),
+      credentials: "include",
+    });
     await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
       method: "POST",
       headers: {
@@ -176,7 +177,8 @@ export default function Login() {
               )}
               <p className="text-sm font-light text-gray-500">
                 Belum punya akun?{" "}
-                <Link scroll={false}
+                <Link
+                  scroll={false}
                   href="/register"
                   className="text-primary-600 font-medium hover:underline"
                 >
@@ -185,7 +187,8 @@ export default function Login() {
               </p>
               <p className="text-sm font-light text-gray-500">
                 Lupa Password?{" "}
-                <Link scroll={false}
+                <Link
+                  scroll={false}
                   href="/forgetPassword"
                   className="text-primary-600 font-medium hover:underline"
                 >

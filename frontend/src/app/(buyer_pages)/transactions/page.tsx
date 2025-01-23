@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { Transaction } from "@/types/transaction";
 import TransactionCard from "./components/transactionCard";
 import TransactionDetailModal from "./components/transactionDetailModal";
-import Loading from "../removed_loading";
+import Loading from "../../removed_loading";
 import { Combobox } from "@/components/ui/combobox";
 import Link from "next/link";
 import ProofUploaderModal from "./components/proofUploaderModal";

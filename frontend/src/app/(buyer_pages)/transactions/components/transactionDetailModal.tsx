@@ -8,7 +8,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { PDFDownloadLink } from "@react-pdf/renderer";
-import InvoicePDF from "../../../components/transaction/invoicePdf";
+import InvoicePDF from "../../../../components/transaction/invoicePdf";
 
 interface TransactionDetailModalProps {
   transaction: Transaction;

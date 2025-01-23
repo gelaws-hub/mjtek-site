@@ -5,7 +5,7 @@ import { Transaction } from "@/types/transaction";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { PDFDownloadLink } from "@react-pdf/renderer";
-import InvoicePDF from "../../../components/transaction/invoicePdf";
+import InvoicePDF from "../../../../components/transaction/invoicePdf";
 
 export default function TransactionDetailModal() {
   const [transaction, setTransaction] = useState<Transaction | null>(null);

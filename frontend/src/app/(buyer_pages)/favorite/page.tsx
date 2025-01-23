@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import useCheckSession from "../(authentication)/auth/useCheckSession";
+import useCheckSession from "../../(authentication)/auth/useCheckSession";
 import { ProductCardItemProps } from "@/components/product/ProductInterface";
 import ProductCardItem from "@/components/product/ProductCardItem";
 import ProductSkeleton from "@/components/product/productSkeleton";

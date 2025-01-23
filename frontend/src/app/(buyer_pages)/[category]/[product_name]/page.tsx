@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Heart, Share2, Facebook, Instagram } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ImageGallery } from "./components/ImageGallery";
-import { ProductRecommendation } from "../../../components/product/ProductRecommendation";
+import { ProductRecommendation } from "../../../../components/product/ProductRecommendation";
 import {
   Popover,
   PopoverContent,
