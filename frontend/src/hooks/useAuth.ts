@@ -2,15 +2,19 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
 
 const useAuth = (allowedRoles: string[]) => {
   const router = useRouter();
   const [userData, setUserData] = useState<any | null>(null);
 
   useEffect(() => {
-    const accessToken = document.cookie
-      .split("; ")
-      .find((cookie) => cookie.startsWith("accessToken="));
+    // const accessToken = document.cookie
+    //   .split("; ")
+    //   .find((cookie) => cookie.startsWith("accessToken="));
+    const accessToken = Cookies.get("accessToken");
+
+    console.log("Access Token:", accessToken);
 
     if (!accessToken) {
       router.replace("/login");
