@@ -17,7 +17,7 @@ const useAuth = (allowedRoles: string[]) => {
     console.log("Access Token:", accessToken);
 
     if (!accessToken) {
-      router.replace("/login");
+      // router.replace("/login");
       return;
     }
 
