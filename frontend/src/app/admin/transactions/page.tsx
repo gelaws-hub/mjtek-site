@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Combobox } from "@/components/ui/combobox";
 import { useSearchParams } from "next/navigation"; // To access query params
 import { Search01Icon } from "@/components/icons/Search01Icon";
+import useAuth from "@/hooks/useAuth";
 
 const fetchTransactions = async (
   page: number = 1,
@@ -66,6 +67,7 @@ const sortingOptions = [
 ];
 
 export default function TransactionPage() {
+  useAuth(["admin"]);
   const [selectedTransaction, setSelectedTransaction] =
     useState<Transaction | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);

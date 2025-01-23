@@ -4,11 +4,13 @@ import { Search01Icon } from "@/components/icons/Search01Icon";
 import DefaultLayout from "@/components/tailadmin/Layouts/DefaultLayout";
 import { errorToast, successToast } from "@/components/toast/reactToastify";
 import { Button } from "@/components/ui/button";
+import useAuth from "@/hooks/useAuth";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function BuyerListPage() {
+  useAuth(["owner"]);
   const [users, setUsers] = useState<any[]>([]);
   const [totalPages, setTotalPages] = useState(1);
 

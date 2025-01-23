@@ -1,13 +1,12 @@
-import ECommerce from "@/components/tailadmin/Dashboard/E-commerce";
-import { Metadata } from "next";
-import DefaultLayout from "@/components/tailadmin/Layouts/DefaultLayout";
+'use client'
 
-export const metadata: Metadata = {
-  title: "Mj Teknologi Semarang Admin Page",
-  description: "This page is for MJ Teknologi Semarang Website",
-};
+import ECommerce from "@/components/tailadmin/Dashboard/E-commerce";
+import DefaultLayout from "@/components/tailadmin/Layouts/DefaultLayout";
+import useAuth from "@/hooks/useAuth";
 
 export default function Home() {
+  useAuth(["admin"]);
+  
   return (
     <>
       <DefaultLayout>

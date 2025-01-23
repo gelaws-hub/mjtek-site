@@ -99,7 +99,7 @@ export default function CategoryPage() {
           {categoryName.charAt(0).toUpperCase() + categoryName.slice(1)}
         </span>
       </h1>
-      <div className="mx-auto grid grid-cols-2 md:grid-cols-[repeat(auto-fit,minmax(170px,1fr))] gap-6 w-full">
+      <div className="mx-auto grid grid-cols-2 md:grid-cols-[repeat(auto-fit,minmax(170px,1fr))] md:gap-4 gap-2 w-full">
         {loading ? (
           Array.from({ length: 10 }).map((_, i) => (
             <ProductSkeleton key={i} className="md:w-[170px] w-[150px] max-w-[200px] h-[250px]" />

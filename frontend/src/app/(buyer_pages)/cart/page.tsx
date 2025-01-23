@@ -9,8 +9,10 @@ import { ProductCardItemProps } from "@/components/product/ProductInterface";
 import { ProductRecommendation } from "@/components/product/ProductRecommendation";
 import { errorToast, successToast } from "@/components/toast/reactToastify";
 import { redirect, useRouter } from "next/navigation";
+import useAuth from "@/hooks/useAuth";
 
 export default function CartPage() {
+  useAuth(["buyer"]);
   const [cartItems, setCartItems] = useState<CartItemType[]>([]);
   const [refresh, setRefresh] = useState(false);
   const totalItems = cartItems.reduce(

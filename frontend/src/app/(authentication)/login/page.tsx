@@ -33,18 +33,6 @@ export default function Login() {
 
   const handleLogin = async (values: any, actions: any) => {
     actions.setSubmitting(true);
-    // await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
-    await fetch(`/api/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: values.email,
-        password: values.password,
-      }),
-      credentials: "include",
-    });
     await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
       method: "POST",
       headers: {
@@ -64,7 +52,6 @@ export default function Login() {
         return response.json();
       })
       .then((data) => {
-        // Cookies.set("accessToken", data.accessToken); // changed my mind, I used http only cookie instead
         actions.resetForm();
         actions.setSubmitting(false);
         if (data.role_name === "admin" || data.role_name === "owner") {

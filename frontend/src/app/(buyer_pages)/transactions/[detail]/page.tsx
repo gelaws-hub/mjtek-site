@@ -6,8 +6,10 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import InvoicePDF from "../../../../components/transaction/invoicePdf";
+import useAuth from "@/hooks/useAuth";
 
 export default function TransactionDetailModal() {
+  useAuth(["buyer"]);
   const [transaction, setTransaction] = useState<Transaction | null>(null);
   const path = usePathname();
   console.log("Path:", path);
