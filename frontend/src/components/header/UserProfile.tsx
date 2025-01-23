@@ -1,120 +1,123 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Cookies from "js-cookie";
 import Image from "next/image";
 import Link from "next/link";
 import { ShoppingCart02Icon } from "../icons/ShoppingCart02Icon";
 import { Notification03Icon } from "../icons/Notification03Icon";
 import { FavouriteIcon } from "../icons/FavouriteIcon";
-import UserInfoModal from "./UserInfoModal";
-import { useAuth } from "@/app/(authentication)/auth/useAuth";
+import useCheckSession from "@/app/(authentication)/auth/useCheckSession";
 import { useRouter } from "next/navigation";
+import useCurrentUser from "@/app/(authentication)/auth/useCurrentUser";
+import UserCard from "../userCard";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 
 export default function UserProfile() {
   const [openUserInfo, setOpenUserInfo] = useState(false);
-  const { user, isLoggedIn } = useAuth();
+  const { isAuthenticated } = useCheckSession();
+  const { user } = useCurrentUser();
   const router = useRouter();
 
   const handleViewFavorite = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isLoggedIn) {
-      router.push("/login");
-    }
     if (user?.id) {
       router.push(`/favorite?user=${encodeURIComponent(user?.id)}`);
     }
   };
-  
-  const toggleUserInfo = () => {
+
+  const toggleUserInfo = (event: any) => {
+    event.stopPropagation();
     setOpenUserInfo(!openUserInfo);
   };
 
-  const handleOutsideClick = (event: any) => {
-    if (!event.target.closest(".toggle-user-info")) {
-      setOpenUserInfo(false);
-    }
-  };
-
-  useEffect(() => {
-    document.addEventListener("click", handleOutsideClick);
-    return () => {
-      document.removeEventListener("click", handleOutsideClick);
-    };
-  }, []);
-
   const handleLogout = async () => {
-    const token = Cookies.get("accessToken");
-    if (token) {
-      try {
-        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/logout`, {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/logout`,
+        {
           method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+          credentials: "include",
+        },
+      );
+      if (response.ok) {
         Cookies.remove("accessToken");
         window.location.reload();
-      } catch (error) {
-        console.error(error);
+      } else {
+        throw new Error("Failed to log out");
       }
+    } catch (error) {
+      console.error(error);
     }
   };
 
   return (
-    <div className="md:col-start-3 flex justify-center md:justify-start items-center gap-2">
-      <div className="md:flex ml-1 md:ml-2 hidden">
-        <button className="hover:bg-slate-100 rounded-xl">
-          <ShoppingCart02Icon height={20} className="text-gray-700" />
-        </button>
-        <button className="hover:bg-slate-100 rounded-lg">
-          <Notification03Icon height={20} className="text-gray-700" />
+    <div className="flex items-center justify-around gap-2 md:col-start-3 md:justify-start">
+      <div className="md:ml-2 flex flex-nowrap gap-1">
+        <Popover>
+          <PopoverTrigger>
+            <ShoppingCart02Icon height={18} width={18} className="text-gray-700" />
+          </PopoverTrigger>
+          <PopoverContent className="max-w-[100px] border-t-4 border-t-blue-950 bg-white p-1 shadow-md">
+            <div className="z-[99] flex flex-col items-center justify-start gap-1">
+              <Link scroll={false}
+                className="rounded-md p-1 text-left text-sm hover:bg-slate-100"
+                href="/cart"
+              >
+                Keranjang
+              </Link>
+              <Link scroll={false}
+                className="rounded-md p-1 text-left text-sm hover:bg-slate-100"
+                href="/transactions"
+              >
+                Transaksi
+              </Link>
+            </div>
+          </PopoverContent>
+        </Popover>
+        <button className="rounded-lg hover:bg-slate-100">
+          <Notification03Icon height={18} width={18} className="text-gray-700" />
         </button>
         <button
-          className="hover:bg-slate-100 rounded-lg"
+          className="rounded-lg hover:bg-slate-100"
           onClick={handleViewFavorite}
         >
-          <FavouriteIcon height={20} className="text-gray-700" />
+          <FavouriteIcon height={18} width={18} className="text-gray-700" />
         </button>
       </div>
-      {isLoggedIn ? (
-        <div
-          className="toggle-user-"
-          onMouseEnter={toggleUserInfo}
-          onMouseLeave={toggleUserInfo}
-        >
-          <div className="flex md:justify-start justify-center cursor-pointer md:gap-2 items-center md:mr-10 hover:bg-blue-900 hover:bg-opacity-10 rounded-xl md:px-3 md:py-1">
-            <Image
-              key="profile_image"
-              src={user?.profile_pic ?? ""}
-              alt="profile_image"
-              width={28}
-              height={28}
-              className="h-8 w-8 rounded-full"
-            />
-            <p className="text-sm text-gray-600 font-medium md:inline hidden">
-              {user?.name}
-            </p>
-          </div>
-          {openUserInfo && (
-            <UserInfoModal
-              user={user}
-              className="absolute"
-              handleLogout={handleLogout}
-            />
-          )}
-        </div>
+      {isAuthenticated && user ? (
+        <UserCard
+          userData={user}
+          onLogout={handleLogout}
+          btnTrigger={
+            <button className="" onClick={toggleUserInfo}>
+              <div className="flex cursor-pointer items-center justify-center rounded-xl hover:bg-blue-900 hover:bg-opacity-10 md:mr-10 md:justify-start md:gap-2 md:px-3 md:py-1">
+                <Image
+                  key="profile_image"
+                  src={user?.profile_pic ?? ""}
+                  alt="profile_image"
+                  width={28}
+                  height={28}
+                  className="h-8 w-8 rounded-full"
+                />
+                <p className="hidden text-sm font-medium text-gray-600 md:inline">
+                  {user?.name}
+                </p>
+              </div>
+            </button>
+          }
+        />
       ) : (
-        <div className="flex justify-center items-center gap-2">
-          <Link
+        <div className="flex items-center justify-center gap-2">
+          <Link scroll={false}
             href="/login"
-            className="group flex md:justify-center cursor-pointer md:gap-2 items-center hover:bg-blue-950 w-16 rounded-xl md:px-3 md:py-[0.3rem] border-2 border-blue-950 transition-colors duration-300 ease-in-out"
+            className="group flex w-12 cursor-pointer items-center justify-center rounded-xl border border-blue-950 py-1 transition-colors duration-300 ease-in-out hover:bg-blue-950 md:w-16 md:gap-2 md:px-3"
           >
-            <p className="text-sm text-blue-950 group-hover:text-white transition-colors duration-300 ease-in-out">
+            <p className="text-xs text-blue-950 transition-colors duration-300 ease-in-out group-hover:text-white md:text-sm">
               Masuk
             </p>
           </Link>
-          <Link
+          <Link scroll={false}
             href="/register"
-            className="flex md:justify-center cursor-pointer md:gap-2 items-center hover:bg-blue-950 rounded-xl md:min-w-16 md:py-[0.3rem] bg-blue-900 border-2 border-blue-900 hover:border-blue-950"
+            className="hidden cursor-pointer items-center rounded-xl border-2 border-blue-900 bg-blue-900 hover:border-blue-950 hover:bg-blue-950 md:flex md:min-w-16 md:justify-center md:gap-2 md:py-[0.3rem]"
           >
             <p className="text-sm text-white">Daftar</p>
           </Link>

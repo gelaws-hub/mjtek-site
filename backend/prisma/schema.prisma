@@ -8,20 +8,24 @@ datasource db {
 }
 
 model product {
-  id               Int     @id @default(autoincrement())
+  id               String    @id
   category_id      Int
   sub_category_id  Int?
   brand_id         Int
   product_name     String
-  price            Decimal @db.Decimal(10, 2)
-  description      String? @db.Text
-  estimated_weight Decimal @db.Decimal(10, 2)
+  price            Decimal   @db.Decimal(10, 2)
+  description      String?   @db.Text
+  estimated_weight Decimal   @db.Decimal(10, 2)
   stock            Int
-  is_deleted       Boolean @default(false)
+  is_deleted       Boolean   @default(false)
+  createdTime      DateTime  @default(now())
+  editedTime       DateTime?
+  user_id          String    @default("admin-root-id")
 
   category           category             @relation(fields: [category_id], references: [id])
   sub_category       sub_category?        @relation(fields: [sub_category_id], references: [id])
   brand              brand                @relation(fields: [brand_id], references: [id])
+  user               user                 @relation(fields: [user_id], references: [id]) // Relation to user
   cart               cart[]
   favorite           favorite[]
   media              media[]
@@ -33,6 +37,7 @@ model product {
   @@index([category_id])
   @@index([sub_category_id])
   @@index([brand_id])
+  @@index([user_id]) 
 }
 
 model category {
@@ -68,7 +73,7 @@ model socket {
 
 model product_socket {
   id         Int     @id @default(autoincrement())
-  product_id Int
+  product_id String
   socket_id  Int
   product    product @relation(fields: [product_id], references: [id])
   socket     socket  @relation(fields: [socket_id], references: [id])
@@ -82,7 +87,7 @@ model ram_type {
 
 model product_ram_type {
   id          Int      @id @default(autoincrement())
-  product_id  Int
+  product_id  String
   ram_type_id Int
   product     product  @relation(fields: [product_id], references: [id])
   ram_type    ram_type @relation(fields: [ram_type_id], references: [id])
@@ -103,7 +108,7 @@ model simulation {
 model simulation_detail {
   id            Int        @id @default(autoincrement())
   simulation_id Int
-  product_id    Int
+  product_id    String
   simulation    simulation @relation(fields: [simulation_id], references: [id])
   product       product    @relation(fields: [product_id], references: [id])
 
@@ -111,22 +116,25 @@ model simulation_detail {
 }
 
 model user {
-  id              String               @id @default(uuid())
-  role_name       String
-  name            String
-  email           String               @unique(map: "user_email_unique")
-  password        String
-  address         String
-  phone_number    String
-  profile_pic     String
-  fa_enable       Boolean              @default(false)
-  fa_secret       String?
-  refresh_tokens  user_refresh_token[]
-  simulation      simulation[]
-  transaction     transaction[]
-  cart            cart[]
-  favorite        favorite[]
-  transaction_log transaction_log[]
+  id             String               @id @default(uuid())
+  role_name      String
+  name           String
+  email          String               @unique(map: "user_email_unique")
+  password       String
+  address        String
+  phone_number   String
+  profile_pic    String
+  is_active      Boolean             @default(false)
+  activation_token        String?
+  reset_password_token    String?
+  reset_password_expires  DateTime?
+  created_at     DateTime @default(now())
+  refresh_tokens user_refresh_token[]
+  simulation     simulation[]
+  transaction    transaction[]
+  cart           cart[]
+  favorite       favorite[]
+  products       product[]
 
   role role @relation(fields: [role_name], references: [role_name])
 
@@ -136,7 +144,7 @@ model user {
 
 model user_refresh_token {
   id            String   @id @default(uuid())
-  refresh_token String   @db.VarChar(255)
+  refresh_token String   @db.VarChar(1024)
   user_id       String
   created_at    DateTime @default(now())
   user          user     @relation(fields: [user_id], references: [id], onDelete: Cascade)
@@ -146,7 +154,7 @@ model user_refresh_token {
 
 model cart {
   id          Int      @id @default(autoincrement())
-  product_id  Int
+  product_id  String
   user_id     String
   quantity    Int      @default(1)
   date        DateTime
@@ -159,23 +167,35 @@ model cart {
   @@map("cart")
 }
 
+model transaction_status {
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
+  description String?
+
+  transaction transaction[]
+}
+
 model transaction {
-  id                 Int                  @id @default(autoincrement())
-  user_id            String
-  total_items        Int
-  total_price        Decimal              @db.Decimal(10, 2)
-  description        String
+  id            String    @id @default(uuid())
+  user_id       String
+  total_items   Int
+  total_price   Decimal   @db.Decimal(10, 2)
+  start_time    DateTime  @default(now())
+  end_time      DateTime?
+  payment_proof String?
+  status_id     Int       @default(1)
+
+  transaction_status transaction_status   @relation(fields: [status_id], references: [id])
   user               user                 @relation(fields: [user_id], references: [id])
   transaction_detail transaction_detail[]
-  transaction_log    transaction_log[]
 
   @@index([user_id])
 }
 
 model transaction_detail {
   id             Int         @id @default(autoincrement())
-  product_id     Int
-  transaction_id Int
+  product_id     String
+  transaction_id String
   quantity       Int
   total_price    Decimal     @db.Decimal(10, 2)
   product        product     @relation(fields: [product_id], references: [id])
@@ -186,7 +206,7 @@ model transaction_detail {
 
 model favorite {
   id         Int     @id @default(autoincrement())
-  product_id Int
+  product_id String
   user_id    String
   product    product @relation(fields: [product_id], references: [id])
   user       user    @relation(fields: [user_id], references: [id])
@@ -194,7 +214,7 @@ model favorite {
 
 model media {
   id         Int     @id @default(autoincrement())
-  product_id Int
+  product_id String
   source     String
   file_type  String
   product    product @relation(fields: [product_id], references: [id])
@@ -204,15 +224,4 @@ model role {
   role_name   String @id
   description String
   user        user[]
-}
-
-model transaction_log {
-  id             Int      @id @default(autoincrement())
-  transaction_id Int
-  user_id        String
-  order_status   Int
-  timestamp      DateTime
-
-  transaction transaction @relation(fields: [transaction_id], references: [id])
-  user        user        @relation(fields: [user_id], references: [id])
 }

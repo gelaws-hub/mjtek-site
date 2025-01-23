@@ -1,41 +1,45 @@
 import express from 'express';
 import { 
-    registerUser, 
-    login,  
+    registerUser,
+    activateUser, 
+    login,
+    requestResetPassword,
+    resetPassword,  
     refreshToken,
-    getCurrentUser,
-    getUsers, 
+    getCurrentUser, 
     logoutUser,
     ensureAuthenticated,
-    authorize
+    authorize,
+    validateSession
 } from '../auth/userController';
 
 import { createRole, getAllRoles, getRoleById, updateRole, deleteRole } from '../auth/roleController';
+import { getUsers } from '../auth/BuyerController';
 
 const userRoutes = express.Router();
 
 // REGISTER USER
 userRoutes.post('/register', registerUser);
 
+// ACTIVATE USER
+userRoutes.post('/activate', activateUser);
+
 // LOGIN USER
 userRoutes.post('/login', login);
 
-// LOGIN 2FA
-// userRoutes.post('/login-2fa', login2FA);
+// RESET PASSWORD REQUEST
+userRoutes.post('/request-reset-password', requestResetPassword);
+
+// SAVE NEW PASSWORD
+userRoutes.post('/reset-password', resetPassword);
 
 // REFRESH TOKEN
 userRoutes.post('/refresh-token', refreshToken);
 
-// GENERATE 2FA QR CODE (Protected route - user must be authenticated)
-// userRoutes.get('/2fa/qrcode', ensureAuthenticated, generate2FAQRCode);
-
-// VALIDATE 2FA (Protected route - user must be authenticated)
-// userRoutes.post('/2fa/validate', ensureAuthenticated, validate2FA);
-
 // GET CURRENT USER (Protected route - user must be authenticated)
 userRoutes.get('/me', ensureAuthenticated, getCurrentUser);
 
-userRoutes.get('/users', ensureAuthenticated, getUsers);
+userRoutes.get('/users', ensureAuthenticated, authorize(["admin", "owner"]), getUsers);
 
 // LOGOUT USER (Protected route - user must be authenticated)
 userRoutes.post('/logout', ensureAuthenticated, logoutUser);
@@ -52,5 +56,6 @@ userRoutes.get('/role/:id', getRoleById);
 userRoutes.put('/role/:id', updateRole);
 userRoutes.delete('/role/:id', deleteRole);
 
+userRoutes.get("/validate-session", ensureAuthenticated, validateSession);
 
-export default userRoutes;
+export default userRoutes

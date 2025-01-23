@@ -42,6 +42,7 @@ import {
   getProductRamTypeById,
   updateProductRamType,
 } from "../controllers/simulation/productRamTypeController";
+import { getAllSocketRamType } from "../controllers/simulation/socketRamType";
 
 const simulationRoutes = express.Router();
 
@@ -84,5 +85,7 @@ simulationRoutes.get("/product-socket/:id", getProductRamTypeById);
 simulationRoutes.post("/product-socket", createProductRamType);
 simulationRoutes.delete("/product-socket/:id", deleteProductRamType);
 simulationRoutes.put("/product-socket/:id", updateProductRamType);
+
+simulationRoutes.get("/socket-ramtype", getAllSocketRamType);
 
 export default simulationRoutes;

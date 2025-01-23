@@ -1,59 +1,71 @@
-import express from 'express';
-import bodyParser from 'body-parser';
-import cors from 'cors';
-import cookieParser from 'cookie-parser';
-import dotenv from 'dotenv';
-import produkRoutes from './routes/productRoutes';
-import produkDetailRoutes from './routes/productDetailRoutes'; 
-import simulationRoutes from './routes/simulationRoutes';
-import transaksiRoutes from './routes/transactionRoutes';
-import userRoutes from './routes/userRoutes';
-
+import express from "express";
+import bodyParser from "body-parser";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import dotenv from "dotenv";
+import produkRoutes from "./routes/productRoutes";
+import produkDetailRoutes from "./routes/productDetailRoutes";
+import simulationRoutes from "./routes/simulationRoutes";
+import transaksiRoutes from "./routes/transactionRoutes";
+import userRoutes from "./routes/userRoutes";
+import mediaUploaderRouter from "./routes/mediaUploaderRoutes";
+import path from "path";
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
 app.use(cookieParser());
+app.use(bodyParser.json({ limit: '10mb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 
-// Middleware setup
-app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+// Get the allowed origins from the environment variables (comma-separated)
+const allowedOrigins = process.env.CORS_ALLOWED_ORIGINS
+  ? process.env.CORS_ALLOWED_ORIGINS.split(",")
+  : [];
 
-// Register routes
-app.use('/', produkRoutes);
-app.use('/', produkDetailRoutes);
-app.use('/', simulationRoutes);
-app.use('/', transaksiRoutes);
+  console.log(allowedOrigins);
 
-// auth routes
-app.use('/', userRoutes);
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps or Postman)
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true, // Enable sending cookies
+  })
+);
 
-// Root route
-app.get('/', (req, res) => {
-  res.send('API is running');
+// app.use(cors());
+
+app.use("/", produkRoutes);
+app.use("/", produkDetailRoutes);
+app.use("/", simulationRoutes);
+app.use("/", transaksiRoutes);
+app.use("/", userRoutes);
+app.use("/", mediaUploaderRouter);
+
+// Serve the uploads directory
+const uploadsDir = path.join(
+  process.cwd(),
+  process.env.PRODUCT_UPLOADS_DIR || "uploads"
+);
+app.use("/uploads", express.static(uploadsDir));
+
+app.get("/", (req, res) => {
+  res.send("API is running");
 });
 
-// Handle 404 errors
 app.use((req, res) => {
-  res.status(404).send('Not Found');
+  res.status(404).send("Not Found");
 });
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
-});
-
-// Curb Cores Error by adding a header here
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content, Accept, Content-Type, Authorization"
-  );
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, PATCH, OPTIONS"
-  );
-  next();
+  // console.log(uploadsDir);
 });

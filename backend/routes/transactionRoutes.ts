@@ -1,5 +1,5 @@
 import express from "express";
-import { addToCart, clearCart, getAllCartByUserId, removeFromCart, updateCartItem } from "../controllers/transaksi/cartController";
+import { addToCart, clearCart, getAllCartByUserId, partialUpdateCart, removeFromCart, toggleCartSelection } from "../controllers/transaksi/cartController";
 
 import {
   getAllFavoritesByUserId,
@@ -8,58 +8,37 @@ import {
   removeFromFavorites,
 } from "../controllers/transaksi/favoriteController";
 
-import { createTransaction, deleteTransaction, getAllTransaction, getTransactionById, updateTransaction } from '../controllers/transaksi/transactionController';
+import { cancelTransaction, createTransaction, getAllTransactionsFromUser, getTransactionById, getTransactionStatuses, updateTransactionStatus } from '../controllers/transaksi/transactionController';
 
-import {
-  getAllDetailTransaksi,
-  getDetailTransaksiById,
-  createDetailTransaksi,
-  updateDetailTransaksi,
-  deleteDetailTransaksi,
-} from '../controllers/transaksi/transactionDetailController';
-
-import {
-  getAllLogTransaksi,
-  getLogTransaksiById,
-  createLogTransaksi,
-  updateLogTransaksi,
-  deleteLogTransaksi,
-} from '../controllers/transaksi/logTransaksiController';
-import { ensureCorrectUser } from "../auth/middleware/buyer/buyerMiddleware";
+import { authorize, ensureAuthenticated } from "../auth/userController";
+import { getAllTransactions } from "../controllers/transaksi/searchTransactionController";
+import { uploadTransactionProof } from "../controllers/transaksi/uploadPaymentProof";
 
 const transaksiRoutes = express.Router();
 
-transaksiRoutes.get("/cart/:id_user", getAllCartByUserId);
-transaksiRoutes.get("/cart/detail/:id", clearCart);
-transaksiRoutes.post("/cart", addToCart);
-transaksiRoutes.put("/cart/:id", updateCartItem);
-transaksiRoutes.delete("/cart/:id", removeFromCart);
+transaksiRoutes.get("/cart", ensureAuthenticated, authorize(["buyer"]), getAllCartByUserId);
+transaksiRoutes.post("/cart", ensureAuthenticated, authorize(["buyer"]), addToCart);
+transaksiRoutes.patch("/cart/:product_id", ensureAuthenticated, authorize(["buyer"]), partialUpdateCart);
+transaksiRoutes.put("/cart", ensureAuthenticated, authorize(["buyer"]), toggleCartSelection);
+transaksiRoutes.delete("/cart/:product_id",ensureAuthenticated, authorize(["buyer"]), removeFromCart);
+transaksiRoutes.delete("/cart",ensureAuthenticated, authorize(["buyer"]), clearCart);
 
 //ensureCorrectUser has to take :user_id as a param to make sure it's the correct user
-transaksiRoutes.get("/favorite/:user_id", ensureCorrectUser, getAllFavoritesByUserId);
-transaksiRoutes.post("/favorite/:user_id", ensureCorrectUser, addToFavorites);
-transaksiRoutes.post("/isFavorite/:user_id", ensureCorrectUser, isProductFavorite);
-transaksiRoutes.delete("/favorite/:user_id", ensureCorrectUser, removeFromFavorites); 
+transaksiRoutes.get("/favorite", ensureAuthenticated, authorize(["buyer"]), getAllFavoritesByUserId);
+transaksiRoutes.get("/isFavorite/:product_id", ensureAuthenticated, authorize(["buyer"]), isProductFavorite);
+transaksiRoutes.post("/favorite", ensureAuthenticated, authorize(["buyer"]), addToFavorites);
+transaksiRoutes.delete("/favorite", ensureAuthenticated, authorize(["buyer"]), removeFromFavorites); 
 
 // Transaksi routes
-transaksiRoutes.get('/transaction', getAllTransaction);
-transaksiRoutes.get('/transaction/:id', getTransactionById);
-transaksiRoutes.post('/transaction', createTransaction);
-transaksiRoutes.put('/transaction/:id', updateTransaction);
-transaksiRoutes.delete('/transaction/:id', deleteTransaction);
+transaksiRoutes.get('/transaction', ensureAuthenticated, authorize(["buyer"]), getAllTransactionsFromUser);
+transaksiRoutes.get('/transaction/:transactionId', ensureAuthenticated, authorize(["buyer"]), getTransactionById);
+transaksiRoutes.post('/transaction', ensureAuthenticated, authorize(["buyer"]), createTransaction);
+transaksiRoutes.patch('/transaction/:transactionId', ensureAuthenticated, authorize(["buyer"]), cancelTransaction);
+transaksiRoutes.patch('/transaction-proof/:transactionId', ensureAuthenticated, authorize(["buyer"]), uploadTransactionProof);
 
-// Detail_Transaksi routes
-transaksiRoutes.get('/transaction-detail', getAllDetailTransaksi);
-transaksiRoutes.get('/transaction-detail/:id', getDetailTransaksiById);
-transaksiRoutes.post('/transaction-detail', createDetailTransaksi);
-transaksiRoutes.put('/transaction-detail/:id', updateDetailTransaksi);
-transaksiRoutes.delete('/transaction-detail/:id', deleteDetailTransaksi);
-
-// Log_Transaksi routes
-transaksiRoutes.get('/transaction-log', getAllLogTransaksi);
-transaksiRoutes.get('/transaction-log/:id', getLogTransaksiById);
-transaksiRoutes.post('/transaction-log', createLogTransaksi);
-transaksiRoutes.put('/transaction-log/:id', updateLogTransaksi);
-transaksiRoutes.delete('/transaction-log/:id', deleteLogTransaksi);
+// Admin Transaksi routes
+transaksiRoutes.patch('/admin/transaction/:transactionId', ensureAuthenticated, authorize(["admin", "owner"]), updateTransactionStatus);
+transaksiRoutes.get('/admin/transaction', ensureAuthenticated, authorize(["admin", "owner"]), getAllTransactions);
+transaksiRoutes.get('/admin/transaction-status', ensureAuthenticated, authorize(["admin", "owner"]), getTransactionStatuses);
 
 export default transaksiRoutes;

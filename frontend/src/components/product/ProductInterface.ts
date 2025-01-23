@@ -4,12 +4,23 @@ export interface Media {
 }
 
 export interface Product {
-  id: number;
+  id: string;
   product_name: string;
   price: number;
+  stock: number;
   media: Media[];
   category: {
     id: number;
     category_name: string;
   };
+}
+
+export interface ProductCardItemProps {
+  id: string; 
+  product_name: string;
+  price: number; 
+  stock: number;
+  media_source: string | null; 
+  category_id: number;
+  category_name: string;
 }

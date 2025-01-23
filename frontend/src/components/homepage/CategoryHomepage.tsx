@@ -18,10 +18,9 @@ export default function CategoryHomepage({
         <span className="border-x-[6px] border-blue-900 border-solid mx-4 rounded-md"></span>
         kategori
       </h1>
-      <h1 className="text-2xl font-bold mb-4">Cari berdasarkan kategori</h1>
-      <div className="flex gap-2 items-center overflow-x-scroll scrollbar-none">
+      <div className="flex gap-4 items-center overflow-x-scroll scrollbar-none">
         {categoryData.map((c) => (
-          <Link
+          <Link scroll={false}
             key={c.name}
             className="h-24 w-24 md:h-40 md:w-40 aspect-square flex flex-col items-center px-1 md:p-5 border-2 border-gray-300 rounded-lg hover:bg-blue-950 hover:text-white ease-in-out duration-300 group md:gap-0 justify-between pt-4 pb-2"
             href={c.url}

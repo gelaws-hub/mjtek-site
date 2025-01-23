@@ -1,9 +1,7 @@
 import Image from "next/image";
-import { User } from "./UserProfile";
-import { DiscAlbum } from "lucide-react";
 
 export interface UserInfoModalProps {
-  user: User | null;
+  user: any | null;
   className?: string;
   handleLogout: () => void;
 }

@@ -1,36 +1,44 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import LoadingAuth from "../loading";
+import { useFormik } from "formik";
+import { object, string, ref } from "yup";
 import { useRouter } from "next/navigation";
-
-interface RegisterInputs {
-  name: string;
-  username: string;
-  email: string;
-  password: string;
-  confPassword: string;
-  address: string;
-  phone_number: string;
-}
+import Image from "next/image";
 
 export default function RegisterForm() {
-  const [registerInputs, setRegisterInputs] = useState<RegisterInputs>({
-    name: "",
-    username: "",
-    email: "",
-    password: "",
-    confPassword: "",
-    address: "",
-    phone_number: "",
-  });
-  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  const handleRegister = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setIsLoading(true);
+  const userSchema = object({
+    name: string()
+      .min(3, "Minimal 3 karakter")
+      .max(30, "Maximal 30 karakter")
+      .required("Nama harus diisi"),
+    username: string()
+      .min(3, "Minimal 3 karakter")
+      .max(20, "Maximal 20 karakter")
+      .required("Username harus diisi"),
+    email: string()
+      .email("Tolong masukkan email yang valid")
+      .required("Email harus diisi"),
+    password: string()
+      .matches(
+        /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{6,}$/,
+        "Password harus memiliki minimal 6 karakter, terdapat huruf besar, angka, dan karakter khusus",
+      )
+      .required("Password harus diisi"),
+    confPassword: string()
+      .oneOf([ref("password"), undefined], "Password harus sama")
+      .required("Harus diisi"),
+    address: string().required("Alamat harus diisi"),
+    phone_number: string()
+      .matches(/^\d+$/, "Nomor telepon harus berupa angka")
+      .min(9, "Nomor telepon minimal 9 angka")
+      .max(15, "Nomor telepon maksimal 15 angka")
+      .required("Nomor telepon harus diisi"),
+  });
+
+  const handleRegister = async (values: any, actions: any) => {
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/register`,
@@ -39,85 +47,101 @@ export default function RegisterForm() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(registerInputs),
-        }
+          body: JSON.stringify(values),
+        },
       );
 
       if (response.ok) {
         const data = await response.json();
         console.log(data);
-        setIsLoading(false);
         router.push("/login");
       } else {
         const errorData = await response.json();
         console.error(errorData);
-        setIsLoading(false);
       }
     } catch (error) {
       console.error(error);
-      setIsLoading(false);
     }
+    actions.resetForm();
   };
 
-  const handleInputChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ): void => {
-    setRegisterInputs((prevState) => ({
-      ...prevState,
-      [event.target.name]: event.target.value,
-    }));
-  };
+  const {
+    values,
+    errors,
+    touched,
+    handleBlur,
+    handleChange,
+    handleSubmit,
+    isSubmitting,
+  } = useFormik({
+    initialValues: {
+      name: "",
+      username: "",
+      email: "",
+      password: "",
+      confPassword: "",
+      address: "",
+      phone_number: "",
+    },
+    onSubmit: handleRegister,
+    validationSchema: userSchema,
+  });
 
   return (
     <>
-      {isLoading ? <LoadingAuth /> : null}
       <form
-        className="space-y-4 md:space-y-6"
+        className="space-y-4 md:space-y-6 "
         action="#"
-        onSubmit={handleRegister}
+        onSubmit={handleSubmit}
       >
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label
-              htmlFor="name"
-              className="block mb-2 text-sm font-medium text-gray-900"
-            >
-              Nama
-            </label>
-            <input
-              type="text"
-              name="name"
-              id="name"
-              className="text-gray-900 text-sm block w-full p-2.5 border-b-[2px] border-gray-300 focus:outline-none"
-              placeholder="Masukan nama anda"
-              value={registerInputs.name}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="username"
-              className="block mb-2 text-sm font-medium text-gray-900"
-            >
-              Username
-            </label>
-            <input
-              type="text"
-              name="username"
-              id="username"
-              className="text-gray-900 text-sm block w-full p-2.5 border-b-[2px] border-gray-300 focus:outline-none"
-              placeholder="Buat username unik"
-              value={registerInputs.username}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
+        <div>
+          <label
+            htmlFor="name"
+            className="mb-2 block text-sm font-medium text-gray-900"
+          >
+            Nama
+          </label>
+          <input
+            type="text"
+            name="name"
+            id="name"
+            className={`${errors.name && touched.name ? "border-red-500" : ""} block w-full border-b-[2px] border-gray-300 p-2.5 text-sm text-gray-900 focus:outline-none`}
+            placeholder="Masukan nama anda"
+            value={values.name}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            required
+          />
+          {errors.name && touched.name && (
+            <p className="text-sm text-red-500">{errors.name}</p>
+          )}
+        </div>
+        <div>
+          <label
+            htmlFor="username"
+            className="mb-2 block text-sm font-medium text-gray-900"
+          >
+            Username
+          </label>
+          <input
+            type="text"
+            name="username"
+            id="username"
+            className={`${errors.username && touched.username ? "border-red-500" : ""} block w-full border-b-[2px] border-gray-300 p-2.5 text-sm text-gray-900 focus:outline-none`}
+            placeholder="Buat username unik"
+            value={values.username}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            required
+          />
+          {errors.username && touched.username && (
+            <p className="text-sm text-red-500">{errors.username}</p>
+          )}
         </div>
         <div>
           <label
             htmlFor="email"
-            className="block mb-2 text-sm font-medium text-gray-900"
+            className="mb-2 block text-sm font-medium text-gray-900"
           >
             Email
           </label>
@@ -125,17 +149,21 @@ export default function RegisterForm() {
             type="email"
             name="email"
             id="email"
-            className="text-gray-900 text-sm block w-full p-2.5 border-b-[2px] border-gray-300 focus:outline-none"
+            className={`${errors.email && touched.email ? "border-red-500" : ""} block w-full border-b-[2px] border-gray-300 p-2.5 text-sm text-gray-900 focus:outline-none`}
             placeholder="name@company.com"
-            value={registerInputs.email}
-            onChange={handleInputChange}
+            value={values.email}
+            onChange={handleChange}
+            onBlur={handleBlur}
             required
           />
+          {errors.email && touched.email && (
+            <p className="text-sm text-red-500">{errors.email}</p>
+          )}
         </div>
         <div>
           <label
             htmlFor="password"
-            className="block mb-2 text-sm font-medium text-gray-900"
+            className="mb-2 block text-sm font-medium text-gray-900"
           >
             Password
           </label>
@@ -144,16 +172,20 @@ export default function RegisterForm() {
             name="password"
             id="password"
             placeholder="••••••••"
-            className="text-gray-900 text-sm block w-full p-2.5 border-b-[2px] border-gray-300 focus:outline-none"
-            value={registerInputs.password}
-            onChange={handleInputChange}
+            className={`${errors.password && touched.password ? "border-red-500" : ""} block w-full border-b-[2px] border-gray-300 p-2.5 text-sm text-gray-900 focus:outline-none`}
+            value={values.password}
+            onChange={handleChange}
+            onBlur={handleBlur}
             required
           />
+          {errors.password && touched.password && (
+            <p className="text-sm text-red-500">{errors.password}</p>
+          )}
         </div>
         <div>
           <label
             htmlFor="confPassword"
-            className="block mb-2 text-sm font-medium text-gray-900"
+            className="mb-2 block text-sm font-medium text-gray-900"
           >
             Konfirmasi password
           </label>
@@ -162,16 +194,20 @@ export default function RegisterForm() {
             name="confPassword"
             id="confpassword"
             placeholder="••••••••"
-            className="text-gray-900 text-sm block w-full p-2.5 border-b-[2px] border-gray-300 focus:outline-none"
-            value={registerInputs.confPassword}
-            onChange={handleInputChange}
+            className={`${errors.confPassword && touched.confPassword ? "border-red-500" : ""} block w-full border-b-[2px] border-gray-300 p-2.5 text-sm text-gray-900 focus:outline-none`}
+            value={values.confPassword}
+            onChange={handleChange}
+            onBlur={handleBlur}
             required
           />
+          {errors.confPassword && touched.confPassword && (
+            <p className="text-sm text-red-500">{errors.confPassword}</p>
+          )}
         </div>
         <div>
           <label
             htmlFor="address"
-            className="block mb-2 text-sm font-medium text-gray-900"
+            className="mb-2 block text-sm font-medium text-gray-900"
           >
             Alamat
           </label>
@@ -179,18 +215,21 @@ export default function RegisterForm() {
             type="text"
             name="address"
             id="address"
-            className="text-gray-900 text-sm block w-full p-2.5 border-b-[2px] border-gray-300 focus:outline-none"
-            placeholder="Masukan alamat rumah anda"
-            value={registerInputs.address}
-            onChange={handleInputChange}
+            className={`${errors.address && touched.address ? "border-red-500" : ""} block w-full border-b-[2px] border-gray-300 p-2.5 text-sm text-gray-900 focus:outline-none`}
+            value={values.address}
+            onChange={handleChange}
+            onBlur={handleBlur}
             required
             autoComplete="street-address"
           />
+          {errors.address && touched.address && (
+            <p className="text-sm text-red-500">{errors.address}</p>
+          )}
         </div>
         <div>
           <label
             htmlFor="phone_number"
-            className="block mb-2 text-sm font-medium text-gray-900"
+            className="mb-2 block text-sm font-medium text-gray-900"
           >
             No Handphone
           </label>
@@ -198,20 +237,24 @@ export default function RegisterForm() {
             type="text"
             name="phone_number"
             id="phone_number"
-            className="text-gray-900 text-sm block w-full p-2.5 border-b-[2px] border-gray-300 focus:outline-none"
+            className={`${errors.phone_number && touched.phone_number ? "border-red-500" : ""} block w-full border-b-[2px] border-gray-300 p-2.5 text-sm text-gray-900 [appearance:textfield] focus:outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none`}
             placeholder="Masukan no handphone anda"
-            value={registerInputs.phone_number}
-            onChange={handleInputChange}
+            value={values.phone_number}
+            onChange={handleChange}
+            onBlur={handleBlur}
             required
           />
+          {errors.phone_number && touched.phone_number && (
+            <p className="text-sm text-red-500">{errors.phone_number}</p>
+          )}
         </div>
         <div className="flex items-start">
-          <div className="flex items-center h-5">
+          <div className="flex h-5 items-center">
             <input
               id="terms"
               aria-describedby="terms"
               type="checkbox"
-              className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300"
+              className="focus:ring-3 focus:ring-primary-300 h-4 w-4 rounded border border-gray-300 bg-gray-50"
               required
             />
           </div>
@@ -219,7 +262,7 @@ export default function RegisterForm() {
             <label htmlFor="terms" className="font-light text-gray-500">
               I accept the{" "}
               <a
-                className="font-medium text-primary-600 hover:underline"
+                className="text-primary-600 font-medium hover:underline"
                 href="#"
               >
                 Terms and Conditions
@@ -229,15 +272,16 @@ export default function RegisterForm() {
         </div>
         <button
           type="submit"
-          className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center bg-blue-900 hover:bg-blue-950"
+          disabled={isSubmitting}
+          className="bg-primary-600 hover:bg-primary-700 focus:ring-primary-300 w-full rounded-lg bg-blue-900 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-950 focus:outline-none focus:ring-4"
         >
-          Create an account
+          Buat akun
         </button>
         <p className="text-sm font-light text-gray-500">
           Already have an account?{" "}
-          <Link
+          <Link scroll={false}
             href="/login"
-            className="font-medium text-primary-600 hover:underline"
+            className="text-primary-600 font-medium hover:underline"
           >
             Login here
           </Link>

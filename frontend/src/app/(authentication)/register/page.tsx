@@ -1,10 +1,20 @@
+import Image from "next/image";
 import RegisterForm from "./RegisterForm";
 
 export default function Register() {
+  const bannerLogin =
+    "https://images.tokopedia.net/img/cache/1200/BgtCLw/2021/9/20/a4a3e98f-d9e4-40ae-84b6-8df6903ba113.jpg.webp?ect=4g";
   return (
-    <div className="bg-white rounded-l-2xl drop-shadow-lg shadow-background flex flex-col px-[5%] py-[5%]">
-      <section className="w-full bg-white rounded-lg shadow border md:mt-0 sm:max-w-md xl:p-0 mx-auto">
-        <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
+    <div className=" shadow-background flex h-screen flex-col items-center justify-center rounded-l-2xl px-[5%] drop-shadow-lg backdrop-blur scrollbar-track-transparent scrollbar-thumb-blue-900">
+      <Image
+        src={bannerLogin}
+        alt="login"
+        width={2000}
+        height={2000}
+        className="absolute inset-0 -z-10 h-full w-full object-cover brightness-[.4]"
+      />
+      <section className="max-h-[90%] w-full flex-grow justify-center overflow-y-auto rounded-lg border bg-white/70 p-4 shadow backdrop-blur-sm scrollbar-thin md:max-w-[70vw] lg:max-w-[60vw] ">
+        <div className="space-y-4 p-4 sm:p-8 md:space-y-6">
           <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl">
             Buat akun baru
           </h1>

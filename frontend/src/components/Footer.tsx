@@ -1,10 +1,16 @@
+"use client";
+import { usePathname } from "next/navigation";
+
+const hideHeaderPaths = ["/login", "/register", "/admin"];
 export default function Footer() {
+  const pathname = usePathname();
+  if (hideHeaderPaths.some((path) => pathname?.startsWith(path))) return null;
   return (
-    <footer className="bg-[#1B224B] text-white py-8 px-4 md:px-8 pt-12">
-      <div className="container mx-auto max-w-7xl">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <div className="space-y-4">
-            <h2 className="text-2xl md:text-3xl font-bold">
+    <footer className="bg-[#1B224B] px-4 py-8 pt-12 text-white md:px-8">
+      <div className="container mx-auto max-w-7xl text-xs">
+        <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2">
+          <div className="space-y-4 col-span-2 md:col-span-1">
+            <h2 className="text-2xl font-bold md:text-3xl">
               MJ Teknologi Semarang
             </h2>
             <p className="text-gray-300">
@@ -14,11 +20,11 @@ export default function Footer() {
               Buka Sejak <span className="font-semibold">Agustus 2016</span>
             </p>
           </div>
-          <div className="flex flex-col md:items-end gap-2 text-gray-300">
+          <div className="flex flex-col gap-2 text-gray-300 md:items-end">
             <div className="flex items-center gap-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
+                className="md:h-5 md:w-5 w-3 h-3"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -32,7 +38,7 @@ export default function Footer() {
             <div className="flex items-center gap-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
+                className="md:h-5 md:w-5 w-3 h-3"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -43,7 +49,7 @@ export default function Footer() {
               <span>08976607559</span>
             </div>
           </div>
-          <p className="text-sm text-gray-300 leading-relaxed col-span-2">
+          <p className="col-span-2 text-xs md:text-sm leading-relaxed text-gray-300">
             Beli aneka produk di Toko MJ Teknologi Semarang secara online
             sekarang. Kamu bisa beli produk dari Toko MJ Teknologi Semarang
             dengan aman & mudah dari Kota Semarang. Ingin belanja lebih hemat &
@@ -59,7 +65,9 @@ export default function Footer() {
         </div>
         <div className="pt-8">
           <a href="#">
-            <p className="text-sm text-center text-gray-400" >Copyright MJ Teknologi Semarang 2024. All right reserved</p>
+            <p className="text-center text-sm text-gray-400">
+              Copyright MJ Teknologi Semarang 2024. All right reserved
+            </p>
           </a>
         </div>
       </div>

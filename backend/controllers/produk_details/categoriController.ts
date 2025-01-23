@@ -7,7 +7,7 @@ export const getAllCategories = async (req: Request, res: Response) => {
     const categories = await prisma.category.findMany({
       orderBy: {
         id: "asc", // Sort by id in ascending order
-      },
+      }, take: 1000
     });
     res
       .status(200)

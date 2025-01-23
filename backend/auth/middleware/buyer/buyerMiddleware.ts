@@ -15,28 +15,16 @@ interface CustomRequest extends Request {
   };
 }
 
-interface ValidationRequest extends Request {
-  user?: CustomRequest["user"];
-}
-
 // Middleware to ensure the user is a buyer
 export const ensureCorrectUser: RequestHandler = async (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  const { user_id } = req.params;
+  const token = req.cookies.accessToken;
 
-  if (!authHeader) {
-    return res.status(401).json({ message: "Access token not found" });
+  if (!token) {
+    return res.status(401).json({ message: "Unauthorized" });
   }
-
-  const token = authHeader.split(" ")[1];
 
   try {
     const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!) as any;
-
-    // Verify user ID in the database
-    if (decoded.id !== user_id) {
-      return res.status(404).json({ message: "You're not the correct user" });
-    }
 
     const user = await prisma.user.findUnique({
       where: { id: decoded.id },
