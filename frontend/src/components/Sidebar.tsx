@@ -32,7 +32,7 @@ export default function Sidebar({ sidebarData }: SidebarProps) {
             <div className="">
               <button
                 onClick={() => toggleExpand(item.name)}
-                className="hover:text-blue-950 flex justify-between w-full items-center pr-2"
+                className="hover:text-blue-950 flex justify-between w-full items-center pr-2 hover:underline"
               >
                 <p>{item.name}</p>
                 <div
@@ -51,7 +51,7 @@ export default function Sidebar({ sidebarData }: SidebarProps) {
                 {item.subItems.map((subItem) => (
                   <li key={subItem.name}>
                     <Link scroll={false}
-                      className="hover:text-blue-950 w-full py-2"
+                      className="hover:text-blue-950 w-full py-2 hover:underline"
                       href={subItem.url!}
                     >
                       {subItem.name}

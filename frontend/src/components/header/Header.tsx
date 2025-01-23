@@ -36,7 +36,7 @@ export default function Header() {
           <SearchBar />
         </div>
         <UserProfile />
-        <div className="relative py-2 col-span-3 md:col-span-2 md:col-start-2 row-start-2 md:flex overflow-auto px-4 md:py-0 md:mt-2 scrollbar-none">
+        <div className="relative py-2 col-span-3 md:col-span-2 md:col-start-2 row-start-2 md:flex overflow-auto px-4 md:py-0 md:mt-2 scrollbar-none md:max-w-[80%]">
           <Navbar />
         </div>
       </div>

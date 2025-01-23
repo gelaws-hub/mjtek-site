@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -9,11 +10,13 @@ interface categoryData {
 
 export default function CategoryHomepage({
   categoryData,
+  className = "",
 }: {
   categoryData: categoryData[];
+  className?: string;
 }) {
   return (
-    <div className="my-10 w-[90vw] md:w-[100%] mx-auto">
+    <div className={cn("my-10 w-[90vw] md:w-[100%] mx-auto", className)}>
       <h1 className="text-2xl font-bold mb-4">
         <span className="border-x-[6px] border-blue-900 border-solid mx-4 rounded-md"></span>
         kategori
