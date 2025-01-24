@@ -173,7 +173,7 @@ function ProductTables() {
                       <td className="mr-2 flex items-center gap-2">
                         <div className="h-8 w-8 flex-shrink-0 overflow-hidden rounded-sm sm:rounded-md md:h-12 md:w-12">
                           {product.media ? (
-                            <Image
+                            <img
                               className="h-full w-full object-cover"
                               src={product.media[0].source}
                               width={64}

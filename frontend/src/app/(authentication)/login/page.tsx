@@ -91,7 +91,7 @@ export default function Login() {
   return (
     <div className="grid min-h-[100vh] grid-cols-1 justify-center p-4 lg:grid-cols-[50%_50%] lg:p-20">
       <div className="absolute inset-0 -z-9 h-full w-full bg-black-2/50 backdrop-blur-sm lg:hidden"></div>
-      <Image
+      <img
         src={bannerLogin}
         alt="login"
         width={2000}
@@ -191,7 +191,7 @@ export default function Login() {
         </section>
       </div>
       <div className="hidden h-[70%] self-center rounded-r-2xl bg-blue-500 shadow-xl shadow-slate-400 lg:block">
-        <Image
+        <img
           src={bannerLogin}
           alt="login"
           width={2000}

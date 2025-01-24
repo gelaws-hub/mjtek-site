@@ -5,7 +5,7 @@ interface ImageUploaderProps {
   onFileSelect: (files: File[]) => void;
 }
 
-const ImageUploader: React.FC<ImageUploaderProps> = ({ onFileSelect }) => {
+const ImageUploader: React.FC<imgUploaderProps> = ({ onFileSelect }) => {
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
@@ -41,7 +41,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onFileSelect }) => {
               key={index}
               className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-md bg-gray-200 dark:bg-boxdark"
             >
-              <Image
+              <img
                 width={100}
                 height={100}
                 src={url}

@@ -91,7 +91,7 @@ export default function UserProfile() {
           btnTrigger={
             <button className="" onClick={toggleUserInfo}>
               <div className="flex cursor-pointer items-center justify-center rounded-xl hover:bg-blue-900 hover:bg-opacity-10 md:mr-10 md:justify-start md:gap-2 md:px-3 md:py-1">
-                <Image
+                <img
                   key="profile_image"
                   src={"/image.png"}
                   alt="profile_image"

@@ -73,7 +73,7 @@ export default function TransactionCard({
       {/* Product */}
       <div className="flex items-start gap-4 p-4">
         <div className="relative h-16 w-16 flex-shrink-0">
-          <Image
+          <img
             src={firstProduct.media_source}
             alt={firstProduct.product_name}
             layout="fill"

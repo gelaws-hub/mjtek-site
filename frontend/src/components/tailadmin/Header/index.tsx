@@ -57,7 +57,7 @@ const Header = (props: {
           {/* <!-- Hamburger Toggle BTN --> */}
 
           <Link scroll={false} className="block flex-shrink-0 lg:hidden" href="/">
-            <Image
+            <img
               width={32}
               height={32}
               src={"/logo_mjtek.png"}

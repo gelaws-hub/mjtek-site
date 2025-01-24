@@ -68,7 +68,7 @@ const ChatCard = () => {
             key={key}
           >
             <div className="relative h-14 w-14 rounded-full">
-              <Image
+              <img
                 width={56}
                 height={56}
                 src={chat.avatar}

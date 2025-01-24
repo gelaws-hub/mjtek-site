@@ -244,7 +244,7 @@ export default function TransactionPage() {
                       href={transaction.payment_proof}
                       className="m-1 mx-auto h-16 w-16 overflow-hidden"
                     >
-                      <Image
+                      <img
                         src={transaction.payment_proof}
                         alt={transaction.id}
                         width={500}

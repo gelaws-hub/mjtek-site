@@ -30,7 +30,7 @@ export default function CartItem({
           onChange={(e) => onCheckItem(item.product_id, e.target.checked)}
           className="m-1 my-auto h-4 w-4 cursor-pointer rounded-md border-gray-300 bg-gray-100 text-blue-600 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800"
         />
-        <Image
+        <img
           src={item.media_source}
           alt={item.product_name}
           width={100}

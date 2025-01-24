@@ -20,7 +20,7 @@ export default function Header() {
           href="/"
           className="col-start-1 my-0 md:flex flex-row items-center gap-4 justify-center md:justify-end md:mr-4 lg:mr-[20%]"
         >
-          <Image
+          <img
             key="logo-mjtek"
             src="/logo_mjtek_transparent.png"
             alt="logo-mjtek"

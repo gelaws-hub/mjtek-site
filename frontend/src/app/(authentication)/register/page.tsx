@@ -6,7 +6,7 @@ export default function Register() {
     "https://images.tokopedia.net/img/cache/1200/BgtCLw/2021/9/20/a4a3e98f-d9e4-40ae-84b6-8df6903ba113.jpg.webp?ect=4g";
   return (
     <div className=" shadow-background flex h-screen flex-col items-center justify-center rounded-l-2xl px-[5%] drop-shadow-lg backdrop-blur scrollbar-track-transparent scrollbar-thumb-blue-900">
-      <Image
+      <img
         src={bannerLogin}
         alt="login"
         width={2000}
