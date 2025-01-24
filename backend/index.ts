@@ -10,6 +10,7 @@ import transaksiRoutes from "./routes/transactionRoutes";
 import userRoutes from "./routes/userRoutes";
 import mediaUploaderRouter from "./routes/mediaUploaderRoutes";
 import path from "path";
+import chartRoutes from "./routes/chart";
 
 dotenv.config();
 
@@ -49,6 +50,7 @@ app.use("/", simulationRoutes);
 app.use("/", transaksiRoutes);
 app.use("/", userRoutes);
 app.use("/", mediaUploaderRouter);
+app.use("/", chartRoutes);
 
 // Serve the uploads directory
 const uploadsDir = path.join(

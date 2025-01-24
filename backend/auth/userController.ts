@@ -112,7 +112,7 @@ export const registerUser = async (req: Request, res: Response) => {
         is_active: false,
         role_name: "buyer", // Set default role sebagai user biasa(pembeli)
         profile_pic:
-          "https://raw.githubusercontent.com/gelaws-hub/mjtek-site/refs/heads/main/frontend/public/image.png",
+          "/image.png",
       },
     });
 
