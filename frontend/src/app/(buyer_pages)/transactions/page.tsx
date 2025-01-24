@@ -10,7 +10,6 @@ import { Combobox } from "@/components/ui/combobox";
 import Link from "next/link";
 import ProofUploaderModal from "./components/proofUploaderModal";
 import Image from "next/image";
-import useAuth from "@/hooks/useAuth";
 
 export default function TransactionPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -19,8 +18,6 @@ export default function TransactionPage() {
   const [proofTransaction, setProofTransaction] = useState<Transaction | null>(
     null,
   );
-
-  useAuth(["buyer"]);
 
   const [selectedTransaction, setSelectedTransaction] =
     useState<Transaction | null>(null);

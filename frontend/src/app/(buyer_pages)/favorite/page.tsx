@@ -5,10 +5,8 @@ import useCheckSession from "../../(authentication)/auth/useCheckSession";
 import { ProductCardItemProps } from "@/components/product/ProductInterface";
 import ProductCardItem from "@/components/product/ProductCardItem";
 import ProductSkeleton from "@/components/product/productSkeleton";
-import useAuth from "@/hooks/useAuth";
 
 export default function FavoritePage() {
-  useAuth(["buyer"]);
   const { loading, error, isAuthenticated, roleName, user } = useCheckSession();
   const [products, setProducts] = useState<ProductCardItemProps[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(true);

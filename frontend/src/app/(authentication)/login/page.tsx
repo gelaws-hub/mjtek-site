@@ -16,7 +16,7 @@ export default function Login() {
   const [error, setError] = useState(null);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get("redirectTo") || "/"; // Default to '/' if no redirectTo is provided
+  const callbackUrl = searchParams.get('callbackUrl') || "/";
 
   const userSchema = object({
     email: string()
@@ -33,6 +33,7 @@ export default function Login() {
 
   const handleLogin = async (values: any, actions: any) => {
     actions.setSubmitting(true);
+    
     await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
       method: "POST",
       headers: {
@@ -53,16 +54,18 @@ export default function Login() {
       })
       .then((data) => {
         Cookies.set("accessToken", data.accessToken, { expires: 7 });
-        // actions.resetForm();
         actions.setSubmitting(false);
+  
+        // After successful login, redirect the user to the callback URL (or home page if not set)
         if (data.role_name === "admin" || data.role_name === "owner") {
           router.push("/admin");
         } else {
-          // Redirect to the original page or home page
-          router.push(redirectTo);
+          // Redirect to the callbackUrl if it exists, else fallback to the default page
+          router.push(callbackUrl || "/");
         }
       })
       .catch((error) => {
+        actions.setSubmitting(false);
         setError(error.message);
         console.error(error);
       });

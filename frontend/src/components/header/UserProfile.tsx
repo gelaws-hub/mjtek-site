@@ -10,12 +10,12 @@ import { useRouter } from "next/navigation";
 import useCurrentUser from "@/app/(authentication)/auth/useCurrentUser";
 import UserCard from "../userCard";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import useAuth from "@/hooks/useAuth";
+import useUserData from "@/hooks/useUserData";
 
 export default function UserProfile() {
   const [openUserInfo, setOpenUserInfo] = useState(false);
   // const { isAuthenticated } = useCheckSession();
-  const { userData} = useAuth(["admin", "owner", "user"]);
+  const { userData} = useUserData();
   const router = useRouter();
 
   const handleViewFavorite = (e: React.FormEvent) => {

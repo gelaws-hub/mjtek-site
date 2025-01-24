@@ -3,39 +3,29 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
+import { jwtDecode } from "jwt-decode";
+import { error } from "console";
 
-const useAuth = (allowedRoles: string[]) => {
+const useUserData = (deps: any[] = []) => {
   const router = useRouter();
   const [userData, setUserData] = useState<any | null>(null);
 
   useEffect(() => {
-    // const accessToken = document.cookie
-    //   .split("; ")
-    //   .find((cookie) => cookie.startsWith("accessToken="));
     const accessToken = Cookies.get("accessToken");
-
-    console.log("Access Token:", accessToken);
-
     if (!accessToken) {
-      // router.replace("/login");
       return;
     }
 
     try {
-      const payload = JSON.parse(atob(accessToken.split(".")[1]));
+      const payload = jwtDecode(accessToken) as any;
       setUserData(payload);
-
-      if (!allowedRoles.includes(payload.role_name)) {
-        router.replace("/");
-      }
     } catch (error) {
       console.error("Invalid token:", error);
       router.replace("/login");
     }
-  }, [router]);
+  }, [router, ...deps]);
 
   return { userData };
 };
 
-export default useAuth;
-
+export default useUserData;

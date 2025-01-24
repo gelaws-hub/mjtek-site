@@ -1,28 +1,28 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { jwtDecode } from "jwt-decode";
 
 export function middleware(req: NextRequest) {
   const token = req.cookies.get("accessToken")?.value;
 
-  console.log("Token:", token);
-
   const roleRoutes = {
-    buyer: [/^\/cart(\/.*)?$/, /^\/favorite(\/.*)?$/, /^\/cart(\/.*)?$/, /^\/transactions(\/.*)?$/],
+    buyer: [
+      /^\/cart(\/.*)?$/,
+      /^\/favorite(\/.*)?$/,
+      /^\/transactions(\/.*)?$/,
+    ],
     admin: [/^\/admin(\/.*)?$/],
   };
 
-  console.log("Token:", token);
+  const pathname = req.nextUrl.pathname;
 
   if (token) {
     try {
-      const payload = JSON.parse(
-        Buffer.from(token.split(".")[1], "base64").toString("utf8"),
-      );
-
-      console.log("Payload:", payload);
-
+      const payload = jwtDecode(token) as any;
       const role = payload.role_name;
-      const pathname = req.nextUrl.pathname;
+
+      console.log(`accessing ${pathname} as ${role}`, payload);
+
       const allowedRoutes = roleRoutes[role as "buyer" | "admin"];
       const isAuthorized = allowedRoutes?.some((route) => route.test(pathname));
 
@@ -30,15 +30,25 @@ export function middleware(req: NextRequest) {
         return NextResponse.next();
       }
 
-    //   return NextResponse.redirect(new URL("/unauthorized", req.url));
+      return NextResponse.redirect(new URL("/unauthorized", req.url));
     } catch (err) {
-    //   return NextResponse.redirect(new URL("/login", req.url));
+      console.error("JWT Verification failed:", err);
+      return NextResponse.redirect(
+        new URL("/login?callbackUrl=" + encodeURIComponent(pathname), req.url),
+      );
     }
   }
 
-  return NextResponse.redirect(new URL("/login", req.url));
+  return NextResponse.redirect(
+    new URL("/login?callbackUrl=" + encodeURIComponent(pathname), req.url),
+  );
 }
 
 export const config = {
-  matcher: ["/cart/:path*", "/favorite/:path*", "/admin/:path*"],
+  matcher: [
+    "/cart/:path*",
+    "/favorite/:path*",
+    "/transactions/:path*",
+    "/admin/:path*",
+  ],
 };
