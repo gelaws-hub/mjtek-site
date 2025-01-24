@@ -93,7 +93,7 @@ export default function UserProfile() {
               <div className="flex cursor-pointer items-center justify-center rounded-xl hover:bg-blue-900 hover:bg-opacity-10 md:mr-10 md:justify-start md:gap-2 md:px-3 md:py-1">
                 <Image
                   key="profile_image"
-                  src={userData?.profile_pic ?? "https://raw.githubusercontent.com/gelaws-hub/mjtek-site/refs/heads/main/frontend/public/image.png"}
+                  src={"/image.png"}
                   alt="profile_image"
                   width={28}
                   height={28}

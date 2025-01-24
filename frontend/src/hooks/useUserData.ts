@@ -6,9 +6,19 @@ import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import { error } from "console";
 
+interface UserData {
+  id: string;
+  name: string;
+  email: string;
+  role_name: string;
+  iat: number;
+  exp: number;
+  sub: string;
+}
+
 const useUserData = (deps: any[] = []) => {
   const router = useRouter();
-  const [userData, setUserData] = useState<any | null>(null);
+  const [userData, setUserData] = useState<UserData | null>(null);
 
   useEffect(() => {
     const accessToken = Cookies.get("accessToken");
