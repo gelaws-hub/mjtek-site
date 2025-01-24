@@ -83,7 +83,7 @@ export default function InvoicePDF({ transaction }: InvoicePDFProps) {
     <Document>
       <Page style={styles.page}>
         {/* Header */}
-        <Image
+        <img
           src={"/logo_mjtek_transparent.png"}
           style={styles.productImage}
         />
@@ -105,7 +105,7 @@ export default function InvoicePDF({ transaction }: InvoicePDFProps) {
             <>
               <Text>Bukti Pembayaran : {transaction.payment_proof}</Text>
               <Link scroll={false} href={transaction.payment_proof} />
-              <Image src={transaction.payment_proof} style={styles.logoImage} />
+              <img src={transaction.payment_proof} style={styles.logoImage} />
             </>
           )}
         </View>
@@ -115,7 +115,7 @@ export default function InvoicePDF({ transaction }: InvoicePDFProps) {
         {transaction.products.map((product) => (
           <View key={product.product_id} style={styles.productContainer}>
             {/* Product Image */}
-            <Image src={product.media_source} style={styles.productImage} />
+            <img src={product.media_source} style={styles.productImage} />
             <View style={styles.productDetails}>
               <Text style={styles.productName}>{product.product_name} - {product.product_id}</Text>
               <Text>Kuantitas : {product.quantity}</Text>

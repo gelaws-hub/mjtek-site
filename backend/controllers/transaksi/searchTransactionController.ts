@@ -25,13 +25,12 @@ export const getAllTransactions = async (req: Request, res: Response) => {
     checking: [1, 2, 3],
     processing: [4, 5],
     shipping: [6, 7, 8, 9],
-    dispute: [10, 99],
-    finished: [0, 11],
+    dispute: [10, 98],
+    finished: [0, 99],
   };
 
   // Determine the status IDs to filter by
   const statusIds = status_request ? statuses[status_request] : undefined;
-  console.log("statusIds", statusIds);
 
   // Get query params
   const page = parseInt(req.query.page as string) || 1;

@@ -46,7 +46,7 @@ export default function ThumbnailImageSection({
             {isLoading ? (
               <Loading />
             ) : (
-              <Image
+              <img
                 src={selectedImage}
                 alt="Selected Image"
                 width={1000}
@@ -77,7 +77,7 @@ export default function ThumbnailImageSection({
                 }
               }}
             >
-              <Image
+              <img
                 src={mediaItem.source}
                 alt={mediaItem.file_type}
                 width={60}

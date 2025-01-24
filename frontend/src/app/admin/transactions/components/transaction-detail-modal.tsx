@@ -70,7 +70,7 @@ export default function TransactionDetailModal({
               >
                 <div className="h-16 w-16">
                   {product.media_source && (
-                    <Image
+                    <img
                       src={product.media_source}
                       alt={product.product_name}
                       width={100}

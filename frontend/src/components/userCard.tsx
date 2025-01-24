@@ -17,10 +17,10 @@ interface UserData {
   role_name: string;
   name: string;
   email: string;
-  password: string;
-  address: string;
-  phone_number: string;
-  profile_pic: string;
+  password?: string;
+  address?: string;
+  phone_number?: string;
+  profile_pic?: string;
 }
 
 export default function UserCard({

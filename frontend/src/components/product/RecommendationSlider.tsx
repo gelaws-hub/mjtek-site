@@ -37,7 +37,7 @@ export default function RecommendationSlider({
   return (
     <div
       className={cn(
-        "w-full max-w-[95vw] overflow-x-scroll rounded-md border scrollbar-none",
+        "w-full max-w-[95vw] overflow-x-scroll rounded-md border scrollbar-none mx-auto",
         className,
       )}
     >

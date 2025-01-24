@@ -76,7 +76,7 @@ export function AdvancedImageGallery({
           </div>
           <div className="relative flex-grow p-2">
             <div className="aspect-square cursor-pointer rounded-lg max-h-[450px] mx-auto">
-              <Image
+              <img
                 src={images[currentIndex].source}
                 alt={`Product image ${currentIndex + 1}`}
                 width={1024}
@@ -114,7 +114,7 @@ export function AdvancedImageGallery({
                   }`}
                   onClick={() => setCurrentIndex(index)}
                 >
-                  <Image
+                  <img
                     src={image.source}
                     alt={`Thumbnail ${index + 1}`}
                     width={80}

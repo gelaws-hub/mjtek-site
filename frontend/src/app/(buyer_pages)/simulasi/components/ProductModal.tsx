@@ -101,7 +101,7 @@ export default function ProductModal({
                 className="flex items-center gap-1 border-b border-gray-200 p-1"
               >
                 <div className="flex h-16 w-16">
-                  <Image
+                  <img
                     src={component.media[0].source}
                     alt={component.product_name}
                     width={100}

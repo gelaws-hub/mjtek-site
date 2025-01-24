@@ -23,7 +23,7 @@ interface ImageUploaderProps {
   onSubmit: (file: File) => Promise<void>;
 }
 
-export const ImageUploader: React.FC<ImageUploaderProps> = ({ onSubmit }) => {
+export const ImageUploader: React.FC<imgUploaderProps> = ({ onSubmit }) => {
   const [preview, setPreview] = React.useState<string | ArrayBuffer | null>("");
 
   const formSchema = z.object({
@@ -108,7 +108,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ onSubmit }) => {
                       className="max-h-[400px] rounded-lg"
                     />
                   )}
-                  <ImagePlus
+                  <imgPlus
                     className={`size-20 ${preview ? "hidden" : "block"}`}
                   />
                   <Input {...getInputProps()} type="file" />

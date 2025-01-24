@@ -139,8 +139,8 @@ export const getAllTransactionsFromUser = async (
     checking: [1, 2, 3],
     processing: [4, 5],
     shipping: [6, 7, 8, 9],
-    dispute: [10, 99],
-    finished: [0, 11],
+    dispute: [10, 98],
+    finished: [0, 99],
   };
 
   // Determine the status IDs to filter by

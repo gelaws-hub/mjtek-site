@@ -68,6 +68,17 @@ export const ensureAuthenticated: RequestHandler = async (req, res, next) => {
   }
 };
 
+const getOriginFromRequest = (req: Request) => {
+  const referer = req.get('Referer');  // Get the referer header
+  if (referer) {
+    // The referer is something like `https://example.com/some/path`, 
+    // so we want to extract just the origin (e.g., https://example.com)
+    const origin = new URL(referer).origin;
+    return origin;
+  }
+  return '';  // Default if no referer is provided
+};
+
 // Register user
 export const registerUser = async (req: Request, res: Response) => {
   const { name, email, password, address, phone_number } = req.body;
@@ -101,12 +112,14 @@ export const registerUser = async (req: Request, res: Response) => {
         is_active: false,
         role_name: "buyer", // Set default role sebagai user biasa(pembeli)
         profile_pic:
-          "https://raw.githubusercontent.com/gelaws-hub/mjtek-site/refs/heads/main/frontend/public/image.png",
+          "/image.png",
       },
     });
 
     // Kirim email aktivasi
-    const activationLink = `${process.env.CORS_ALLOWED_ORIGINS}/activate?token=${activationToken}`;
+    // const activationLink = `${process.env.CORS_ALLOWED_ORIGINS}/activate?token=${activationToken}`;
+    const activationLink = `${getOriginFromRequest(req)}/activate?token=${activationToken}`;
+    console.log("activation link: ", activationLink);
     await sendActivationEmail(email, activationLink);
 
     res.status(201).json({
@@ -233,7 +246,7 @@ export const login = async (req: Request, res: Response) => {
         name: user.name,
         email: user.email,
         role_name: user.role_name,
-        // accessToken, // access token is received via http only cookie
+        accessToken: accessToken, 
         // refreshToken, this should never be delivered to client
       });
     

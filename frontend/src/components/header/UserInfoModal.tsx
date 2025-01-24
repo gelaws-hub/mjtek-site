@@ -19,7 +19,7 @@ export default function UserInfoModal({
         className={`min-w-[50px] flex flex-col bg-white z-[100] p-2 rounded-xl shadow-lg ${className}`}
       >
         <div className="flex items-center justify-right p-1 rounded-xl bg-white gap-2 pl-2 shadow-md">
-          <Image
+          <img
             src={user.profile_pic}
             alt={user.name}
             width={32}

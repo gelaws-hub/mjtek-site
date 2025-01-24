@@ -119,7 +119,7 @@ export default function ComponentSelection({
           >
             <div className="p-2 sm:p-4 flex sm:flex-row items-start gap-2 sm:gap-4">
               <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0">
-                <Image
+                <img
                   src={
                     getValidImageSource(selectedProduct.media) ||
                     "/default-image.jpg"

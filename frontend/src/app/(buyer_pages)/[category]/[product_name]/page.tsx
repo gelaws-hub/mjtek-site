@@ -112,7 +112,7 @@ export default function ProductDetailPage() {
       <div className="flex flex-col gap-8 lg:flex-row">
         {/* Product Image Gallery */}
         <div className="lg:sticky lg:top-[9rem] lg:w-1/3 lg:self-start">
-          <ImageGallery setShowAdvanced={setShowAdvancedImage} images={product.media} />
+          <imgGallery setShowAdvanced={setShowAdvancedImage} images={product.media} />
         </div>
 
         {/* Product Info and Order Section */}

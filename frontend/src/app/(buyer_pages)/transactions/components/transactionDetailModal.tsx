@@ -76,7 +76,7 @@ export default function TransactionDetailModal({
                 rel="noopener noreferrer"
                 className="flex h-24 w-full items-center justify-center"
               >
-                <Image
+                <img
                   src={transaction.payment_proof}
                   alt="Proof"
                   width={100}
@@ -96,7 +96,7 @@ export default function TransactionDetailModal({
                 className="flex items-center justify-start gap-2 border-t pt-4"
               >
                 <div className="h-16 w-16">
-                  <Image
+                  <img
                     src={product.media_source}
                     alt={product.product_name}
                     width={100}

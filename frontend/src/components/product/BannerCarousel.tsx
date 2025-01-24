@@ -53,7 +53,7 @@ export default function BannerSlider({
     >
       <div className="flex mb-4 md:overflow-hidden scrollbar-none w-full">
         {imageUrls.map((imageUrl, index) => (
-          <Image
+          <img
             key={index}
             src={imageUrl}
             alt={`Banner Image ${index + 1}`}

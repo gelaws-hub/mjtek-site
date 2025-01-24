@@ -2,32 +2,36 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import ClickOutside from "@/components/tailadmin/ClickOutside";
+import useUserData from "@/hooks/useUserData";
 
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const { userData } = useUserData();
 
   return (
     <ClickOutside onClick={() => setDropdownOpen(false)} className="relative">
-      <Link scroll={false}
+      <Link
+        scroll={false}
         onClick={() => setDropdownOpen(!dropdownOpen)}
         className="flex items-center gap-4"
         href="#"
       >
         <span className="hidden text-right lg:block">
           <span className="block text-sm font-medium text-black dark:text-white">
-            Thomas Anree
+            {userData?.name}
           </span>
-          <span className="block text-xs">UX Designer</span>
+          <span className="block text-xs">{userData?.role_name}</span>
         </span>
 
         <span className="h-12 w-12 rounded-full">
-          <Image
+          <img
             width={112}
             height={112}
-            src={"/images/user/user-01.png"}
+            src={"/image.png"}
             style={{
               width: "auto",
               height: "auto",
+              borderRadius: "100%",
             }}
             alt="User"
           />
@@ -57,8 +61,9 @@ const DropdownUser = () => {
         >
           <ul className="flex flex-col gap-5 border-b border-stroke px-6 py-7.5 dark:border-strokedark">
             <li>
-              <Link scroll={false}
-                href="/profile"
+              <Link
+                scroll={false}
+                href="/admin/profile"
                 className="flex items-center gap-3.5 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
               >
                 <svg
@@ -82,7 +87,8 @@ const DropdownUser = () => {
               </Link>
             </li>
             <li>
-              <Link scroll={false}
+              <Link
+                scroll={false}
                 href="#"
                 className="flex items-center gap-3.5 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
               >
@@ -103,7 +109,8 @@ const DropdownUser = () => {
               </Link>
             </li>
             <li>
-              <Link scroll={false}
+              <Link
+                scroll={false}
                 href="/settings"
                 className="flex items-center gap-3.5 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
               >

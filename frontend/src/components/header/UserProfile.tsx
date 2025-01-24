@@ -10,17 +10,18 @@ import { useRouter } from "next/navigation";
 import useCurrentUser from "@/app/(authentication)/auth/useCurrentUser";
 import UserCard from "../userCard";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import useUserData from "@/hooks/useUserData";
 
 export default function UserProfile() {
   const [openUserInfo, setOpenUserInfo] = useState(false);
-  const { isAuthenticated } = useCheckSession();
-  const { user } = useCurrentUser();
+  // const { isAuthenticated } = useCheckSession();
+  const { userData} = useUserData();
   const router = useRouter();
 
   const handleViewFavorite = (e: React.FormEvent) => {
     e.preventDefault();
-    if (user?.id) {
-      router.push(`/favorite?user=${encodeURIComponent(user?.id)}`);
+    if (userData?.id) {
+      router.push(`/favorite?user=${encodeURIComponent(userData?.id)}`);
     }
   };
 
@@ -83,23 +84,23 @@ export default function UserProfile() {
           <FavouriteIcon height={18} width={18} className="text-gray-700" />
         </button>
       </div>
-      {isAuthenticated && user ? (
+      {userData ? (
         <UserCard
-          userData={user}
+          userData={userData}
           onLogout={handleLogout}
           btnTrigger={
             <button className="" onClick={toggleUserInfo}>
               <div className="flex cursor-pointer items-center justify-center rounded-xl hover:bg-blue-900 hover:bg-opacity-10 md:mr-10 md:justify-start md:gap-2 md:px-3 md:py-1">
-                <Image
+                <img
                   key="profile_image"
-                  src={user?.profile_pic ?? ""}
+                  src={"/image.png"}
                   alt="profile_image"
                   width={28}
                   height={28}
                   className="h-8 w-8 rounded-full"
                 />
                 <p className="hidden text-sm font-medium text-gray-600 md:inline">
-                  {user?.name}
+                  {userData?.name}
                 </p>
               </div>
             </button>
