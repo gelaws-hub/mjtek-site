@@ -246,7 +246,7 @@ export const login = async (req: Request, res: Response) => {
         name: user.name,
         email: user.email,
         role_name: user.role_name,
-        // accessToken, // access token is received via http only cookie
+        accessToken: accessToken, 
         // refreshToken, this should never be delivered to client
       });
     

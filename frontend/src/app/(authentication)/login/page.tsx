@@ -52,7 +52,8 @@ export default function Login() {
         return response.json();
       })
       .then((data) => {
-        actions.resetForm();
+        Cookies.set("accessToken", data.accessToken, { expires: 7 });
+        // actions.resetForm();
         actions.setSubmitting(false);
         if (data.role_name === "admin" || data.role_name === "owner") {
           router.push("/admin");
