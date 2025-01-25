@@ -3,13 +3,14 @@
   "version": "1.0.0",
   "main": "index.ts",
   "scripts": {
-    "start": "nodemon index.ts",
+    "start": "ts-node index.ts",
+    "dev": "nodemon index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
+  "author": "Ibnu Fadhil",
   "license": "ISC",
-  "devDependencies": {
+  "dependencies": {
     "@types/bcrypt": "^5.0.2",
     "@types/bcryptjs": "^2.4.6",
     "@types/cookie-parser": "^1.4.7",
@@ -25,9 +26,7 @@
     "@types/uuid": "^10.0.0",
     "prisma": "^6.0.1",
     "ts-node": "^10.9.2",
-    "typescript": "^5.5.2"
-  },
-  "dependencies": {
+    "typescript": "^5.5.2",
     "@prisma/client": "^5.22.0",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
@@ -46,5 +45,5 @@
     "tsc": "^2.0.4",
     "uuid": "^10.0.0"
   },
-  "description": ""
+  "description": "A Backend App For MJ Teknologi Semarang"
 }
