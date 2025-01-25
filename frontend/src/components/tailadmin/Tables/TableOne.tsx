@@ -21,7 +21,7 @@ const TableOne = ({ data, title, className }: { data: Array<Record<string, any>>
   const headers = data.length > 0 ? Object.keys(data[0]) : [];
 
   return (
-    <div className={cn("rounded-sm border border-stroke bg-white px-5 pb-2.5 pt-6 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1", className)}>
+    <div className={cn("rounded-sm border border-stroke bg-white px-5 pb-2.5 pt-6 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1 w-full overflow-x-auto scrollbar-thin", className)}>
       <h4 className="mb-6 text-xl font-semibold text-black dark:text-white">
         {title}
       </h4>

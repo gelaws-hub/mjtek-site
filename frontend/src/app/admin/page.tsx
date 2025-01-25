@@ -257,7 +257,7 @@ const AdminDashboard: React.FC = () => {
             urlPrefix="/admin/transactions?status="
           />
           {/* <MapOne /> */}
-          <div className="col-span-12 h-full xl:col-span-7 overflow-auto scrollbar-thin">
+          <div className="col-span-12 h-full xl:col-span-7 w-full">
             <TableOne
               title="Pembeli teratas"
               data={topBuyers}
