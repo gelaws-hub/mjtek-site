@@ -16,12 +16,25 @@ const data = [
   },
 ];
 
-const TableOne = ({ data, title, className }: { data: Array<Record<string, any>>, title?: string, className?: string }) => {
+const TableOne = ({
+  data,
+  title,
+  className,
+}: {
+  data: Array<Record<string, any>>;
+  title?: string;
+  className?: string;
+}) => {
   // Extract headers from the keys of the first object
   const headers = data.length > 0 ? Object.keys(data[0]) : [];
 
   return (
-    <div className={cn("rounded-sm border border-stroke bg-white px-5 pb-2.5 pt-6 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1 w-full overflow-x-auto scrollbar-thin", className)}>
+    <div
+      className={cn(
+        "w-full overflow-x-auto rounded-sm border border-stroke bg-white px-5 pb-2.5 pt-6 shadow-default scrollbar-thin dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1",
+        className,
+      )}
+    >
       <h4 className="mb-6 text-xl font-semibold text-black dark:text-white">
         {title}
       </h4>
@@ -29,12 +42,16 @@ const TableOne = ({ data, title, className }: { data: Array<Record<string, any>>
       <table className="w-full border-collapse border-spacing-0 text-left">
         <thead>
           <tr className="bg-gray-2 dark:bg-meta-4">
+            <th className="p-2.5 text-left text-sm font-medium xsm:text-base xl:p-5">
+              No
+            </th>
             {headers.map((header, index) => (
               <th
                 key={index}
-                className="p-2.5 text-center xl:p-5 text-sm font-medium uppercase xsm:text-base"
+                className="p-2.5 text-left text-sm font-medium uppercase xsm:text-base xl:p-5"
               >
-                {header.replace(/_/g, " ")} {/* Replace underscores with spaces */}
+                {header.replace(/_/g, " ")}{" "}
+                {/* Replace underscores with spaces */}
               </th>
             ))}
           </tr>
@@ -49,10 +66,13 @@ const TableOne = ({ data, title, className }: { data: Array<Record<string, any>>
                   : ""
               }
             >
+              <td className="p-2.5 text-center text-black dark:text-white xl:p-5">
+                {rowIndex + 1} {/* Row number */}
+              </td>
               {headers.map((header, colIndex) => (
                 <td
                   key={colIndex}
-                  className="p-2.5 text-center xl:p-5 text-black dark:text-white truncate whitespace-nowrap"
+                  className="truncate whitespace-nowrap p-2.5 text-left text-black dark:text-white xl:p-5"
                 >
                   {row[header]}
                 </td>
@@ -64,6 +84,5 @@ const TableOne = ({ data, title, className }: { data: Array<Record<string, any>>
     </div>
   );
 };
-
 
 export default TableOne;
