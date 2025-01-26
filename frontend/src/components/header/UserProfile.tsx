@@ -39,6 +39,7 @@ export default function UserProfile() {
           credentials: "include",
         },
       );
+      Cookies.remove("accessToken");
       if (response.ok) {
         Cookies.remove("accessToken");
         window.location.reload();
