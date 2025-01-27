@@ -197,7 +197,7 @@ export default function ProductDetailPage() {
                     <Share2 className="h-4 w-4" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
+                <PopoverContent className="w-auto p-0 bg-white mb-6">
                   <div className="grid gap-4 p-4">
                     <Button
                       onClick={() => handleShare("whatsapp")}
