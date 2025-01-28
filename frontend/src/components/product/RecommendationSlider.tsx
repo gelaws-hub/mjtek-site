@@ -32,7 +32,7 @@ export default function RecommendationSlider({
       }
     };
     fetchProducts();
-  }, []);
+  }, [category_ids]);
 
   return (
     <div
