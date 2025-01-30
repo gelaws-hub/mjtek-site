@@ -82,7 +82,7 @@ export default function CartPage() {
     }
   };
 
-  const toCart = async (product_id: number, quantity = 1) => {
+  const toCart = async (product_id: string, quantity = 1) => {
     setIsLoading(true);
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/cart`, {
@@ -115,12 +115,12 @@ export default function CartPage() {
     fetchCarts();
   }, [refresh]);
 
-  const handleQuantityChange = (product_id: number, changeBy: number) => {
+  const handleQuantityChange = (product_id: string, changeBy: number) => {
     toCart(product_id, changeBy);
   };
 
   const handleCheckItem = async (
-    product_id?: number,
+    product_id?: string,
     is_selected?: boolean,
   ) => {
     setIsLoading(true);
@@ -221,7 +221,7 @@ export default function CartPage() {
     }
   };
 
-  const handleAddToFavorite = (product_id: number) => {
+  const handleAddToFavorite = (product_id: string) => {
     console.log(`Added product ${product_id} to favorites`);
   };
 

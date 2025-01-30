@@ -1,6 +1,5 @@
 "use client";
 
-import Loading from "@/app/removed_loading";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 

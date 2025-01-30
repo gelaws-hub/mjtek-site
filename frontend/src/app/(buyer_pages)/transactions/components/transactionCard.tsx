@@ -76,9 +76,7 @@ export default function TransactionCard({
           <img
             src={firstProduct.media_source}
             alt={firstProduct.product_name}
-            layout="fill"
-            objectFit="cover"
-            className="rounded"
+            className="rounded object-cover"
           />
         </div>
         <div className="flex-grow">

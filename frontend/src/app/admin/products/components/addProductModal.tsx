@@ -358,7 +358,7 @@ export default function AddProductModal({
               />
             </div>
             <div>
-              <imgUploader onFileSelect={handleMediaFileChange} />
+              <ImageUploader onFileSelect={handleMediaFileChange} />
             </div>
             <Button type="submit" className="h-full text-white">
               <AddCircleIcon className="text-white" width={24} height={24} />
