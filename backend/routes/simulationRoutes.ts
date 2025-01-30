@@ -16,19 +16,6 @@ import {
   updateRamType,
 } from "../controllers/simulation/ramTypeController";
 
-import {
-  createSimulation,
-  deleteSimulation,
-  getAllSimulations,
-  getSimulationById,
-  updateSimulation,
-} from "../controllers/simulation/simulatioController";
-import {
-  createSimulationDetail,
-  deleteSimulationDetail,
-  getAllSimulationDetails,
-  getSimulationDetailById,
-} from "../controllers/simulation/simulationDetailController";
 
 import {
   createProductSocket,
@@ -43,6 +30,9 @@ import {
   updateProductRamType,
 } from "../controllers/simulation/productRamTypeController";
 import { getAllSocketRamType } from "../controllers/simulation/socketRamType";
+import { deleteSimulation, getSimulationById, getSimulations, saveSimulation, updateSimulation } from "../controllers/simulation/simulationController";
+import { ensureCorrectUser } from "../auth/middleware/buyer/buyerMiddleware";
+import { authorize, ensureAuthenticated } from "../auth/userController";
 
 const simulationRoutes = express.Router();
 
@@ -61,18 +51,6 @@ simulationRoutes.post("/ramtype", createRamType);
 simulationRoutes.put("/ramtype/:id", updateRamType);
 simulationRoutes.delete("/ramtype/:id", deleteRamType);
 
-// Simulasi routes
-simulationRoutes.get("/simulation", getAllSimulations);
-simulationRoutes.get("/simulation/:id", getSimulationById);
-simulationRoutes.post("/simulation", createSimulation);
-simulationRoutes.put("/simulation/:id", updateSimulation);
-simulationRoutes.delete("/simulation/:id", deleteSimulation);
-
-// Detail_Simulasi routes
-simulationRoutes.get("/simulation-detail", getAllSimulationDetails);
-simulationRoutes.get("/simulation-detail/:id", getSimulationDetailById);
-simulationRoutes.post("/simulation-detail", createSimulationDetail);
-simulationRoutes.delete("/simulation-detail/:id", deleteSimulationDetail);
 
 // Product Socket routes
 simulationRoutes.get("/product-socket/:id", getProductSocketById);
@@ -87,5 +65,11 @@ simulationRoutes.delete("/product-socket/:id", deleteProductRamType);
 simulationRoutes.put("/product-socket/:id", updateProductRamType);
 
 simulationRoutes.get("/socket-ramtype", getAllSocketRamType);
+
+simulationRoutes.post("/simulation", ensureAuthenticated, authorize(["buyer"]), saveSimulation);
+simulationRoutes.get("/simulations", ensureAuthenticated, authorize(["buyer"]), getSimulations);
+simulationRoutes.get("/simulation/:id", getSimulationById);
+simulationRoutes.patch("/simulation/:id", ensureAuthenticated, authorize(["buyer"]), updateSimulation);
+simulationRoutes.delete("/simulation/:id", ensureAuthenticated, authorize(["buyer"]), deleteSimulation);
 
 export default simulationRoutes;

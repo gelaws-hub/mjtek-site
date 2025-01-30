@@ -11,6 +11,7 @@
   "author": "Ibnu Fadhil",
   "license": "ISC",
   "dependencies": {
+    "@prisma/client": "^5.22.0",
     "@types/bcrypt": "^5.0.2",
     "@types/bcryptjs": "^2.4.6",
     "@types/cookie-parser": "^1.4.7",
@@ -24,10 +25,6 @@
     "@types/otplib": "^10.0.0",
     "@types/qrcode": "^1.5.5",
     "@types/uuid": "^10.0.0",
-    "prisma": "^6.0.1",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.5.2",
-    "@prisma/client": "^5.22.0",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
     "cloudinary": "^2.5.1",
@@ -41,8 +38,12 @@
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.16",
     "nodemon": "^3.1.1",
+    "prisma": "^6.0.1",
     "qrcode": "^1.5.4",
+    "short-unique-id": "^5.2.0",
+    "ts-node": "^10.9.2",
     "tsc": "^2.0.4",
+    "typescript": "^5.5.2",
     "uuid": "^10.0.0"
   },
   "description": "A Backend App For MJ Teknologi Semarang"
