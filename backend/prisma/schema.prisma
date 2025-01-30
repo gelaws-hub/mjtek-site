@@ -8,30 +8,29 @@ datasource db {
 }
 
 model product {
-  id               String    @id
-  category_id      Int
-  sub_category_id  Int?
-  brand_id         Int
-  product_name     String
-  price            Decimal   @db.Decimal(10, 2)
-  description      String?   @db.Text
-  estimated_weight Decimal   @db.Decimal(10, 2)
-  stock            Int
-  is_deleted       Boolean   @default(false)
-  createdTime      DateTime  @default(now())
-  editedTime       DateTime?
-  user_id          String    @default("admin-root-id")
-
-  category           category             @relation(fields: [category_id], references: [id])
-  sub_category       sub_category?        @relation(fields: [sub_category_id], references: [id])
-  brand              brand                @relation(fields: [brand_id], references: [id])
-  user               user                 @relation(fields: [user_id], references: [id]) // Relation to user
+  id                 String               @id
+  category_id        Int
+  sub_category_id    Int?
+  brand_id           Int
+  product_name       String
+  price              Decimal              @db.Decimal(10, 2)
+  description        String?              @db.Text
+  estimated_weight   Decimal              @db.Decimal(10, 2)
+  stock              Int
+  is_deleted         Boolean              @default(false)
+  createdTime        DateTime             @default(now())
+  editedTime         DateTime?
+  user_id            String               @default("admin-root-id")
   cart               cart[]
   favorite           favorite[]
   media              media[]
-  transaction_detail transaction_detail[]
+  brand              brand                @relation(fields: [brand_id], references: [id])
+  category           category             @relation(fields: [category_id], references: [id])
+  sub_category       sub_category?        @relation(fields: [sub_category_id], references: [id])
+  user               user                 @relation(fields: [user_id], references: [id])
   product_ram_type   product_ram_type[]
   product_socket     product_socket[]
+  transaction_detail transaction_detail[]
 
   @@index([category_id])
   @@index([sub_category_id])
@@ -64,8 +63,8 @@ model socket {
   release_date   DateTime
   description    String?
   brand_id       Int
-  brand          brand            @relation(fields: [brand_id], references: [id])
   product_socket product_socket[]
+  brand          brand            @relation(fields: [brand_id], references: [id])
 
   @@index([brand_id])
 }
@@ -76,6 +75,9 @@ model product_socket {
   socket_id  Int
   product    product @relation(fields: [product_id], references: [id])
   socket     socket  @relation(fields: [socket_id], references: [id])
+
+  @@index([product_id], map: "product_socket_product_id_fkey")
+  @@index([socket_id], map: "product_socket_socket_id_fkey")
 }
 
 model ram_type {
@@ -90,15 +92,18 @@ model product_ram_type {
   ram_type_id Int
   product     product  @relation(fields: [product_id], references: [id])
   ram_type    ram_type @relation(fields: [ram_type_id], references: [id])
+
+  @@index([product_id], map: "product_ram_type_product_id_fkey")
+  @@index([ram_type_id], map: "product_ram_type_ram_type_id_fkey")
 }
 
 model simulation {
-  id              String      @id @default(uuid())
+  id              String   @id @default(uuid())
   user_id         String
-  simulation_data Json?
   title           String?
   description     String?
   modifiedAt      DateTime
+  simulation_data Json?
   user            user     @relation(fields: [user_id], references: [id])
 
   @@index([user_id])
@@ -108,7 +113,7 @@ model user {
   id                     String               @id @default(uuid())
   role_name              String
   name                   String
-  email                  String               @unique(map: "user_email_unique")
+  email                  String               @unique
   password               String
   address                String
   phone_number           String
@@ -118,17 +123,16 @@ model user {
   reset_password_token   String?
   reset_password_expires DateTime?
   created_at             DateTime             @default(now())
-  refresh_tokens         user_refresh_token[]
-  simulation             simulation[]
-  transaction            transaction[]
   cart                   cart[]
   favorite               favorite[]
   products               product[]
+  simulation             simulation[]
+  transaction            transaction[]
+  role                   role                 @relation(fields: [role_name], references: [role_name])
+  refresh_tokens         user_refresh_token[]
 
-  role role @relation(fields: [role_name], references: [role_name])
-
-  @@unique([email])
-  @@map("user") // Optional: To make sure the table is named "user"
+  @@index([role_name], map: "user_role_name_fkey")
+  @@map("user")
 }
 
 model user_refresh_token {
@@ -138,6 +142,7 @@ model user_refresh_token {
   created_at    DateTime @default(now())
   user          user     @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
+  @@index([user_id], map: "user_refresh_token_user_id_fkey")
   @@map("user_refresh_token")
 }
 
@@ -147,9 +152,9 @@ model cart {
   user_id     String
   quantity    Int      @default(1)
   date        DateTime
+  is_selected Boolean  @default(true)
   product     product  @relation(fields: [product_id], references: [id])
   user        user     @relation(fields: [user_id], references: [id])
-  is_selected Boolean  @default(true)
 
   @@index([product_id])
   @@index([user_id])
@@ -157,28 +162,27 @@ model cart {
 }
 
 model transaction_status {
-  id          Int     @id @default(autoincrement())
-  name        String  @unique
+  id          Int           @id @default(autoincrement())
+  name        String        @unique
   description String?
-
   transaction transaction[]
 }
 
 model transaction {
-  id            String    @id @default(uuid())
-  user_id       String
-  total_items   Int
-  total_price   Decimal   @db.Decimal(10, 2)
-  start_time    DateTime  @default(now())
-  end_time      DateTime?
-  payment_proof String?
-  status_id     Int       @default(1)
-
+  id                 String               @id @default(uuid())
+  user_id            String
+  total_items        Int
+  total_price        Decimal              @db.Decimal(10, 2)
+  start_time         DateTime             @default(now())
+  end_time           DateTime?
+  payment_proof      String?
+  status_id          Int                  @default(1)
   transaction_status transaction_status   @relation(fields: [status_id], references: [id])
   user               user                 @relation(fields: [user_id], references: [id])
   transaction_detail transaction_detail[]
 
   @@index([user_id])
+  @@index([status_id], map: "transaction_status_id_fkey")
 }
 
 model transaction_detail {
@@ -191,6 +195,7 @@ model transaction_detail {
   transaction    transaction @relation(fields: [transaction_id], references: [id])
 
   @@index([product_id, transaction_id])
+  @@index([transaction_id], map: "transaction_detail_transaction_id_fkey")
 }
 
 model favorite {
@@ -199,6 +204,9 @@ model favorite {
   user_id    String
   product    product @relation(fields: [product_id], references: [id])
   user       user    @relation(fields: [user_id], references: [id])
+
+  @@index([product_id], map: "favorite_product_id_fkey")
+  @@index([user_id], map: "favorite_user_id_fkey")
 }
 
 model media {
@@ -207,6 +215,8 @@ model media {
   source     String
   file_type  String
   product    product @relation(fields: [product_id], references: [id])
+
+  @@index([product_id], map: "media_product_id_fkey")
 }
 
 model role {
