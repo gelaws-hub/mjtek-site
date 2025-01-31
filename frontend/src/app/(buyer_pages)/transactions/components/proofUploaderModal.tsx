@@ -12,7 +12,7 @@ export default function ProofUploaderModal({ onSubmit, onClose, openState }: any
   return (
     <Dialog open={openState} onOpenChange={onClose}>
       <DialogContent className="border-none p-2">
-        <imgUploader onSubmit={onSubmit} />
+        <ImageUploader onSubmit={onSubmit} />
       </DialogContent>
     </Dialog>
   );

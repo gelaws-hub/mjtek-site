@@ -6,10 +6,10 @@ import FavoriteButton from "@/components/product/FavoriteButton";
 
 interface CartItemProps {
   item: CartItemType;
-  onQuantityChange: (id: number, changeBy: number) => void;
-  onCheckItem: (id: number, isChecked: boolean) => void;
-  onDeleteItem: (id: number) => void;
-  onAddToFavorite: (id: number) => void;
+  onQuantityChange: (id: string, changeBy: number) => void;
+  onCheckItem: (id: string, isChecked: boolean) => void;
+  onDeleteItem: (id: string) => void;
+  onAddToFavorite: (id: string) => void;
   isLoading?: boolean;
 }
 

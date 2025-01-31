@@ -49,7 +49,7 @@ const FavoriteButton = ({ productId, text, height="" }: FavoriteButtonProps) => 
     e.preventDefault();
     e.stopPropagation();
     if (!isAuthenticated) {
-      goToLogin();
+      errorToast("Silakan login terlebih dahulu", "top-left");
       return;
     }
 

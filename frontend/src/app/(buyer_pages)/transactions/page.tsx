@@ -5,11 +5,9 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { Transaction } from "@/types/transaction";
 import TransactionCard from "./components/transactionCard";
 import TransactionDetailModal from "./components/transactionDetailModal";
-import Loading from "../../removed_loading";
 import { Combobox } from "@/components/ui/combobox";
 import Link from "next/link";
 import ProofUploaderModal from "./components/proofUploaderModal";
-import Image from "next/image";
 
 export default function TransactionPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -143,7 +141,7 @@ export default function TransactionPage() {
   };
 
   if (isLoading) {
-    return <Loading />;
+    return <div>Loading...</div>;
   }
 
   if (error) {

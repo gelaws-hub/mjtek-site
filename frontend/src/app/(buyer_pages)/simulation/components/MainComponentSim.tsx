@@ -9,6 +9,8 @@ import DeleteConfirmModal from "@/components/DeleteConfirmModal";
 import { DeletePutBackIcon } from "@/components/icons/DeletePutBackIcon";
 import { Share01Icon } from "@/components/icons/Share01Icon";
 import { ViewIcon } from "@/components/icons/ViewIcon";
+import { errorToast, successToast } from "@/components/toast/reactToastify";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface Socket {
   id: number;
@@ -24,7 +26,20 @@ interface StorageDevice {
   product: Product | null;
 }
 
+interface SimMeta {
+  id?: string;
+  user_id?: string;
+  simulation_data?: string;
+  title?: string;
+  description?: string;
+  modifiedAt?: string;
+}
+
 export default function MainComponentSim() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const simId = searchParams.get("id");
+
   const [selectedComponents, setSelectedComponents] = useState({
     CPU: null as Product | null,
     Mobo: null as Product | null,
@@ -45,6 +60,7 @@ export default function MainComponentSim() {
   const [sockets, setSockets] = useState<Socket[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [simMeta, setSimMeta] = useState<SimMeta>();
 
   // Initial Fetch to all sockets
   const fetchAllSockets = async () => {
@@ -54,7 +70,7 @@ export default function MainComponentSim() {
         setAllSockets(JSON.parse(cachedSockets));
       } else {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/socket`
+          `${process.env.NEXT_PUBLIC_API_URL}/socket`,
         );
         const data = await response.json();
         setAllSockets(data.sockets);
@@ -67,33 +83,69 @@ export default function MainComponentSim() {
 
   // Initial load selected components from local storage
   useEffect(() => {
-    const storedData = localStorage.getItem("simulationData");
-    if (storedData) {
-      const parsedData = JSON.parse(storedData);
-      if (!parsedData.Mobo) {
-        delete parsedData.Ram;
+    if (simId) {
+      setIsLoading(true);
+      fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/simulation/${simId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      )
+        .then((response) => {
+          if (response.ok) {
+            successToast("Simulasi berhasil diambil", "top-left");
+            return response.json();
+          } else {
+            throw new Error("Failed to fetch simulation data");
+          }
+        })
+        .then((data) => {
+          setSimMeta(data);
+          setSelectedComponents(data.simulation_data);
+          setIsLoading(false);
+        })
+        .catch((error) => {
+          console.error("Error fetching simulation data:", error);
+          setIsLoading(false);
+        });
+    } else {
+      const storedData = localStorage.getItem("simulationData");
+      if (storedData) {
+        const parsedData = JSON.parse(storedData);
+        if (!parsedData.Mobo) {
+          delete parsedData.Ram;
+        }
+        setSelectedComponents(parsedData);
       }
-      setSelectedComponents(parsedData);
+      fetchAllSockets().then(() => setIsLoading(false));
     }
-    fetchAllSockets().then(() => setIsLoading(false));
-  }, []);
+  }, [simId]);
+
+  const fetchSimulationMeta = () => {
+    if (searchParams.get("id")) {
+
+    }
+  };
 
   // Save selected components to local storage
   useEffect(() => {
     if (!isLoading) {
       localStorage.setItem(
         "simulationData",
-        JSON.stringify(selectedComponents)
+        JSON.stringify(selectedComponents),
       );
     }
-  }, [selectedComponents, isLoading]);
+  }, [selectedComponents, isLoading, simId]);
 
   // Filter sockets based on selected brand
   useEffect(() => {
     if (selectedComponents.Brand && allSockets.length > 0) {
       const filteredSockets = allSockets.filter(
         (socket) =>
-          socket.brand.brand_name.toLowerCase() === selectedComponents.Brand
+          socket.brand.brand_name.toLowerCase() === selectedComponents.Brand,
       );
       setSockets(filteredSockets);
     } else {
@@ -103,7 +155,7 @@ export default function MainComponentSim() {
 
   const handleComponentChange = (
     componentType: keyof typeof selectedComponents,
-    product: Product | null
+    product: Product | null,
   ) => {
     setSelectedComponents((prev) => ({ ...prev, [componentType]: product }));
   };
@@ -145,7 +197,7 @@ export default function MainComponentSim() {
   const handleDeleteStorageFromSimulation = (index: number) => {
     setSelectedComponents((prevComponents) => {
       const updatedStorage = (prevComponents.Storage || []).filter(
-        (_, i) => i !== index
+        (_, i) => i !== index,
       );
       return {
         ...prevComponents,
@@ -170,6 +222,40 @@ export default function MainComponentSim() {
     }));
   };
 
+  const handleSaveSimulation = async () => {
+    try {
+      const body = {
+        simulation_data: selectedComponents,
+        title: simMeta?.title,
+        description: simMeta?.description,
+      };
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/simulation${simMeta?.id ? `/${simMeta?.id}` : ""}`,
+        {
+          method: `${simMeta?.id ? "PATCH" : "POST"}`,
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
+          credentials: "include",
+        },
+      );
+      if (response.status == 401) {
+        errorToast("Anda harus login terlebih dahulu", "top-left");
+      }
+      const data = await response.json();
+      successToast("Simulasi berhasil disimpan", "top-left");
+      setSimMeta(data);
+      router.push(`/simulation?id=${data.id}`);
+    } catch (error) {
+      errorToast("Gagal menyimpan simulasi", "top-left");
+      console.error("Error saving simulation:", error);
+    }
+  };
+
+  console.log("Sim meta :  ", simMeta);
+  console.log("selectedComponents", selectedComponents);
+
   return (
     <div className="flex flex-col space-y-6">
       <h1 className="text-2xl font-bold">PC Simulation</h1>
@@ -177,20 +263,20 @@ export default function MainComponentSim() {
       {/* Processor Configuration */}
       <Card>
         <CardContent className="p-6">
-          <h2 className="text-base md:text-lg font-semibold mb-2 md:mb-4">
+          <h2 className="mb-2 text-base font-semibold md:mb-4 md:text-lg">
             Konfigurasi Processor
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4">
+          <div className="grid grid-cols-1 gap-2 md:grid-cols-2 md:gap-4">
             <div className="space-y-2">
               <label
                 htmlFor="processor"
-                className="text-sm md:text-base font-medium"
+                className="text-sm font-medium md:text-base"
               >
                 Brand CPU
               </label>
               <select
                 id="processor"
-                className="w-full p-2 border rounded-md bg-background text-sm md:text-base"
+                className="bg-background w-full rounded-md border p-2 text-sm md:text-base"
                 onChange={(e) => {
                   setSelectedComponents((prev) => ({
                     ...prev,
@@ -201,7 +287,7 @@ export default function MainComponentSim() {
                     SocketId: null,
                     CPU: null,
                     Mobo: null,
-                    Ram: null
+                    Ram: null,
                   }));
                 }}
                 value={selectedComponents.Brand ?? ""}
@@ -214,13 +300,13 @@ export default function MainComponentSim() {
             <div className="space-y-2">
               <label
                 htmlFor="socket"
-                className="text-sm md:text-base font-medium"
+                className="text-sm font-medium md:text-base"
               >
                 Socket
               </label>
               <select
                 id="socket"
-                className="w-full p-2 border rounded-md bg-background text-sm md:text-base"
+                className="bg-background w-full rounded-md border p-2 text-sm md:text-base"
                 onChange={(e) => {
                   const value = e.target.value;
                   setSelectedComponents((prev) => ({
@@ -228,7 +314,7 @@ export default function MainComponentSim() {
                     SocketId: value === "" ? null : value,
                     CPU: null,
                     Mobo: null,
-                    Ram: null
+                    Ram: null,
                   }));
                 }}
                 value={selectedComponents.SocketId ?? ""}
@@ -250,13 +336,13 @@ export default function MainComponentSim() {
         {/* Main Components */}
         <Card>
           <CardContent className="p-6">
-            <h2 className="text-base md:text-xl font-semibold mb-4">
+            <h2 className="mb-4 text-base font-semibold md:text-xl">
               Komponen utama
             </h2>
             <div className="space-y-4">
               {/* CPU */}
               <div className="">
-                <h3 className="text-sm md:text-lg font-semibold text-gray-700 md:mb-2">
+                <h3 className="text-sm font-semibold text-gray-700 md:mb-2 md:text-lg">
                   Pilih CPU
                 </h3>
                 <ComponentSelection
@@ -272,7 +358,7 @@ export default function MainComponentSim() {
               </div>
               {/* Motherboard */}
               <div className="">
-                <h3 className="text-sm md:text-lg font-semibold text-gray-700 md:mb-2">
+                <h3 className="text-sm font-semibold text-gray-700 md:mb-2 md:text-lg">
                   Pilih Motherboard
                 </h3>
                 <ComponentSelection
@@ -291,7 +377,7 @@ export default function MainComponentSim() {
               </div>
               {/* RAM */}
               <div className="">
-                <h3 className="text-sm md:text-lg font-semibold text-gray-700 md:mb-2">
+                <h3 className="text-sm font-semibold text-gray-700 md:mb-2 md:text-lg">
                   Pilih RAM
                 </h3>
                 <ComponentSelection
@@ -299,8 +385,8 @@ export default function MainComponentSim() {
                   categoryId="2"
                   socketId=""
                   ramTypeId={
-                    selectedComponents.Mobo?.product_ram_type
-                      ? selectedComponents.Mobo.product_ram_type
+                    selectedComponents.Mobo?.ram_type
+                      ? selectedComponents.Mobo.ram_type
                           .map((ram: any) => ram.id)
                           .join(",")
                       : undefined
@@ -313,7 +399,7 @@ export default function MainComponentSim() {
               </div>
               {/* VGA */}
               <div className="">
-                <h3 className="text-sm md:text-lg font-semibold text-gray-700 md:mb-2">
+                <h3 className="text-sm font-semibold text-gray-700 md:mb-2 md:text-lg">
                   Pilih VGA
                 </h3>
                 <ComponentSelection
@@ -333,8 +419,8 @@ export default function MainComponentSim() {
 
         {/* Storage */}
         <Card>
-          <CardContent className="p-6  flex flex-col">
-            <h2 className="text-base md:text-xl font-semibold mb-4">Storage</h2>
+          <CardContent className="flex  flex-col p-6">
+            <h2 className="mb-4 text-base font-semibold md:text-xl">Storage</h2>
             <div className="space-y-4">
               {/* Storage */}
               <div className=" mb-4">
@@ -344,7 +430,7 @@ export default function MainComponentSim() {
                     className="mt-4 flex flex-row justify-evenly"
                   >
                     <div className="w-full flex-1">
-                      <h3 className="text-lg font-semibold text-gray-700 mb-2">
+                      <h3 className="mb-2 text-lg font-semibold text-gray-700">
                         Pilih Storage {ssd.key}
                       </h3>
                       <ComponentSelection
@@ -362,7 +448,7 @@ export default function MainComponentSim() {
                     </div>
                     {ssd.product === null && (
                       <Button
-                        className="p-3 text-whitetransition mx-2 mt-auto rounded-lg"
+                        className="text-whitetransition mx-2 mt-auto rounded-lg bg-red-600 p-3 hover:bg-red-500"
                         onClick={() => handleDeleteStorageFromSimulation(index)}
                         variant="destructive"
                       >
@@ -375,7 +461,7 @@ export default function MainComponentSim() {
             </div>
             <button
               onClick={addNewStorage}
-              className="mt-2 py-2 px-4 bg-blue-900 text-white rounded-lg hover:bg-blue-950 transition mx-2 ml-auto"
+              className="mx-2 ml-auto mt-2 rounded-lg bg-blue-900 px-4 py-2 text-white transition hover:bg-blue-950"
             >
               Tambah Storage
             </button>
@@ -384,13 +470,13 @@ export default function MainComponentSim() {
 
         <Card>
           <CardContent className="p-6">
-            <h2 className="text-base md:text-lg font-semibold mb-2 md:mb-4">
+            <h2 className="mb-2 text-base font-semibold md:mb-4 md:text-lg">
               Komponen lain
             </h2>
             <div className="space-y-4">
               {/* Casing */}
               <div className="">
-                <h3 className="text-sm md:text-lg font-semibold text-gray-700 md:mb-2">
+                <h3 className="text-sm font-semibold text-gray-700 md:mb-2 md:text-lg">
                   Pilih Casing
                 </h3>
                 <ComponentSelection
@@ -406,7 +492,7 @@ export default function MainComponentSim() {
               </div>
               {/* PSU */}
               <div className="">
-                <h3 className="text-sm md:text-lg font-semibold text-gray-700 md:mb-2">
+                <h3 className="text-sm font-semibold text-gray-700 md:mb-2 md:text-lg">
                   Pilih Power Supply Unit (PSU)
                 </h3>
                 <ComponentSelection
@@ -422,7 +508,7 @@ export default function MainComponentSim() {
               </div>
               {/* Monitor 1 */}
               <div className="">
-                <h3 className="text-sm md:text-lg font-semibold text-gray-700 md:mb-2">
+                <h3 className="text-sm font-semibold text-gray-700 md:mb-2 md:text-lg">
                   Pilih Monitor 1
                 </h3>
                 <ComponentSelection
@@ -438,7 +524,7 @@ export default function MainComponentSim() {
               </div>
               {/* Monitor 2 */}
               <div className="">
-                <h3 className="text-sm md:text-lg font-semibold text-gray-700 md:mb-2">
+                <h3 className="text-sm font-semibold text-gray-700 md:mb-2 md:text-lg">
                   Pilih Monitor 2
                 </h3>
                 <ComponentSelection
@@ -455,7 +541,7 @@ export default function MainComponentSim() {
             </div>
             {/* Monitor 3 */}
             <div className="">
-              <h3 className="text-sm md:text-lg font-semibold text-gray-700 md:mb-2">
+              <h3 className="text-sm font-semibold text-gray-700 md:mb-2 md:text-lg">
                 Pilih Monitor 3
               </h3>
               <ComponentSelection
@@ -475,9 +561,9 @@ export default function MainComponentSim() {
         {/* Summary */}
         <Card className="sticky bottom-0 mt-8 bg-white">
           <CardContent className="p-6">
-            <div className="flex justify-between items-center">
+            <div className="flex items-center justify-between">
               <div>
-                <p className="text-[0.8rem] md:text-lg font-semibold">
+                <p className="text-[0.8rem] font-semibold md:text-lg">
                   <span className="block md:inline">
                     {" "}
                     {new Intl.NumberFormat("id-ID", {
@@ -512,12 +598,12 @@ export default function MainComponentSim() {
                           }
                           return acc;
                         },
-                        0
-                      )
+                        0,
+                      ),
                     )}
                   </span>
                 </p>
-                <p className="text-xs md:text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-xs md:text-sm">
                   Jumlah komponen:{" "}
                   <span>
                     {Object.values(selectedComponents).reduce(
@@ -546,7 +632,7 @@ export default function MainComponentSim() {
                         }
                         return acc;
                       },
-                      0
+                      0,
                     )}
                   </span>
                 </p>
@@ -560,13 +646,21 @@ export default function MainComponentSim() {
                   <DeletePutBackIcon />
                   <span className="hidden md:inline">Reset</span>
                 </Button>
-                <Button variant="outline" className="min-w-12">
-                  <ViewIcon />
-                  <span className="hidden md:inline">Preview</span>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    navigator.clipboard.writeText(window.location.href);
+                    successToast("berhasil disalin", "top-left");
+                  }}
+                  className="min-w-12"
+                >
+                  <Share01Icon />
+                  <span className="hidden md:inline">Bagikan</span>
                 </Button>
                 <Button
+                  onClick={() => handleSaveSimulation()}
                   variant="default"
-                  className="bg-blue-950 min-w-12 text-slate-100"
+                  className="min-w-12 bg-blue-950 text-slate-100"
                 >
                   <Share01Icon className="text-slate-100" />
                   <span className="hidden md:inline">Simpan</span>

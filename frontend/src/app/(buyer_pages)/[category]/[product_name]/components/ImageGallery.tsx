@@ -13,7 +13,6 @@ interface ImageGalleryProps {
 
 export function ImageGallery({ images, setShowAdvanced = () => {} }: ImageGalleryProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  // const [showAdvanced, setShowAdvanced] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);

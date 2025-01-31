@@ -1,4 +1,5 @@
 import Breadcrumb from "@/components/BreadCrump"; // Import Breadcrumb
+import { Suspense } from "react";
 
 export default function RootLayout({
   children,
@@ -7,8 +8,10 @@ export default function RootLayout({
 }>) {
   return (
     <div className="mx-auto mt-6 w-[90%] md:w-[80%] lg:w-[75%]">
-      <Breadcrumb />
-      {children}
+      <Suspense>
+        <Breadcrumb />
+        {children}
+      </Suspense>
     </div>
   );
 }

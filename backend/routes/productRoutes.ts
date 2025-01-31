@@ -10,11 +10,12 @@ import { createFullDetailProduct } from "../controllers/product_controllers/crea
 import { authorize, ensureAuthenticated } from "../auth/userController";
 import { getClientProducts } from "../controllers/product_controllers/getClientProducts";
 import { bulkCreateProducts } from "../controllers/product_controllers/createMultipleProducts";
+import { searchSimProducts } from "../controllers/product_controllers/simProductSearchController";
 
 const productRoutes = express.Router();
 
 productRoutes.get("/product", getClientProducts);
-productRoutes.get("/sim-product", getAllProducts);
+productRoutes.get("/sim-product", searchSimProducts);
 productRoutes.get("/product/:id", getProductById);
 
 // Admin only routes

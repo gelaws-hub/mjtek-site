@@ -9,9 +9,9 @@ export function ProductImage({ product }: { product: Product }) {
       <img
         src={`${product.media_source}`}
         alt={`Product ${product.product_name}`}
-        layout="fill"
-        objectFit="cover"
-        className="rounded-md"
+        // layout="fill"
+        // objectFit="cover"
+        className="rounded-md object-cover"
       />
     </div>
   )

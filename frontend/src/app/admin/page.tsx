@@ -34,6 +34,14 @@ interface OrdersByStatus {
   total_orders: string;
 }
 
+interface TopBuyers {
+  nama: string, 
+  total_pembelian: number,
+  total_pendapatan: string,
+  persentase_pendapatan: string,
+}
+
+
 const AdminDashboard: React.FC = () => {
   const [sales, setSales] = useState<Sales[]>([
     { time: "Jan", total_income: "0" },
@@ -46,7 +54,9 @@ const AdminDashboard: React.FC = () => {
     { status: "finished", total_orders: "0" },
   ]);
 
-  const [topBuyers, setTopBuyers] = useState<any[]>([]);
+  const [topBuyers, setTopBuyers] = useState<TopBuyers[]>([
+    { nama: "", total_pembelian: 0, total_pendapatan: "", persentase_pendapatan: "" },
+  ]);
 
   const searchParams = useSearchParams();
   const range = Number(searchParams.get("range")) || 6;
@@ -107,7 +117,15 @@ const AdminDashboard: React.FC = () => {
           },
         );
         const data = await res.json();
-        setTopBuyers(data);
+        if (data.length < 5) {
+          const dummyData: TopBuyers[] = [];
+          for (let i = 0; i < 5 - data.length; i++) {
+            dummyData.push({ nama: "", total_pembelian: 0, total_pendapatan: "", persentase_pendapatan: "" });
+          }
+          setTopBuyers([...data, ...dummyData]);
+        } else {
+          setTopBuyers(data);
+        }
       } catch (error) {
         console.log(error);
       }
@@ -257,7 +275,7 @@ const AdminDashboard: React.FC = () => {
             urlPrefix="/admin/transactions?status="
           />
           {/* <MapOne /> */}
-          <div className="col-span-12 h-full xl:col-span-7">
+          <div className="col-span-12 h-full xl:col-span-7 w-full">
             <TableOne
               title="Pembeli teratas"
               data={topBuyers}

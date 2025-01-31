@@ -5,7 +5,7 @@ interface ImageUploaderProps {
   onFileSelect: (files: File[]) => void;
 }
 
-const ImageUploader: React.FC<imgUploaderProps> = ({ onFileSelect }) => {
+const ImageUploader: React.FC<ImageUploaderProps> = ({ onFileSelect }) => {
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 

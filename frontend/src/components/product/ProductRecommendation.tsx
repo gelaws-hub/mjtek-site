@@ -23,7 +23,7 @@ export function ProductRecommendation({
   if (!products) return null;
 
   return (
-    <div className="relative mx-auto mb-10 w-full overflow-x-auto scrollbar-thin">
+    <div className="relative mx-auto mb-10 w-full overflow-x-auto overflow-y-hidden scrollbar-thin py-4">
       {loading ? (
         <div className="flex gap-2 md:gap-4">
           {Array.from({ length: 10 }).map((_, i) => (

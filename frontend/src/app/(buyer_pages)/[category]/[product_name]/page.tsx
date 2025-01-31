@@ -17,6 +17,9 @@ import { ShoppingCart02Icon } from "@/components/icons/ShoppingCart02Icon";
 import AddToCartButton from "@/components/product/AddToCartButton";
 import FavoriteButton from "@/components/product/FavoriteButton";
 import { AdvancedImageGallery } from "./components/AdvancedImageGallery";
+import {
+  ProductLoadingPage
+} from "./components/ProductLoadingPage";
 
 function formatPrice(price: number) {
   return new Intl.NumberFormat("id-ID", {
@@ -39,6 +42,7 @@ export default function ProductDetailPage() {
   >([]);
 
   const [reccomendationLoading, setRecommendationLoading] = useState(false);
+  const [productLoading, setProductLoading] = useState(true);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -65,14 +69,17 @@ export default function ProductDetailPage() {
   }, [productId]);
 
   const fetchProductById = async (productId: string | null) => {
+    setProductLoading(true);
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/product/${productId}`,
       );
       const data = await response.json();
       setProduct(data.data);
+      setProductLoading(false);
     } catch (error) {
       console.error("Error fetching product details:", error);
+      setProductLoading(false);
     }
   };
 
@@ -104,7 +111,11 @@ export default function ProductDetailPage() {
   };
 
   if (!product) {
-    return <p>Loading</p>;
+    return <ProductLoadingPage />;
+  }
+
+  if (productLoading) {
+    return <ProductLoadingPage />;
   }
 
   return (
@@ -112,7 +123,7 @@ export default function ProductDetailPage() {
       <div className="flex flex-col gap-8 lg:flex-row">
         {/* Product Image Gallery */}
         <div className="lg:sticky lg:top-[9rem] lg:w-1/3 lg:self-start">
-          <imgGallery setShowAdvanced={setShowAdvancedImage} images={product.media} />
+          <ImageGallery setShowAdvanced={setShowAdvancedImage} images={product.media} />
         </div>
 
         {/* Product Info and Order Section */}
@@ -186,7 +197,7 @@ export default function ProductDetailPage() {
                     <Share2 className="h-4 w-4" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
+                <PopoverContent className="w-auto p-0 bg-white mb-6">
                   <div className="grid gap-4 p-4">
                     <Button
                       onClick={() => handleShare("whatsapp")}

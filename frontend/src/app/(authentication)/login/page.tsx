@@ -53,7 +53,7 @@ export default function Login() {
         return response.json();
       })
       .then((data) => {
-        Cookies.set("accessToken", data.accessToken, { expires: 7 });
+        Cookies.set("accessToken", data.accessToken, { expires: 1 });
         actions.setSubmitting(false);
   
         // After successful login, redirect the user to the callback URL (or home page if not set)
