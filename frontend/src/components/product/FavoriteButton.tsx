@@ -17,8 +17,6 @@ interface FavoriteButtonProps {
 const FavoriteButton = ({ productId, text, height="" }: FavoriteButtonProps) => {
   const [isFavourite, setIsFavourite] = useState<boolean>(false);
   const { isAuthenticated } = useCheckSession();
-  const router = useRouter();
-  const { goToLogin } = useGoToLogin();
 
   const checkFavoriteStatus = async () => {
     try {
