@@ -171,7 +171,7 @@ export default function Simulasi() {
               ) : (
                 <Link
                   href={`/login?callbackUrl=${encodeURIComponent(`/simulation${simulationId ? `?id=${simulationId}` : ""}`)}`}
-                  className="h-10 cursor-pointer rounded-md border bg-blue-900 p-2 px-4 text-white hover:bg-blue-700"
+                  className="h-10 cursor-pointer rounded-md border p-2 px-4 text-black hover:bg-gray-200"
                 >
                   Silahkan Login
                 </Link>
@@ -179,7 +179,7 @@ export default function Simulasi() {
             </div>
           </CardContent>
         </Card>
-        <MainComponentSim />
+        <MainComponentSim isAuthenticated={isAuthenticated} />
       </div>
     </RefreshContext.Provider>
   );

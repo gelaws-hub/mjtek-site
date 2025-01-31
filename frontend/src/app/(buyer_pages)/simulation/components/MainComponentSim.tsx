@@ -33,7 +33,11 @@ interface StorageDevice {
   product: Product | null;
 }
 
-export default function MainComponentSim() {
+export default function MainComponentSim({
+  isAuthenticated,
+}: {
+  isAuthenticated: boolean;
+}) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const simId = searchParams.get("id");
@@ -61,13 +65,16 @@ export default function MainComponentSim() {
   const [simMeta, setSimMeta] = useState<SimMeta>();
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
   const [refresh] = useRefreshContext();
+  const [loadingSockets, setLoadingSockets] = useState(true);
 
   // Initial Fetch to all sockets
   const fetchAllSockets = async () => {
+    setLoadingSockets(true);
     try {
       const cachedSockets = sessionStorage.getItem("allSockets");
       if (cachedSockets) {
         setAllSockets(JSON.parse(cachedSockets));
+        setLoadingSockets(false);
       } else {
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/socket`,
@@ -75,11 +82,18 @@ export default function MainComponentSim() {
         const data = await response.json();
         setAllSockets(data.sockets);
         sessionStorage.setItem("allSockets", JSON.stringify(data.sockets));
+        setLoadingSockets(false);
       }
     } catch (error) {
       console.error("Error fetching sockets:", error);
+      setLoadingSockets(false);
     }
+    setLoadingSockets(false);
   };
+
+  useEffect(() => {
+    fetchAllSockets();
+  }, []);
 
   // Initial load selected components from local storage
   useEffect(() => {
@@ -121,7 +135,7 @@ export default function MainComponentSim() {
       // fetchAllSockets().then(() => setIsLoading(false));
       setIsLoading(false);
     }
-  }, [simId, refresh]);
+  }, [simId, refresh, simId]);
 
   // Save selected components to local storage
   useEffect(() => {
@@ -135,7 +149,7 @@ export default function MainComponentSim() {
 
   // Filter sockets based on selected brand
   useEffect(() => {
-    if (selectedComponents.Brand && allSockets.length > 0) {
+    if (selectedComponents.Brand && allSockets) {
       const filteredSockets = allSockets.filter(
         (socket) =>
           socket.brand.brand_name.toLowerCase() === selectedComponents.Brand,
@@ -245,18 +259,20 @@ export default function MainComponentSim() {
           simData={selectedComponents}
         />
       )}
-      <Card>
-        <CardContent className="p-6">
-          <h2 className="mb-2 text-base font-semibold md:mb-4 md:text-lg">
-            Informasi Simulasi
-          </h2>
-          <CollapsibleInfo
-            title={simMeta?.title ?? ""}
-            description={simMeta?.description ?? ""}
-            user={simMeta?.user?.name ?? ""}
-          />
-        </CardContent>
-      </Card>
+      {simMeta && (
+        <Card>
+          <CardContent className="p-6">
+            <h2 className="mb-2 text-base font-semibold md:mb-4 md:text-lg">
+              Informasi Simulasi
+            </h2>
+            <CollapsibleInfo
+              title={simMeta?.title ?? ""}
+              description={simMeta?.description ?? ""}
+              user={simMeta?.user?.name ?? ""}
+            />
+          </CardContent>
+        </Card>
+      )}
       {/* Processor Configuration */}
       <Card>
         <CardContent className="p-6">
@@ -302,6 +318,7 @@ export default function MainComponentSim() {
                 Socket
               </label>
               <select
+                disabled={loadingSockets}
                 id="socket"
                 className="bg-background w-full rounded-md border p-2 text-sm md:text-base"
                 onChange={(e) => {
@@ -643,17 +660,19 @@ export default function MainComponentSim() {
                   <DeletePutBackIcon />
                   <span className="hidden md:inline">Reset</span>
                 </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    navigator.clipboard.writeText(window.location.href);
-                    successToast("berhasil disalin", "top-left");
-                  }}
-                  className="min-w-12"
-                >
-                  <Share01Icon />
-                  <span className="hidden md:inline">Bagikan</span>
-                </Button>
+                {isAuthenticated && (
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      navigator.clipboard.writeText(window.location.href);
+                      successToast("berhasil disalin", "top-left");
+                    }}
+                    className="min-w-12"
+                  >
+                    <Share01Icon />
+                    <span className="hidden md:inline">Bagikan</span>
+                  </Button>
+                )}
                 <Button
                   onClick={() => setIsSaveModalOpen(true)}
                   variant="default"
