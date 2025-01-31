@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import ComponentSelection from "./ComponentSelection";
 import { Card, CardContent } from "@/components/ui/card";
-import { Product } from "./Interfaces";
+import { Product, SimData } from "./Interfaces";
 import { Button } from "@/components/ui/button";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal";
 import { DeletePutBackIcon } from "@/components/icons/DeletePutBackIcon";
@@ -11,6 +11,11 @@ import { Share01Icon } from "@/components/icons/Share01Icon";
 import { ViewIcon } from "@/components/icons/ViewIcon";
 import { errorToast, successToast } from "@/components/toast/reactToastify";
 import { useRouter, useSearchParams } from "next/navigation";
+import { SimMeta } from "./Interfaces";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Collapsible } from "@radix-ui/react-collapsible";
+import { CollapsibleInfo } from "./CollapsibleInfo";
+import { SaveSimulationDialog } from "./SaveDialog";
 
 interface Socket {
   id: number;
@@ -26,21 +31,12 @@ interface StorageDevice {
   product: Product | null;
 }
 
-interface SimMeta {
-  id?: string;
-  user_id?: string;
-  simulation_data?: string;
-  title?: string;
-  description?: string;
-  modifiedAt?: string;
-}
-
 export default function MainComponentSim() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const simId = searchParams.get("id");
 
-  const [selectedComponents, setSelectedComponents] = useState({
+  const [selectedComponents, setSelectedComponents] = useState<SimData>({
     CPU: null as Product | null,
     Mobo: null as Product | null,
     Ram: null as Product | null,
@@ -61,6 +57,7 @@ export default function MainComponentSim() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [simMeta, setSimMeta] = useState<SimMeta>();
+  const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
 
   // Initial Fetch to all sockets
   const fetchAllSockets = async () => {
@@ -85,18 +82,15 @@ export default function MainComponentSim() {
   useEffect(() => {
     if (simId) {
       setIsLoading(true);
-      fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/simulation/${simId}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/simulation/${simId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
         },
-      )
+      })
         .then((response) => {
           if (response.ok) {
-            successToast("Simulasi berhasil diambil", "top-left");
+            // successToast("Simulasi berhasil diambil", "top-left");
             return response.json();
           } else {
             throw new Error("Failed to fetch simulation data");
@@ -124,15 +118,9 @@ export default function MainComponentSim() {
     }
   }, [simId]);
 
-  const fetchSimulationMeta = () => {
-    if (searchParams.get("id")) {
-
-    }
-  };
-
   // Save selected components to local storage
   useEffect(() => {
-    if (!isLoading) {
+    if (!isLoading && !simId) {
       localStorage.setItem(
         "simulationData",
         JSON.stringify(selectedComponents),
@@ -159,10 +147,6 @@ export default function MainComponentSim() {
   ) => {
     setSelectedComponents((prev) => ({ ...prev, [componentType]: product }));
   };
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
 
   const handleResetClick = () => {
     setIsDeleteModalOpen(true);
@@ -222,44 +206,46 @@ export default function MainComponentSim() {
     }));
   };
 
-  const handleSaveSimulation = async () => {
-    try {
-      const body = {
-        simulation_data: selectedComponents,
-        title: simMeta?.title,
-        description: simMeta?.description,
-      };
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/simulation${simMeta?.id ? `/${simMeta?.id}` : ""}`,
-        {
-          method: `${simMeta?.id ? "PATCH" : "POST"}`,
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(body),
-          credentials: "include",
-        },
-      );
-      if (response.status == 401) {
-        errorToast("Anda harus login terlebih dahulu", "top-left");
-      }
-      const data = await response.json();
-      successToast("Simulasi berhasil disimpan", "top-left");
-      setSimMeta(data);
-      router.push(`/simulation?id=${data.id}`);
-    } catch (error) {
-      errorToast("Gagal menyimpan simulasi", "top-left");
-      console.error("Error saving simulation:", error);
-    }
-  };
-
-  console.log("Sim meta :  ", simMeta);
-  console.log("selectedComponents", selectedComponents);
+  if (isLoading) {
+    return (
+      <div className="flex flex-col space-y-6">
+        <Card>
+          <Skeleton className="h-[130px] w-full" />
+        </Card>
+        <Card>
+          <Skeleton className="h-[160px] w-full" />
+        </Card>
+        <Card>
+          <Skeleton className="h-[800px] w-full" />
+        </Card>
+        <Card>
+          <Skeleton className="h-[250px] w-full" />
+        </Card>
+        <Card>
+          <Skeleton className="h-[500px] w-full" />
+        </Card>
+        <Card className="sticky bottom-0 mt-8">
+          <Skeleton className="h-[96px] w-full" />
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col space-y-6">
-      <h1 className="text-2xl font-bold">PC Simulation</h1>
-
+      <SaveSimulationDialog open={isSaveModalOpen} setOpen={setIsSaveModalOpen} simData={selectedComponents} />
+      <Card>
+        <CardContent className="p-6">
+          <h2 className="mb-2 text-base font-semibold md:mb-4 md:text-lg">
+            Informasi Simulasi
+          </h2>
+          <CollapsibleInfo
+            title={simMeta?.title ?? ""}
+            description={simMeta?.description ?? ""}
+            user={simMeta?.user?.name ?? ""}
+          />
+        </CardContent>
+      </Card>
       {/* Processor Configuration */}
       <Card>
         <CardContent className="p-6">
@@ -658,7 +644,7 @@ export default function MainComponentSim() {
                   <span className="hidden md:inline">Bagikan</span>
                 </Button>
                 <Button
-                  onClick={() => handleSaveSimulation()}
+                  onClick={() => setIsSaveModalOpen(true)}
                   variant="default"
                   className="min-w-12 bg-blue-950 text-slate-100"
                 >

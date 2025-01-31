@@ -16,7 +16,7 @@ export default function Login() {
   const [error, setError] = useState(null);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get('callbackUrl') || "/";
+  const callbackUrl = decodeURIComponent(searchParams.get('callbackUrl') || "/");
 
   const userSchema = object({
     email: string()

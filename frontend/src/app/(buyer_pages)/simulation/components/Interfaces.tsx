@@ -24,3 +24,29 @@ export interface Product {
   }>;
 }
 
+export interface SimMeta {
+  id?: string;
+  user_id?: string;
+  simulation_data?: string;
+  title?: string;
+  description?: string;
+  modifiedAt?: string;
+  user?: {
+    name: string;
+  };
+}
+
+export interface SimData {
+  CPU: null | Product;
+  Mobo: null | Product;
+  Ram: null | Product;
+  Vga: null | Product;
+  SocketId: null | string;
+  Brand: null | string;
+  Storage: { key: string; product: null | Product }[] | null;
+  Casing: null | Product;
+  PSU: null | Product;
+  Monitor1: null | Product;
+  Monitor2: null | Product;
+  Monitor3: null | Product;
+}

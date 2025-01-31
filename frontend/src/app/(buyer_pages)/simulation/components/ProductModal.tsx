@@ -39,8 +39,9 @@ export default function ProductModal({
 }: ProductModalProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [responseData, setResponseData] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const searchRef = useRef<HTMLInputElement>(null);
+  const [deleteModal, setDeleteModal] = useState(false);
   // const [open, setOpen] = useState(false);
 
   const debouncedFetchProducts = debounce(async () => {
@@ -105,18 +106,18 @@ export default function ProductModal({
     }
   };
 
-  if (!responseData) return null;
+  // if (!responseData) return null;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent
-        aria-describedby={`Pilih ${responseData.categories[0].category_name}`}
+        aria-describedby={`Pilih ${!loading && responseData.categories[0].category_name}`}
         className="flex h-[80vh] w-[90%] max-w-[1024px] flex-col rounded-lg bg-white"
       >
         <DialogHeader className="space-y-1.5 border-b border-gray-200 pb-4">
           <DialogTitle className="text-left">
-            Pilih {responseData.categories[0].category_name}{" "}
+            Pilih {!loading && responseData.categories[0].category_name}{" "}
           </DialogTitle>
           <DialogDescription></DialogDescription>
           <div className="relative flex w-full items-center border-gray-200">
@@ -125,7 +126,7 @@ export default function ProductModal({
               onChange={handleSearchChange}
               onKeyDown={handleKeyDown} // Listen for Enter key
               id="name"
-              placeholder={`Cari ${responseData.categories[0].category_name}...`}
+              placeholder={`Cari ${!loading ? responseData.categories[0].category_name : "Produk"}... `}
               className="col-span-3"
             />
             <Button
@@ -138,7 +139,7 @@ export default function ProductModal({
           </div>
         </DialogHeader>
         <div className="grid h-full gap-4 overflow-y-scroll py-4 scrollbar-thin">
-          <div className="mx-auto grid w-full max-w-[96%] grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-2 md:gap-3">
+          <div className="mx-auto grid w-full max-w-[96%] grid-cols-2 md:grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-2 md:gap-3">
             {loading ? (
               Array.from({ length: 10 }).map((_, index) => (
                 <ProductSkeleton key={index} />
@@ -157,32 +158,36 @@ export default function ProductModal({
             )}
           </div>
         </div>
-        <DialogFooter className="flex w-full flex-row items-center justify-center border-t border-gray-200 p-4 sm:flex-row sm:justify-center sm:space-x-2">
-          <Button
-            disabled={currentPage <= 1}
-            onClick={() => handlePageChange(currentPage - 1)}
-          >
-            Prev
-          </Button>
-          <select
-            className="px-4 py-2"
-            onChange={(e) => handlePageChange(parseInt(e.target.value))}
-            value={currentPage}
-            content="Current Page"
-          >
-            {Array.from({ length: responseData.totalPages }).map((_, index) => (
-              <option key={index + 1} value={index + 1}>
-                {index + 1}
-              </option>
-            ))}
-          </select>
-          <Button
-            disabled={currentPage >= responseData.totalPages}
-            onClick={() => handlePageChange(currentPage + 1)}
-          >
-            Prev
-          </Button>
-        </DialogFooter>
+        {!loading && (
+          <DialogFooter className="flex w-full flex-row items-center justify-center border-t border-gray-200 p-4 sm:flex-row sm:justify-center sm:space-x-2">
+            <Button
+              disabled={currentPage <= 1}
+              onClick={() => handlePageChange(currentPage - 1)}
+            >
+              Prev
+            </Button>
+            <select
+              className="px-4 py-2"
+              onChange={(e) => handlePageChange(parseInt(e.target.value))}
+              value={currentPage}
+              content="Current Page"
+            >
+              {Array.from({ length: responseData.totalPages }).map(
+                (_, index) => (
+                  <option key={index + 1} value={index + 1}>
+                    {index + 1}
+                  </option>
+                ),
+              )}
+            </select>
+            <Button
+              disabled={currentPage >= responseData.totalPages}
+              onClick={() => handlePageChange(currentPage + 1)}
+            >
+              Prev
+            </Button>
+          </DialogFooter>
+        )}
       </DialogContent>
     </Dialog>
   );
