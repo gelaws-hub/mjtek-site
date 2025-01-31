@@ -42,20 +42,22 @@ export default function Simulasi() {
 
   const fetchSimulation = async () => {
     setIsLoading(true);
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/simulations?onlyInfo=true`,
-        {
-          method: "GET",
-          credentials: "include",
-        },
-      );
-      const data = await response.json();
-      setSimulations(data);
-      setIsLoading(false);
-    } catch (error) {
-      console.error("Error fetching simulation:", error);
-      setIsLoading(false);
+    if (isAuthenticated) {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/simulations?onlyInfo=true`,
+          {
+            method: "GET",
+            credentials: "include",
+          },
+        );
+        const data = await response.json();
+        setSimulations(data);
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching simulation:", error);
+        setIsLoading(false);
+      }
     }
     setIsLoading(false);
   };
@@ -139,7 +141,7 @@ export default function Simulasi() {
               </button>
               {isLoading ? (
                 <Skeleton className="h-10 w-full" />
-              ) : isAuthenticated && user.role_name === "buyer" ? (
+              ) : isAuthenticated && user.role_name === "buyer"  ? (
                 simulations.map((simulation: any) => (
                   <div
                     className="flex h-10 rounded-md border"

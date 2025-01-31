@@ -13,6 +13,8 @@ import { Label } from "@/components/ui/label";
 import { useEffect, useState } from "react";
 import { SaveCollapsible } from "./SaveCollapsible";
 import { useRefreshContext } from "@/lib/refreshContext";
+import { errorToast } from "@/components/toast/reactToastify";
+import { useRouter } from "next/navigation";
 
 interface Simulations {
   id: string;
@@ -35,6 +37,7 @@ export function SaveSimulationDialog({ open, setOpen, simData }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const [simulations, setSimulations] = useState<Simulations[]>();
   const [refresh] = useRefreshContext();
+  const router = useRouter();
 
   const fetchSimulation = async () => {
     setIsLoading(true);
@@ -46,6 +49,11 @@ export function SaveSimulationDialog({ open, setOpen, simData }: Props) {
           credentials: "include",
         },
       );
+      if (response.status === 401) {
+        errorToast("Anda harus login terlebih dahulu", "top-left");
+        router.push("/login?callbackUrl=/simulation");
+        return;
+      }
       const data = await response.json();
       setSimulations(data);
       setIsLoading(false);
@@ -70,16 +78,26 @@ export function SaveSimulationDialog({ open, setOpen, simData }: Props) {
             simulasi yang ingin anda gunakan untuk menyimpan.
           </DialogDescription>
         </DialogHeader>
-        {simulations
-          ? simulations.map((sim) => (
-              <SaveCollapsible
-                onSave={() => setOpen(false)}
-                key={sim.id}
-                simInfo={sim}
-                simData={simData}
-              />
-            ))
-          : "Belum ada simulasi tersimpan"}
+        {simulations && simulations.length > 0 ? (
+          simulations.map((sim) => (
+            <SaveCollapsible
+              onSave={() => setOpen(false)}
+              key={sim.id}
+              simInfo={sim}
+              simData={simData}
+            />
+          ))
+        ) : (
+          <SaveCollapsible
+            simData={simData}
+            simInfo={{
+              id: "",
+              title: "",
+              description: "",
+            }}
+            onSave={() => setOpen(false)}
+          />
+        )}
         {simulations && simulations.length < 3 && (
           <SaveCollapsible
             simData={simData}

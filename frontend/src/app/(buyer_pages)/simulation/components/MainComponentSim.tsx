@@ -16,6 +16,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Collapsible } from "@radix-ui/react-collapsible";
 import { CollapsibleInfo } from "./CollapsibleInfo";
 import { SaveSimulationDialog } from "./SaveDialog";
+import { useRefreshContext } from "@/lib/refreshContext";
+import { SaveIcon } from "lucide-react";
 
 interface Socket {
   id: number;
@@ -58,6 +60,7 @@ export default function MainComponentSim() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [simMeta, setSimMeta] = useState<SimMeta>();
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
+  const [refresh] = useRefreshContext();
 
   // Initial Fetch to all sockets
   const fetchAllSockets = async () => {
@@ -80,6 +83,7 @@ export default function MainComponentSim() {
 
   // Initial load selected components from local storage
   useEffect(() => {
+    fetchAllSockets();
     if (simId) {
       setIsLoading(true);
       fetch(`${process.env.NEXT_PUBLIC_API_URL}/simulation/${simId}`, {
@@ -114,9 +118,10 @@ export default function MainComponentSim() {
         }
         setSelectedComponents(parsedData);
       }
-      fetchAllSockets().then(() => setIsLoading(false));
+      // fetchAllSockets().then(() => setIsLoading(false));
+      setIsLoading(false);
     }
-  }, [simId]);
+  }, [simId, refresh]);
 
   // Save selected components to local storage
   useEffect(() => {
@@ -233,7 +238,13 @@ export default function MainComponentSim() {
 
   return (
     <div className="flex flex-col space-y-6">
-      <SaveSimulationDialog open={isSaveModalOpen} setOpen={setIsSaveModalOpen} simData={selectedComponents} />
+      {isSaveModalOpen && (
+        <SaveSimulationDialog
+          open={isSaveModalOpen}
+          setOpen={setIsSaveModalOpen}
+          simData={selectedComponents}
+        />
+      )}
       <Card>
         <CardContent className="p-6">
           <h2 className="mb-2 text-base font-semibold md:mb-4 md:text-lg">
@@ -648,7 +659,7 @@ export default function MainComponentSim() {
                   variant="default"
                   className="min-w-12 bg-blue-950 text-slate-100"
                 >
-                  <Share01Icon className="text-slate-100" />
+                  <SaveIcon className="text-slate-100" />
                   <span className="hidden md:inline">Simpan</span>
                 </Button>
                 <DeleteConfirmModal
