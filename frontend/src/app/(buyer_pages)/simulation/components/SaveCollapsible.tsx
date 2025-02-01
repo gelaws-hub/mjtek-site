@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, PlusIcon } from "lucide-react";
 import { useFormik } from "formik";
 import { z } from "zod";
 import { toFormikValidationSchema } from "zod-formik-adapter";
@@ -98,7 +98,8 @@ export function SaveCollapsible({
           role="button"
         >
           <h4 className="truncate text-sm font-semibold">
-            {simInfo.id == simIdParams ? `${simInfo.title} (lokasi asli)` : "Tambah simulasi baru"}
+            {!simInfo.id && <span className="flex items-center justify-center gap-3"><PlusIcon className="w-4 h-4" /> Tambah simulasi Baru</span>}
+            {simInfo.id == simIdParams ? `${simInfo.title} (lokasi asli)` : `${simInfo.title}`}
           </h4>
           <Button variant="ghost" size="sm">
             <ChevronRight

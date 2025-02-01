@@ -85,6 +85,7 @@ export function SaveSimulationDialog({ open, setOpen, simData }: Props) {
               key={sim.id}
               simInfo={sim}
               simData={simData}
+
             />
           ))
         ) : (
@@ -98,7 +99,7 @@ export function SaveSimulationDialog({ open, setOpen, simData }: Props) {
             onSave={() => setOpen(false)}
           />
         )}
-        {simulations && simulations.length < 3 && (
+        {simulations && simulations.length > 0 && simulations.length < 3 && (
           <SaveCollapsible
             simData={simData}
             simInfo={{

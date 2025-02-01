@@ -5,19 +5,17 @@ import ComponentSelection from "./ComponentSelection";
 import { Card, CardContent } from "@/components/ui/card";
 import { Product, SimData } from "./Interfaces";
 import { Button } from "@/components/ui/button";
-import DeleteConfirmModal from "@/components/DeleteConfirmModal";
 import { DeletePutBackIcon } from "@/components/icons/DeletePutBackIcon";
 import { Share01Icon } from "@/components/icons/Share01Icon";
-import { ViewIcon } from "@/components/icons/ViewIcon";
-import { errorToast, successToast } from "@/components/toast/reactToastify";
+import { successToast } from "@/components/toast/reactToastify";
 import { useRouter, useSearchParams } from "next/navigation";
 import { SimMeta } from "./Interfaces";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Collapsible } from "@radix-ui/react-collapsible";
 import { CollapsibleInfo } from "./CollapsibleInfo";
 import { SaveSimulationDialog } from "./SaveDialog";
 import { useRefreshContext } from "@/lib/refreshContext";
 import { SaveIcon } from "lucide-react";
+import { DeleteAlert } from "./DeleteAlert";
 
 interface Socket {
   id: number;
@@ -131,11 +129,12 @@ export default function MainComponentSim({
           delete parsedData.Ram;
         }
         setSelectedComponents(parsedData);
+        setSimMeta(undefined);
       }
       // fetchAllSockets().then(() => setIsLoading(false));
       setIsLoading(false);
     }
-  }, [simId, refresh, simId]);
+  }, [simId, refresh]);
 
   // Save selected components to local storage
   useEffect(() => {
@@ -228,9 +227,11 @@ export default function MainComponentSim({
   if (isLoading) {
     return (
       <div className="flex flex-col space-y-6">
-        <Card>
-          <Skeleton className="h-[130px] w-full" />
-        </Card>
+        {simMeta && (
+          <Card>
+            <Skeleton className="h-[130px] w-full" />
+          </Card>
+        )}
         <Card>
           <Skeleton className="h-[160px] w-full" />
         </Card>
@@ -681,11 +682,11 @@ export default function MainComponentSim({
                   <SaveIcon className="text-slate-100" />
                   <span className="hidden md:inline">Simpan</span>
                 </Button>
-                <DeleteConfirmModal
-                  isOpen={isDeleteModalOpen}
-                  onClose={() => setIsDeleteModalOpen(false)}
-                  onConfirm={handleConfirmReset}
-                  message="Apakah anda yakin untuk menghapus Simulasi ini?"
+                <DeleteAlert
+                  onDelete={handleConfirmReset}
+                  onCancel={() => setIsDeleteModalOpen(false)}
+                  open={isDeleteModalOpen}
+                  message="Apakah anda yakin untuk me-reset Simulasi ini?"
                 />
               </div>
             </div>
