@@ -11,6 +11,7 @@ import useCurrentUser from "@/app/(authentication)/auth/useCurrentUser";
 import UserCard from "../userCard";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import useUserData from "@/hooks/useUserData";
+import { errorToast } from "../toast/reactToastify";
 
 export default function UserProfile() {
   const [openUserInfo, setOpenUserInfo] = useState(false);
@@ -39,8 +40,15 @@ export default function UserProfile() {
           credentials: "include",
         },
       );
-      Cookies.remove("accessToken");
-      window.location.reload();
+
+      if (response.ok) {
+        Cookies.remove("accessToken");
+        window.location.reload();
+      }
+      if(!response.ok){
+        const errorData = await response.json();
+        console.error(errorData);
+      }
     } catch (error) {
       console.error(error);
     }
