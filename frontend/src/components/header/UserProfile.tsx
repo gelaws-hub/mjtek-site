@@ -11,7 +11,6 @@ import useCurrentUser from "@/app/(authentication)/auth/useCurrentUser";
 import UserCard from "../userCard";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import useUserData from "@/hooks/useUserData";
-import { errorToast } from "../toast/reactToastify";
 
 export default function UserProfile() {
   const [openUserInfo, setOpenUserInfo] = useState(false);
