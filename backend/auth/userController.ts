@@ -109,7 +109,7 @@ export const registerUser = async (req: Request, res: Response) => {
         phone_number,
         activation_token: activationToken,
         reset_password_token: null,
-        is_active: false,
+        is_active: true,
         role_name: "buyer", // Set default role sebagai user biasa(pembeli)
         profile_pic:
           "/image.png",
@@ -117,7 +117,6 @@ export const registerUser = async (req: Request, res: Response) => {
     });
 
     // Kirim email aktivasi
-    // const activationLink = `${process.env.CORS_ALLOWED_ORIGINS}/activate?token=${activationToken}`;
     const activationLink = `${getOriginFromRequest(req)}/activate?token=${activationToken}`;
     console.log("activation link: ", activationLink);
     await sendActivationEmail(email, activationLink);

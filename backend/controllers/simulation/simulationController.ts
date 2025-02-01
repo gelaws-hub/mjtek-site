@@ -37,6 +37,8 @@ export const saveSimulation = async (req: Request, res: Response) => {
 
 export const getSimulations = async(req: Request, res: Response) => {
   const user = (req as CustomRequest).user;
+  const onlyInfo = req.query.onlyInfo === "true" ? true : false;
+
   if (!user) {
     return res.status(401).json({ message: "Unauthorized" });
   }
@@ -45,6 +47,15 @@ export const getSimulations = async(req: Request, res: Response) => {
       where: {
         user_id: user.id,
       },
+      select: {
+        id: true,
+        title: true,
+        user_id: true,
+        user: { select: { name: true } },
+        description: true,
+        modifiedAt: true,
+        simulation_data: !onlyInfo,
+      }
     });
     return res.status(200).json(simulations);
   } catch (error) {
@@ -61,6 +72,9 @@ export const getSimulationById = async(req: Request, res: Response) => {
       where: {
         id: id,
       },
+      include: {
+        user: { select: { name: true } },
+      }
     });
     return res.status(200).json(simulation);
   } catch (error) {
