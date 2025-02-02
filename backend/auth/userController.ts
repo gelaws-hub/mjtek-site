@@ -362,15 +362,15 @@ export const logoutUser: RequestHandler = async (req, res) => {
     }
 
     res.clearCookie("accessToken", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      httpOnly: false, // Prevent client-side access
+      secure: isProduction, // Use HTTPS in production
+      sameSite: isProduction ? "none" : "strict", // Prevent CSRF attacks
     });
 
     res.clearCookie("refreshToken", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      httpOnly: true, // Prevent client-side access
+      sameSite: "none",
+      secure: true,
     });
 
     return res.status(200).json({ message: "Successfully logged out." });
