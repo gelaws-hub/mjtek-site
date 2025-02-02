@@ -112,12 +112,15 @@ export default function ProductModal({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent
-        aria-describedby={`Pilih ${!loading && responseData.categories[0].category_name}`}
+        aria-describedby={`Pilih ${!loading && responseData.categories[0] ? responseData.categories[0].category_name : null}`}
         className="flex h-[80vh] w-[90%] max-w-[1024px] flex-col rounded-lg bg-white"
       >
         <DialogHeader className="space-y-1.5 border-b border-gray-200 pb-4">
           <DialogTitle className="text-left">
-            Pilih {!loading && responseData.categories[0].category_name}{" "}
+            Pilih{" "}
+            {!loading && responseData.categories[0]
+              ? responseData.categories[0].category_name
+              : null}{" "}
           </DialogTitle>
           <DialogDescription></DialogDescription>
           <div className="relative flex w-full items-center border-gray-200">
@@ -126,7 +129,7 @@ export default function ProductModal({
               onChange={handleSearchChange}
               onKeyDown={handleKeyDown} // Listen for Enter key
               id="name"
-              placeholder={`Cari ${!loading ? responseData.categories[0].category_name : "Produk"}... `}
+              placeholder={`Cari ${!loading && responseData.categories[0] ? responseData.categories[0].category_name : "Produk"}... `}
               className="col-span-3"
             />
             <Button
@@ -139,7 +142,7 @@ export default function ProductModal({
           </div>
         </DialogHeader>
         <div className="grid h-full gap-4 overflow-y-scroll py-4 scrollbar-thin">
-          <div className="mx-auto grid w-full max-w-[96%] grid-cols-2 md:grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-2 md:gap-3">
+          <div className="mx-auto grid w-full max-w-[96%] grid-cols-2 gap-2 md:grid-cols-[repeat(auto-fill,minmax(150px,1fr))] md:gap-3">
             {loading ? (
               Array.from({ length: 10 }).map((_, index) => (
                 <ProductSkeleton key={index} />
@@ -154,7 +157,10 @@ export default function ProductModal({
                 />
               ))
             ) : (
-              <p>No products found.</p>
+              <p className="col-span-full mx-auto my-auto w-full text-center">
+                Oops, Tidak ada produk yang ditemukan. Silahkan gunakan
+                konfigurasi lain
+              </p>
             )}
           </div>
         </div>
