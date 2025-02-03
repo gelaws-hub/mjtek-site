@@ -70,7 +70,7 @@ export default function TransactionDetailModal({
               >
                 <div className="h-16 w-16">
                   {product.media_source && (
-                    <Image
+                    <img
                       src={product.media_source}
                       alt={product.product_name}
                       width={100}
@@ -80,7 +80,7 @@ export default function TransactionDetailModal({
                   )}
                 </div>
                 <div className="w-full">
-                  <Link href={`/kategori/${product.product_name}-${product.product_id}`} className="line-clamp-1 font-medium">
+                  <Link scroll={false} href={`/kategori/${product.product_name}-${product.product_id}`} className="line-clamp-1 font-medium">
                     {product.product_name} - {product.quantity}
                   </Link>
                   <div className="flex items-center justify-between">

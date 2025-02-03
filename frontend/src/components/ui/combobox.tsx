@@ -20,11 +20,20 @@ import {
 } from "@/components/ui/popover";
 
 export function Combobox({
-  defaultOption = {},
-  options = [],
-  setOption = () => {},
+  defaultOption = { label: "", value: "" },
+  options = [] as { label: string; value: string }[],
+  setOption = () => ({} as any),
   label = "",
-}: any) {
+  className = "",
+  withSearch = true,
+}: {
+  defaultOption: { label: string; value: string };
+  options: { label: string; value: string }[];
+  setOption: (option: { label: string; value: string }) => void;
+  label?: string;
+  className?: string,
+  withSearch?: boolean;
+}) {
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState("");
 
@@ -35,7 +44,7 @@ export function Combobox({
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger className="bg-inherit" asChild>
+      <PopoverTrigger className={cn("bg-inherit", className)} asChild>
         <Button
           variant="outline"
           role="combobox"
@@ -48,9 +57,9 @@ export function Combobox({
           <ChevronsUpDown className="opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="z-[10000] w-[170px] md:w-[229px] max-w-full p-0 ">
+      <PopoverContent className={cn("z-[10000] w-[170px] max-w-full p-0 md:w-[229px]", className)}>
         <Command className="bg-slate-50 dark:bg-gray-800">
-          <CommandInput placeholder="Search data..." className="h-9" />
+          {withSearch && <CommandInput placeholder="Search data..." className="h-9" />}
           <CommandList>
             <CommandEmpty>No data found.</CommandEmpty>
             <CommandGroup>

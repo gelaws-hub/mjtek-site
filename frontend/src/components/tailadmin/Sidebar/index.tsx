@@ -27,15 +27,15 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
       >
         {/* <!-- SIDEBAR HEADER --> */}
         <div className="flex items-center justify-between gap-2 px-6 py-5.5 lg:py-6.5">
-          <Link href="/admin" className="flex items-center gap-2">
-            <Image
+          <Link scroll={false} href="/admin" className="flex items-center gap-2">
+            <img
               width={32}
               height={32}
               src={"/logo_mjtek.png"}
               alt="Logo"
               className="rounded-lg dark:fill-white"
             />
-            <h2 className="text-lg text-blue-900 dark:text-white">
+            <h2 className="text-lg text-white font-semibold">
               MJ teknologi
             </h2>
           </Link>

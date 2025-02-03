@@ -19,7 +19,7 @@ export default function useCurrentUser() {
       try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/me`, {
           method: "GET",
-          credentials: "include", // Include cookies with the request
+          credentials: "include",
         });
         if (response.ok) {
           const data = await response.json();

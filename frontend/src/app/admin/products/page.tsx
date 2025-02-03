@@ -18,7 +18,6 @@ const ProductPage: React.FC = () => {
         <ProductOptions />
         <ProductTables />
       </RefreshContext.Provider>
-      <ToastContainer />
     </DefaultLayout>
   );
 };

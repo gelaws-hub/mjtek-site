@@ -12,6 +12,7 @@ interface CustomRequest extends Request {
 
 export const getAllTransactions = async (req: Request, res: Response) => {
   const user = (req as CustomRequest).user;
+  const status_request = req.query.status as string | undefined;
 
   if (!user) {
     return res.status(401).json({
@@ -19,6 +20,17 @@ export const getAllTransactions = async (req: Request, res: Response) => {
       message: "Unauthorized",
     });
   }
+
+  const statuses: { [key: string]: number[] } = {
+    checking: [1, 2, 3],
+    processing: [4, 5],
+    shipping: [6, 7, 8, 9],
+    dispute: [10, 98],
+    finished: [0, 99],
+  };
+
+  // Determine the status IDs to filter by
+  const statusIds = status_request ? statuses[status_request] : undefined;
 
   // Get query params
   const page = parseInt(req.query.page as string) || 1;
@@ -38,6 +50,7 @@ export const getAllTransactions = async (req: Request, res: Response) => {
             contains: searchUser,
           },
         },
+        ...(statusIds && { status_id: { in: statusIds } }),
         transaction_detail: {
           some: {
             product: {
@@ -67,6 +80,7 @@ export const getAllTransactions = async (req: Request, res: Response) => {
             contains: searchUser,
           },
         },
+        ...(statusIds && { status_id: { in: statusIds } }),
         transaction_detail: {
           some: {
             product: {

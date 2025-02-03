@@ -2,7 +2,7 @@
     "category": [
         {
             "name": "Simulasi Rakit PC",
-            "url": "/simulasi",
+            "url": "/simulation",
             "icon": "/category_icons/sim_rakit_pc_icon.svg"
         },
         {

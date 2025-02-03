@@ -4,7 +4,6 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import crypto from "crypto";
-import { uploadToCloudinary } from "../../utils/cloudinary"; // Reusable Cloudinary module
 
 // Configure multer for local file storage
 const storage = multer.diskStorage({
@@ -182,17 +181,11 @@ export const createFullDetailProduct = async (req: Request, res: Response) => {
         for (const file of files) {
           const fileUrl = `/uploads/products/${categorySlug}/${file.filename}`;
 
-          // Upload to Cloudinary
-          const cloudinaryResult = await uploadToCloudinary(
-            fs.readFileSync(file.path),
-            `products/${categorySlug}`,
-            file.filename
-          );
-
+          // Save media to the database
           const media = await prisma.media.create({
             data: {
               product_id: product.id,
-              source: cloudinaryResult.secure_url, // Local URL
+              source: fileUrl,
               file_type: file.mimetype.startsWith("image") ? "image" : "video",
             },
           });

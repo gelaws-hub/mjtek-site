@@ -1,0 +1,38 @@
+{
+    "DummySidebar": [
+        {
+            "name": "Komponen PC",
+            "url": "/komponen-pc",
+            "subItems": [
+                {
+                    "name": "CPU",
+                    "url": "/cpu"
+                },
+                {
+                    "name": "VGA",
+                    "url": "/vga"
+                },
+                {
+                    "name": "RAM",
+                    "url": "/ram"
+                },
+                {
+                    "name": "Monitor",
+                    "url": "/monitor"
+                }
+            ]
+        },
+        {
+            "name": "PC Ready",
+            "url": "/pc-ready"
+        },
+        {
+            "name": "Monitor",
+            "url": "/monitor"
+        },
+        {
+            "name": "Simulasi Rakit PC",
+            "url": "/simulation"
+        }
+    ]
+}

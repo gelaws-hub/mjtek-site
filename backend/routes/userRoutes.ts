@@ -7,8 +7,7 @@ import {
     resetPassword,
     requestChangePassword,  
     refreshToken,
-    getCurrentUser,
-    getUsers, 
+    getCurrentUser, 
     logoutUser,
     ensureAuthenticated,
     authorize,
@@ -16,6 +15,7 @@ import {
 } from '../auth/userController';
 
 import { createRole, getAllRoles, getRoleById, updateRole, deleteRole } from '../auth/roleController';
+import { getUsers } from '../auth/BuyerController';
 
 const userRoutes = express.Router();
 
@@ -40,7 +40,7 @@ userRoutes.post('/refresh-token', refreshToken);
 // GET CURRENT USER (Protected route - user must be authenticated)
 userRoutes.get('/me', ensureAuthenticated, getCurrentUser);
 
-userRoutes.get('/users', ensureAuthenticated, getUsers);
+userRoutes.get('/users', ensureAuthenticated, authorize(["admin", "owner"]), getUsers);
 
 // CHANGE PASSWORD
 userRoutes.post('/change-password', ensureAuthenticated,requestChangePassword);

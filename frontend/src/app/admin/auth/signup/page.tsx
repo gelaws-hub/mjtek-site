@@ -21,15 +21,15 @@ const SignUp: React.FC = () => {
         <div className="flex flex-wrap items-center">
           <div className="hidden w-full xl:block xl:w-1/2">
             <div className="px-26 py-17.5 text-center">
-              <Link className="mb-5.5 inline-block" href="/">
-                <Image
+              <Link scroll={false} className="mb-5.5 inline-block" href="/">
+                <img
                   className="hidden dark:block"
                   src={"/images/logo/logo.svg"}
                   alt="Logo"
                   width={176}
                   height={32}
                 />
-                <Image
+                <img
                   className="dark:hidden"
                   src={"/images/logo/logo-dark.svg"}
                   alt="Logo"
@@ -359,7 +359,7 @@ const SignUp: React.FC = () => {
                 <div className="mt-6 text-center">
                   <p>
                     Already have an account?{" "}
-                    <Link href="/auth/signin" className="text-primary">
+                    <Link scroll={false} href="/auth/signin" className="text-primary">
                       Sign in
                     </Link>
                   </p>

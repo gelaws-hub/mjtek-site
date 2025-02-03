@@ -16,6 +16,7 @@ export interface Status {
 export interface Transaction {
   id: string;
   user_id: string;
+  user: User;
   total_items: number;
   total_price: string;
   start_time: string;
@@ -24,3 +25,20 @@ export interface Transaction {
   status: Status;
   products: Product[];
 }
+
+export interface User {
+  id: string;
+  role_name: string;
+  name: string;
+  email: string;
+  password?: string;
+  address?: string;
+  phone_number?: string;
+  profile_pic?: string;
+  is_active?: boolean;
+  activation_token?: string | null;
+  reset_password_token?: string | null;
+  reset_password_expires?: string | null;
+  created_at?: string;
+}
+

@@ -6,12 +6,12 @@ export function ProductImage({ product }: { product: Product }) {
   // For this example, we'll use a placeholder image
   return (
     <div className="w-16 h-16 relative">
-      <Image
+      <img
         src={`${product.media_source}`}
         alt={`Product ${product.product_name}`}
-        layout="fill"
-        objectFit="cover"
-        className="rounded-md"
+        // layout="fill"
+        // objectFit="cover"
+        className="rounded-md object-cover"
       />
     </div>
   )

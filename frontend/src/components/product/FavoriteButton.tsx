@@ -17,8 +17,6 @@ interface FavoriteButtonProps {
 const FavoriteButton = ({ productId, text, height="" }: FavoriteButtonProps) => {
   const [isFavourite, setIsFavourite] = useState<boolean>(false);
   const { isAuthenticated } = useCheckSession();
-  const router = useRouter();
-  const { goToLogin } = useGoToLogin();
 
   const checkFavoriteStatus = async () => {
     try {
@@ -49,7 +47,7 @@ const FavoriteButton = ({ productId, text, height="" }: FavoriteButtonProps) => 
     e.preventDefault();
     e.stopPropagation();
     if (!isAuthenticated) {
-      goToLogin();
+      errorToast("Silakan login terlebih dahulu", "top-left");
       return;
     }
 

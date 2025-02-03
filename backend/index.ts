@@ -11,7 +11,7 @@ import userRoutes from "./routes/userRoutes";
 import profileRoutes from "./routes/profileRoutes";
 import mediaUploaderRouter from "./routes/mediaUploaderRoutes";
 import path from "path";
-import { uploadProfilePicture } from "./controllers/profile_controller/uploadProfilePicture";
+import chartRoutes from "./routes/chart";
 
 dotenv.config();
 
@@ -19,8 +19,8 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(cookieParser());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json({ limit: '10mb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 
 // Get the allowed origins from the environment variables (comma-separated)
 const allowedOrigins = process.env.CORS_ALLOWED_ORIGINS
@@ -52,6 +52,7 @@ app.use("/", transaksiRoutes);
 app.use("/", userRoutes);
 app.use("/", profileRoutes);
 app.use("/", mediaUploaderRouter);
+app.use("/", chartRoutes);
 
 // Serve the uploads directory
 const uploadsDir = path.join(
@@ -67,7 +68,6 @@ app.get("/", (req, res) => {
 app.use((req, res) => {
   res.status(404).send("Not Found");
 });
-
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

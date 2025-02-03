@@ -23,10 +23,12 @@ const BreadcrumbDynamic = () => {
   }
 
   return (
-    <Breadcrumb className="py-2">
+    <Breadcrumb>
       <BreadcrumbList className="text-xs text-gray-500 md:text-sm">
-        <BreadcrumbItem className="hover:text-gray-900">
-          <BreadcrumbLink href="/">home</BreadcrumbLink>
+        <BreadcrumbItem className="hover:text-gray-900 truncate">
+          <BreadcrumbLink href="/" className="truncate">
+            home
+          </BreadcrumbLink>
         </BreadcrumbItem>
         {segments.map((segment, index) => {
           const isLast = index === segments.length - 1;
@@ -37,9 +39,11 @@ const BreadcrumbDynamic = () => {
               <BreadcrumbSeparator />
               <BreadcrumbItem className="hover:text-gray-900">
                 {isLast ? (
-                  <BreadcrumbPage>{decodeURIComponent(segment)}</BreadcrumbPage>
+                  <BreadcrumbPage className="w-40 truncate">
+                    {decodeURIComponent(segment)}
+                  </BreadcrumbPage>
                 ) : (
-                  <BreadcrumbLink href={href}>
+                  <BreadcrumbLink href={href} className="truncate">
                     {decodeURIComponent(segment)}
                   </BreadcrumbLink>
                 )}

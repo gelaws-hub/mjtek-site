@@ -33,7 +33,6 @@ export const ensureAuthenticated: RequestHandler = async (req, res, next) => {
 
   // If no token is found in cookies, return 401 Unauthorized
   if (!token) {
-    console.log("Access token not found in cookies");
     return res.status(401).json({ message: "Access token not found" });
   }
 
@@ -69,6 +68,17 @@ export const ensureAuthenticated: RequestHandler = async (req, res, next) => {
   }
 };
 
+const getOriginFromRequest = (req: Request) => {
+  const referer = req.get('Referer');  // Get the referer header
+  if (referer) {
+    // The referer is something like `https://example.com/some/path`, 
+    // so we want to extract just the origin (e.g., https://example.com)
+    const origin = new URL(referer).origin;
+    return origin;
+  }
+  return '';  // Default if no referer is provided
+};
+
 // Register user
 export const registerUser = async (req: Request, res: Response) => {
   const { name, email, password, address, phone_number } = req.body;
@@ -102,17 +112,26 @@ export const registerUser = async (req: Request, res: Response) => {
         is_active: false,
         role_name: "buyer", // Set default role sebagai user biasa(pembeli)
         profile_pic:
-          "https://raw.githubusercontent.com/gelaws-hub/mjtek-site/refs/heads/main/frontend/public/image.png",
+          "/image.png",
       },
     });
 
+    const userCreated = {
+      name: user.name,
+      email: user.email,
+      address: user.address,
+      phone_number: user.phone_number,
+      role_name: user.role_name,
+    }
+
     // Kirim email aktivasi
-    const activationLink = `${process.env.CORS_ALLOWED_ORIGINS}/activate?token=${activationToken}`;
+    const activationLink = `${getOriginFromRequest(req)}/activate?token=${activationToken}`;
+    console.log("activation link: ", activationLink);
     await sendActivationEmail(email, activationLink);
 
     res.status(201).json({
-      message: 'User registered successfully. Please check your email to activate your account.',
-      user,
+      message: 'User registered successfully',
+      userCreated,
     });
   } catch (error) {
     console.error(error);
@@ -213,10 +232,10 @@ export const login = async (req: Request, res: Response) => {
 
       res.cookie("accessToken", accessToken, {
         httpOnly: false, // Prevent client-side access
-        // secure: isProduction, // Use HTTPS in production
-        // sameSite: isProduction ? "none" : "strict", // Prevent CSRF attacks
-        sameSite: "none",
-        secure: true,
+        secure: isProduction, // Use HTTPS in production
+        sameSite: isProduction ? "none" : "strict", // Prevent CSRF attacks
+        // sameSite: "none",
+        // secure: true,
         maxAge: 86400 * 1000, // 1 day expiration
       });
 
@@ -234,7 +253,7 @@ export const login = async (req: Request, res: Response) => {
         name: user.name,
         email: user.email,
         role_name: user.role_name,
-        // accessToken, // access token is received via http only cookie
+        accessToken: accessToken, 
         // refreshToken, this should never be delivered to client
       });
     
@@ -351,15 +370,15 @@ export const logoutUser: RequestHandler = async (req, res) => {
     }
 
     res.clearCookie("accessToken", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      httpOnly: false, // Prevent client-side access
+      secure: isProduction, // Use HTTPS in production
+      sameSite: isProduction ? "none" : "strict", // Prevent CSRF attacks
     });
 
     res.clearCookie("refreshToken", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      httpOnly: true, // Prevent client-side access
+      sameSite: "none",
+      secure: true,
     });
 
     return res.status(200).json({ message: "Successfully logged out." });
@@ -534,7 +553,6 @@ export const validateSession = (req: ValidationRequest, res: Response) => {
   const token = req.cookies.accessToken;
 
   if (!token) {
-    console.log("Access token not found in cookies");
     return res.status(401).json({ message: "Access token not found" });
   }
 

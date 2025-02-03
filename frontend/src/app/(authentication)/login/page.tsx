@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
@@ -16,7 +16,7 @@ export default function Login() {
   const [error, setError] = useState(null);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get("redirectTo") || "/"; // Default to '/' if no redirectTo is provided
+  const callbackUrl = decodeURIComponent(searchParams.get('callbackUrl') || "/");
 
   const userSchema = object({
     email: string()
@@ -26,24 +26,14 @@ export default function Login() {
       .min(6)
       .matches(
         /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{6,}$/,
-        "Password harus memiliki minimal 6 karakter, terdapat huruf besar, angka, dan karakter khusus"
+        "Password harus memiliki minimal 6 karakter, terdapat huruf besar, angka, dan karakter khusus",
       )
       .required("Password harus diisi"),
   });
 
   const handleLogin = async (values: any, actions: any) => {
     actions.setSubmitting(true);
-    // await fetch(`/api/login`, {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify({
-    //     email: values.email,
-    //     password: values.password,
-    //   }),
-    //   credentials: "include",
-    // })
+    
     await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
       method: "POST",
       headers: {
@@ -63,17 +53,19 @@ export default function Login() {
         return response.json();
       })
       .then((data) => {
-        // Cookies.set("accessToken", data.accessToken); // changed my mind, I used http only cookie instead
-        actions.resetForm();
+        Cookies.set("accessToken", data.accessToken, { expires: 1 });
         actions.setSubmitting(false);
+  
+        // After successful login, redirect the user to the callback URL (or home page if not set)
         if (data.role_name === "admin" || data.role_name === "owner") {
           router.push("/admin");
         } else {
-          // Redirect to the original page or home page
-          router.push(redirectTo);
+          // Redirect to the callbackUrl if it exists, else fallback to the default page
+          router.push(callbackUrl || "/");
         }
       })
       .catch((error) => {
+        actions.setSubmitting(false);
         setError(error.message);
         console.error(error);
       });
@@ -99,7 +91,7 @@ export default function Login() {
   return (
     <div className="grid min-h-[100vh] grid-cols-1 justify-center p-4 lg:grid-cols-[50%_50%] lg:p-20">
       <div className="absolute inset-0 -z-9 h-full w-full bg-black-2/50 backdrop-blur-sm lg:hidden"></div>
-      <Image
+      <img
         src={bannerLogin}
         alt="login"
         width={2000}
@@ -177,6 +169,7 @@ export default function Login() {
               <p className="text-sm font-light text-gray-500">
                 Belum punya akun?{" "}
                 <Link
+                  scroll={false}
                   href="/register"
                   className="text-primary-600 font-medium hover:underline"
                 >
@@ -186,6 +179,7 @@ export default function Login() {
               <p className="text-sm font-light text-gray-500">
                 Lupa Password?{" "}
                 <Link
+                  scroll={false}
                   href="/forgetPassword"
                   className="text-primary-600 font-medium hover:underline"
                 >
@@ -197,7 +191,7 @@ export default function Login() {
         </section>
       </div>
       <div className="hidden h-[70%] self-center rounded-r-2xl bg-blue-500 shadow-xl shadow-slate-400 lg:block">
-        <Image
+        <img
           src={bannerLogin}
           alt="login"
           width={2000}

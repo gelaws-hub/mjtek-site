@@ -58,7 +58,7 @@ export function Sidebar() {
   return (
     <aside className="fixed left-0 top-0 z-50 flex h-screen w-72.5 flex-col overflow-y-hidden bg-blue-950 duration-300 ease-linear dark:bg-boxdark lg:static lg:translate-x-0">
       <div className="flex items-center justify-between gap-2 px-6 py-5.5 lg:py-6.5">
-        <Link href="/">
+        <Link scroll={false} href="/">
           <h1 className="text-2xl font-bold text-white">MJ </h1>
         </Link>
       </div>
@@ -96,7 +96,7 @@ export function Sidebar() {
                             className="w-full justify-start pl-10 text-white hover:bg-blue-950"
                             asChild
                           >
-                            <Link href={subItem.href}>{subItem.title}</Link>
+                            <Link scroll={false} href={subItem.href}>{subItem.title}</Link>
                           </Button>
                         ))}
                       </CollapsibleContent>
@@ -109,7 +109,7 @@ export function Sidebar() {
                       className="w-full justify-start text-white hover:bg-blue-950"
                       asChild
                     >
-                      <Link href={item.href}>
+                      <Link scroll={false} href={item.href}>
                         <item.icon className="mr-2 h-4 w-4" />
                         {item.title}
                       </Link>

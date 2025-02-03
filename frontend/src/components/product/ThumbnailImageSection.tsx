@@ -1,6 +1,5 @@
 "use client";
 
-import Loading from "@/app/loading";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
@@ -43,18 +42,15 @@ export default function ThumbnailImageSection({
       <div className="flex">
         {selectedImage && (
           <div className="w-full h-full max-h-[50vh]">
-            {isLoading ? (
-              <Loading />
-            ) : (
-              <Image
+              <img
                 src={selectedImage}
                 alt="Selected Image"
                 width={1000}
                 height={1000}
                 className="max-h-[50vh] object-contain aspect-square rounded-lg"
-                onLoadingComplete={() => setIsLoading(false)} // Set loading to false when complete
+                loading="lazy"
+                // onLoadingComplete={() => setIsLoading(false)} // Set loading to false when complete
               />
-            )}
           </div>
         )}
       </div>
@@ -77,14 +73,14 @@ export default function ThumbnailImageSection({
                 }
               }}
             >
-              <Image
+              <img
                 src={mediaItem.source}
                 alt={mediaItem.file_type}
                 width={60}
                 height={60}
                 className="object-contain max-w-[60px] max-h-[60px] p-1 aspect-square rounded-lg"
                 loading="lazy" // Enable lazy loading
-                onLoadingComplete={() => handleImageLoad(mediaItem.source)} // Cache the image on load
+                // onLoadingComplete={() => handleImageLoad(mediaItem.source)} // Cache the image on load
               />
             </button>
           ))}

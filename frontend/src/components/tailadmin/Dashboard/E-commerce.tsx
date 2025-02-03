@@ -20,7 +20,7 @@ const ECommerce: React.FC = () => {
     <>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
         <CardDataStats title="Total views" total="$3.456K" rate="0.43%" levelUp>
-          <svg
+          {/* <svg
             className="fill-primary dark:fill-white"
             width="22"
             height="16"
@@ -36,7 +36,8 @@ const ECommerce: React.FC = () => {
               d="M11 10.9219C9.38438 10.9219 8.07812 9.61562 8.07812 8C8.07812 6.38438 9.38438 5.07812 11 5.07812C12.6156 5.07812 13.9219 6.38438 13.9219 8C13.9219 9.61562 12.6156 10.9219 11 10.9219ZM11 6.625C10.2437 6.625 9.625 7.24375 9.625 8C9.625 8.75625 10.2437 9.375 11 9.375C11.7563 9.375 12.375 8.75625 12.375 8C12.375 7.24375 11.7563 6.625 11 6.625Z"
               fill=""
             />
-          </svg>
+          </svg> */}
+          test
         </CardDataStats>
         <CardDataStats title="Total Profit" total="$45,2K" rate="4.35%" levelUp>
           <svg
