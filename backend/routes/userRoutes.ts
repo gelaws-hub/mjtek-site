@@ -4,7 +4,8 @@ import {
     activateUser, 
     login,
     requestResetPassword,
-    resetPassword,  
+    resetPassword,
+    requestChangePassword,  
     refreshToken,
     getCurrentUser, 
     logoutUser,
@@ -40,6 +41,9 @@ userRoutes.post('/refresh-token', refreshToken);
 userRoutes.get('/me', ensureAuthenticated, getCurrentUser);
 
 userRoutes.get('/users', ensureAuthenticated, authorize(["admin", "owner"]), getUsers);
+
+// CHANGE PASSWORD
+userRoutes.post('/change-password', ensureAuthenticated,requestChangePassword);
 
 // LOGOUT USER (Protected route - user must be authenticated)
 userRoutes.post('/logout', ensureAuthenticated, logoutUser);

@@ -52,4 +52,10 @@ export const sendResetPasswordEmail = async (email: string, resetLink: string) =
     console.error('Failed to send reset password email:', error);
     throw new Error('Failed to send reset password email');
   }
+  try {
+    console.log("Sending reset email to:", email, "with link:", resetLink); // Debugging log
+    // Implementasi pengiriman email di sini
+  } catch (error: any) {
+    console.error("Error sending email:", error.message);
+  }
 };

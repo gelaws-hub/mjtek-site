@@ -29,7 +29,7 @@ const isProduction = process.env.NODE_ENV === "production";
 // Middleware untuk validasi token
 export const ensureAuthenticated: RequestHandler = async (req, res, next) => {
   // Get the token from the cookies
-  const token = req.cookies.accessToken;
+  const token = req.cookies.accessToken || req.headers.authorization?.split(' ')[1];
 
   // If no token is found in cookies, return 401 Unauthorized
   if (!token) {
@@ -479,6 +479,42 @@ export const resetPassword = async (req: Request, res: Response) => {
       message:
         error.message || 'Terjadi kesalahan server saat mengubah password.',
     });
+  }
+};
+
+export const requestChangePassword: RequestHandler = async (req, res) => {
+  try {
+    const user = (req as CustomRequest).user;
+    if (!user) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    if (!user.email) {
+      return res.status(400).json({ message: "Email is required." });
+    }
+
+    // Generate reset token
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    const expires = new Date();
+    expires.setHours(expires.getHours() + 1);
+
+    // Simpan token di database
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        reset_password_token: resetToken,
+        reset_password_expires: expires,
+      },
+    });
+
+    // Kirim email
+    const resetLink = `${process.env.CORS_ALLOWED_ORIGINS}/reset-password?token=${resetToken}`;
+    await sendResetPasswordEmail(user.email, resetLink);
+
+    return res.status(200).json({ message: "Password reset email sent." });
+  } catch (error: any) {
+    console.error("Error in password reset request:", error.message);
+    return res.status(500).json({ message: "Server error." });
   }
 };
 

@@ -8,6 +8,7 @@ import produkDetailRoutes from "./routes/productDetailRoutes";
 import simulationRoutes from "./routes/simulationRoutes";
 import transaksiRoutes from "./routes/transactionRoutes";
 import userRoutes from "./routes/userRoutes";
+import profileRoutes from "./routes/profileRoutes";
 import mediaUploaderRouter from "./routes/mediaUploaderRoutes";
 import path from "path";
 import chartRoutes from "./routes/chart";
@@ -49,6 +50,7 @@ app.use("/", produkDetailRoutes);
 app.use("/", simulationRoutes);
 app.use("/", transaksiRoutes);
 app.use("/", userRoutes);
+app.use("/", profileRoutes);
 app.use("/", mediaUploaderRouter);
 app.use("/", chartRoutes);
 
