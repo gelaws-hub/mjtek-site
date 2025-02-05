@@ -10,7 +10,7 @@ export const getClientProducts = async (req: Request, res: Response) => {
   const categories = req.query.categories as string | undefined;
 
   try {
-    // Build the filters
+    // Build the category filter (apply only if categories are provided)
     const categoryFilter = categories
       ? {
           category_id: {
@@ -19,30 +19,55 @@ export const getClientProducts = async (req: Request, res: Response) => {
         }
       : {};
 
+    // Build the search filter
     const searchFilter = searchTerm
       ? {
           OR: [
-            {
-              product_name: {
-                contains: searchTerm,
-              },
-            },
-            {
-              description: {
-                contains: searchTerm,
-              },
-            },
+            { product_name: { contains: searchTerm } },
+            { description: { contains: searchTerm } },
           ],
         }
       : {};
 
-    // Fetch products with necessary fields
+    // Fetch all products to get all categories (no pagination here)
+    const allProducts = await prisma.product.findMany({
+      where: {
+        is_deleted: false,
+        ...categoryFilter,
+        ...searchFilter,
+      },
+      select: {
+        id: true,
+        product_name: true,
+        price: true,
+        stock: true,
+        media: {
+          select: { source: true },
+          where: { file_type: "image" },
+          take: 1,
+        },
+        category: { select: { id: true, category_name: true } },
+      },
+    });
+
+    // Extract category IDs from all products
+    const allCategoryIds = Array.from(
+      new Set(allProducts.map((product) => product.category?.id).filter(Boolean))
+    );
+
+    // Fetch the available categories from the extracted category IDs
+    const availableCategories = await prisma.category.findMany({
+      where: { id: { in: allCategoryIds } },
+      select: { id: true, category_name: true },
+    });
+
+    // Now fetch the paginated products
     const products = await prisma.product.findMany({
       skip,
       take: limit,
       orderBy: [
-        { stock: "desc" }, // Sort by stock (ascending)
-        { createdTime: "desc" }, // Secondary sort by id for consistent order
+        { stock: "desc" },
+        { createdTime: "desc" },
       ],
       where: {
         is_deleted: false,
@@ -55,24 +80,15 @@ export const getClientProducts = async (req: Request, res: Response) => {
         price: true,
         stock: true,
         media: {
-          select: {
-            source: true,
-          },
-          where: {
-            file_type: "image", // Only fetch image media
-          },
-          take: 1, // Only get the first image
+          select: { source: true },
+          where: { file_type: "image" },
+          take: 1,
         },
-        category: {
-          select: {
-            id: true,
-            category_name: true,
-          },
-        },
+        category: { select: { id: true, category_name: true } },
       },
     });
 
-    // Count total products for pagination
+    // Count the total number of products matching the filters (search and category)
     const totalCount = await prisma.product.count({
       where: {
         is_deleted: false,
@@ -83,20 +99,7 @@ export const getClientProducts = async (req: Request, res: Response) => {
 
     const totalPages = Math.ceil(totalCount / limit);
 
-    // Extract unique categories from the fetched products
-    const categoryIds = Array.from(
-      new Set(products.map((product) => product.category?.id).filter(Boolean))
-    );
-
-    const availableCategories = await prisma.category.findMany({
-      where: { id: { in: categoryIds } },
-      select: {
-        id: true,
-        category_name: true,
-      },
-    });
-
-    // Format the products to match `ProductCardItemProps`
+    // Format the products
     const formattedProducts = products.map((product) => ({
       id: product.id,
       product_name: product.product_name,
@@ -105,11 +108,12 @@ export const getClientProducts = async (req: Request, res: Response) => {
       media_source:
         product.media[0]?.source?.startsWith("/")
           ? `${process.env.BASE_URL}${product.media[0]?.source}`
-          : product.media[0]?.source || null, // Get the first media source or null
+          : product.media[0]?.source || null,
       category_id: product.category?.id || null,
       category_name: product.category?.category_name || "Unknown",
     }));
 
+    // Send the response
     res.status(200).json({
       status_code: 200,
       message: "Success fetching products",
@@ -118,7 +122,7 @@ export const getClientProducts = async (req: Request, res: Response) => {
       currentPage: page,
       pageSize: limit,
       products: formattedProducts,
-      categories: availableCategories, // Return available categories
+      categories: availableCategories, // Return all available categories
     });
   } catch (error: any) {
     console.error("Error fetching products:", error.message);
@@ -128,3 +132,5 @@ export const getClientProducts = async (req: Request, res: Response) => {
     });
   }
 };
+
+

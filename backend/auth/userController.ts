@@ -109,12 +109,20 @@ export const registerUser = async (req: Request, res: Response) => {
         phone_number,
         activation_token: activationToken,
         reset_password_token: null,
-        is_active: true,
+        is_active: false,
         role_name: "buyer", // Set default role sebagai user biasa(pembeli)
         profile_pic:
           "/image.png",
       },
     });
+
+    const userCreated = {
+      name: user.name,
+      email: user.email,
+      address: user.address,
+      phone_number: user.phone_number,
+      role_name: user.role_name,
+    }
 
     // Kirim email aktivasi
     const activationLink = `${getOriginFromRequest(req)}/activate?token=${activationToken}`;
@@ -122,8 +130,8 @@ export const registerUser = async (req: Request, res: Response) => {
     await sendActivationEmail(email, activationLink);
 
     res.status(201).json({
-      message: 'User registered successfully. Please check your email to activate your account.',
-      user,
+      message: 'User registered successfully',
+      userCreated,
     });
   } catch (error) {
     console.error(error);
@@ -404,7 +412,7 @@ export const requestResetPassword = async (req: Request, res: Response) => {
       });
 
       // Kirim email reset password
-      const resetLink = `${process.env.CORS_ALLOWED_ORIGINS}/reset-password?token=${resetToken}`;
+      const resetLink = `${getOriginFromRequest(req)}/reset-password?token=${resetToken}`;
       await sendResetPasswordEmail(user.email, resetLink);
     }
 

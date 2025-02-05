@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useFormik } from "formik";
 import { object, string, ref } from "yup";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 
 export default function RegisterForm() {
   const router = useRouter();
@@ -14,10 +13,6 @@ export default function RegisterForm() {
       .min(3, "Minimal 3 karakter")
       .max(30, "Maximal 30 karakter")
       .required("Nama harus diisi"),
-    username: string()
-      .min(3, "Minimal 3 karakter")
-      .max(20, "Maximal 20 karakter")
-      .required("Username harus diisi"),
     email: string()
       .email("Tolong masukkan email yang valid")
       .required("Email harus diisi"),
@@ -76,7 +71,6 @@ export default function RegisterForm() {
   } = useFormik({
     initialValues: {
       name: "",
-      username: "",
       email: "",
       password: "",
       confPassword: "",
@@ -114,28 +108,6 @@ export default function RegisterForm() {
           />
           {errors.name && touched.name && (
             <p className="text-sm text-red-500">{errors.name}</p>
-          )}
-        </div>
-        <div>
-          <label
-            htmlFor="username"
-            className="mb-2 block text-sm font-medium text-gray-900"
-          >
-            Username
-          </label>
-          <input
-            type="text"
-            name="username"
-            id="username"
-            className={`${errors.username && touched.username ? "border-red-500" : ""} block w-full border-b-[2px] border-gray-300 p-2.5 text-sm text-gray-900 focus:outline-none`}
-            placeholder="Buat username unik"
-            value={values.username}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            required
-          />
-          {errors.username && touched.username && (
-            <p className="text-sm text-red-500">{errors.username}</p>
           )}
         </div>
         <div>
