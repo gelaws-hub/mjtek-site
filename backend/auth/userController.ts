@@ -508,7 +508,7 @@ export const requestChangePassword: RequestHandler = async (req, res) => {
     });
 
     // Kirim email
-    const resetLink = `${process.env.CORS_ALLOWED_ORIGINS}/reset-password?token=${resetToken}`;
+    const resetLink = `${getOriginFromRequest(req)}/reset-password?token=${resetToken}`;
     await sendResetPasswordEmail(user.email, resetLink);
 
     return res.status(200).json({ message: "Password reset email sent." });
