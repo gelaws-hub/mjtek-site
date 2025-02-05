@@ -198,7 +198,7 @@ export const getAllTransactionsFromUser = async (
       start_time: transaction.start_time,
       end_time: transaction.end_time,
       payment_proof: transaction.payment_proof
-        ? `${process.env.BASE_URL}${transaction.payment_proof}`
+        ? (process.env.BASE_URL?.startsWith('/') ? `${process.env.BASE_URL}${transaction.payment_proof}` : transaction.payment_proof)
         : null,
       status: {
         status_id: transaction.transaction_status.id,
@@ -286,7 +286,7 @@ export const getTransactionById = async (req: Request, res: Response) => {
       start_time: transaction.start_time,
       end_time: transaction.end_time,
       payment_proof: transaction.payment_proof
-        ? `${process.env.BASE_URL}${transaction.payment_proof}`
+        ? (process.env.BASE_URL?.startsWith('/') ? `${process.env.BASE_URL}${transaction.payment_proof}` : transaction.payment_proof)
         : null,
       status: {
         status_id: transaction.transaction_status.id,

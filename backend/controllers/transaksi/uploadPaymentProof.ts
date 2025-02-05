@@ -1,45 +1,11 @@
 import { Request, Response } from "express";
 import multer from "multer";
 import path from "path";
-import fs from "fs";
+import { uploadFileToGoogleCloud } from "../../utils/googleStorage";
 import prisma from "../../utils/database";
 
-// Configure multer for local file storage
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadsDir = path.join(process.cwd(), "uploads", "transactions");
-
-    // Ensure the directory exists
-    if (!fs.existsSync(uploadsDir)) {
-      fs.mkdirSync(uploadsDir, { recursive: true });
-      console.log(`Directory created: ${uploadsDir}`);
-    }
-
-    cb(null, uploadsDir);
-  },
-  filename: (req, file, cb) => {
-    const transactionId = req.params.transactionId || "unknown";
-    const timestamp = Date.now();
-    const extension = path.extname(file.originalname);
-    const fileName = `${transactionId}-${timestamp}${extension}`;
-    cb(null, fileName);
-  },
-});
-
-const fileFilter = (
-  req: Request,
-  file: Express.Multer.File,
-  cb: multer.FileFilterCallback
-) => {
-  const allowedMimeTypes = ["image/jpeg", "image/png", "application/pdf"];
-  if (allowedMimeTypes.includes(file.mimetype)) {
-    cb(null, true);
-  } else {
-    cb(new Error("Unsupported file type. Only JPEG, PNG, and PDF are allowed."));
-  }
-};
-
-const upload = multer({ storage, fileFilter }).single("proof");
+// Set up multer to handle file uploads in memory (for Google Cloud Storage)
+const upload = multer({ storage: multer.memoryStorage() }).single("proof");
 
 // Controller function
 export const uploadTransactionProof = async (req: Request, res: Response) => {
@@ -65,22 +31,18 @@ export const uploadTransactionProof = async (req: Request, res: Response) => {
         return res.status(404).json({ error: "Transaction not found." });
       }
 
-      // Delete the existing proof file if it exists
-      if (transaction.payment_proof) {
-        const existingFilePath = path.join(process.cwd(), transaction.payment_proof);
-        if (fs.existsSync(existingFilePath)) {
-          fs.unlinkSync(existingFilePath);
-          // console.log(`Deleted existing file: ${existingFilePath}`);
-        }
-      }
+      // Generate the file name for Google Cloud Storage
+      const fileName = `${transactionId}-${Date.now()}${path.extname(req.file.originalname)}`;
 
-      // Save the new file path to the database
-      const filePath = `/uploads/transactions/${req.file.filename}`;
+      // Upload the file to Google Cloud Storage using the utility function
+      const fileUrl = await uploadFileToGoogleCloud(req.file.buffer, fileName, req.file.mimetype);
+
+      // Save the new file URL to the database
       const updatedTransaction = await prisma.transaction.update({
         where: { id: transactionId },
         data: {
-          payment_proof: filePath,
-          status_id: 3,
+          payment_proof: fileUrl,
+          status_id: 3, // Example: updating the status to "proof uploaded"
         },
       });
 

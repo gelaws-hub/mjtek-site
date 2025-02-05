@@ -2,88 +2,13 @@ import { Request, Response } from "express";
 import prisma from "../../utils/database";
 import multer from "multer";
 import path from "path";
-import fs from "fs";
 import crypto from "crypto";
+import { uploadFileToGoogleCloud } from "../../utils/googleStorage"; // Import the utility function
 
-// Configure multer for local file storage
-const storage = multer.diskStorage({
-  destination: async (req, file, cb) => {
-    try {
-      const category_id = parseInt(req.body.category_id);
-      if (isNaN(category_id)) {
-        return cb(new Error("Invalid or missing category_id"), "");
-      }
+// Set up multer to handle file uploads in memory (for Google Cloud Storage)
+const upload = multer({ storage: multer.memoryStorage() }).array("media");
 
-      const category = await prisma.category.findUnique({
-        where: { id: category_id },
-      });
-
-      if (!category) {
-        return cb(new Error("Category not found"), "");
-      }
-
-      const categoryName = category.category_name
-        .toLowerCase()
-        .replace(/\s+/g, "-");
-
-      const uploadsDir = path.join(
-        process.cwd(),
-        "uploads",
-        "products",
-        categoryName
-      );
-
-      if (!fs.existsSync(uploadsDir)) {
-        fs.mkdirSync(uploadsDir, { recursive: true });
-        console.log(`Directory created: ${uploadsDir}`);
-      }
-
-      cb(null, uploadsDir);
-    } catch (error: any) {
-      cb(error, "");
-    }
-  },
-  filename: (req, file, cb) => {
-    try {
-      const productNameSlug = req.body.product_name
-        ?.replace(/[\/\s]+/g, "-")
-        .toLowerCase();
-      const timestamp = Date.now();
-      const extension = path.extname(file.originalname);
-      const fileName = `${productNameSlug}-${timestamp}${extension}`;
-      cb(null, fileName);
-    } catch (error: any) {
-      cb(error, "");
-    }
-  },
-});
-
-const fileFilter = (
-  req: Request,
-  file: Express.Multer.File,
-  cb: multer.FileFilterCallback
-) => {
-  const allowedMimeTypes = [
-    "image/jpeg",
-    "image/png",
-    "image/gif",
-    "image/webp",
-    "video/mp4",
-    "video/mpeg",
-    "video/quicktime",
-    "video/x-msvideo",
-    "video/x-ms-wmv",
-  ];
-
-  if (allowedMimeTypes.includes(file.mimetype)) {
-    cb(null, true);
-  } else {
-    cb(new Error("Unsupported file type. Only images and videos are allowed."));
-  }
-};
-
-const upload = multer({ storage, fileFilter }).array("media");
-
+// Controller function
 export const createFullDetailProduct = async (req: Request, res: Response) => {
   upload(req, res, async (err) => {
     if (err) {
@@ -174,14 +99,14 @@ export const createFullDetailProduct = async (req: Request, res: Response) => {
       if (Array.isArray(req.files) && req.files.length > 0) {
         const files = req.files as Express.Multer.File[];
 
-        const categorySlug = category.category_name
-          .toLowerCase()
-          .replace(/\s+/g, "-");
-
         for (const file of files) {
-          const fileUrl = `/uploads/products/${categorySlug}/${file.filename}`;
+          // Generate a custom file name for Google Cloud Storage
+          const fileName = `${productId}-${Date.now()}${path.extname(file.originalname)}`;
+          
+          // Upload the file to Google Cloud Storage
+          const fileUrl = await uploadFileToGoogleCloud(file.buffer, fileName, file.mimetype);
 
-          // Save media to the database
+          // Save media to the database with the Google Cloud URL
           const media = await prisma.media.create({
             data: {
               product_id: product.id,
