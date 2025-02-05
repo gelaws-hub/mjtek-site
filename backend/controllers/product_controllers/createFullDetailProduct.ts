@@ -66,7 +66,6 @@ export const createFullDetailProduct = async (req: Request, res: Response) => {
 
       const randomSuffix = crypto.randomBytes(2).toString("hex").toUpperCase();
       const productId = `${prefix}${randomSuffix}`;
-
       const existingProduct = await prisma.product.findUnique({
         where: { id: productId },
       });
@@ -101,7 +100,7 @@ export const createFullDetailProduct = async (req: Request, res: Response) => {
 
         for (const file of files) {
           // Generate a custom file name for Google Cloud Storage
-          const fileName = `${productId}-${Date.now()}${path.extname(file.originalname)}`;
+          const fileName = `products/${categoryName ? categoryName + "/" : ""}${productId}-${Date.now()}${path.extname(file.originalname)}`;
           
           // Upload the file to Google Cloud Storage
           const fileUrl = await uploadFileToGoogleCloud(file.buffer, fileName, file.mimetype);

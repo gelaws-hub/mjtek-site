@@ -32,7 +32,7 @@ export const uploadTransactionProof = async (req: Request, res: Response) => {
       }
 
       // Generate the file name for Google Cloud Storage
-      const fileName = `${transactionId}-${Date.now()}${path.extname(req.file.originalname)}`;
+      const fileName = `payment_proof/${transactionId}-${Date.now()}${path.extname(req.file.originalname)}`;
 
       // Upload the file to Google Cloud Storage using the utility function
       const fileUrl = await uploadFileToGoogleCloud(req.file.buffer, fileName, req.file.mimetype);
