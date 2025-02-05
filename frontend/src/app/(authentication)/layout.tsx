@@ -25,7 +25,7 @@ export default function RootLayout({
       <body>
         <ToastContainer />
         <Header />
-        <div className="min-h-screen max-w-[1200px] mx-auto">
+        <div className="h-screen w-screen mx-auto">
           {children}
           <Toaster />
         </div>

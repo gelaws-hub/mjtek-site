@@ -84,14 +84,14 @@ export default function RegisterForm() {
   return (
     <>
       <form
-        className="space-y-4 md:space-y-6 "
+        className="space-y-4 md:space-y-6"
         action="#"
         onSubmit={handleSubmit}
       >
         <div>
           <label
             htmlFor="name"
-            className="mb-2 block text-sm font-medium text-gray-900"
+            className="block text-sm font-medium text-gray-900"
           >
             Nama
           </label>
@@ -99,7 +99,7 @@ export default function RegisterForm() {
             type="text"
             name="name"
             id="name"
-            className={`${errors.name && touched.name ? "border-red-500" : ""} block w-full border-b-[2px] border-gray-300 p-2.5 text-sm text-gray-900 focus:outline-none`}
+            className={`${errors.name && touched.name ? "border-red-500" : ""} block w-full border-b-[2px] border-gray-300 p-2.5  text-sm text-gray-900 focus:outline-none`}
             placeholder="Masukan nama anda"
             value={values.name}
             onChange={handleChange}
@@ -113,7 +113,7 @@ export default function RegisterForm() {
         <div>
           <label
             htmlFor="email"
-            className="mb-2 block text-sm font-medium text-gray-900"
+            className="block text-sm font-medium text-gray-900"
           >
             Email
           </label>
@@ -135,7 +135,7 @@ export default function RegisterForm() {
         <div>
           <label
             htmlFor="password"
-            className="mb-2 block text-sm font-medium text-gray-900"
+            className="block text-sm font-medium text-gray-900"
           >
             Password
           </label>
@@ -144,7 +144,7 @@ export default function RegisterForm() {
             name="password"
             id="password"
             placeholder="••••••••"
-            className={`${errors.password && touched.password ? "border-red-500" : ""} block w-full border-b-[2px] border-gray-300 p-2.5 text-sm text-gray-900 focus:outline-none`}
+            className={`${errors.password && touched.password ? "border-red-500" : ""} block w-full border-b-[2px] border-gray-300 p-2.5  text-sm text-gray-900 focus:outline-none`}
             value={values.password}
             onChange={handleChange}
             onBlur={handleBlur}
@@ -157,7 +157,7 @@ export default function RegisterForm() {
         <div>
           <label
             htmlFor="confPassword"
-            className="mb-2 block text-sm font-medium text-gray-900"
+            className="block text-sm font-medium text-gray-900"
           >
             Konfirmasi password
           </label>
@@ -166,7 +166,7 @@ export default function RegisterForm() {
             name="confPassword"
             id="confpassword"
             placeholder="••••••••"
-            className={`${errors.confPassword && touched.confPassword ? "border-red-500" : ""} block w-full border-b-[2px] border-gray-300 p-2.5 text-sm text-gray-900 focus:outline-none`}
+            className={`${errors.confPassword && touched.confPassword ? "border-red-500" : ""} block w-full border-b-[2px] border-gray-300 p-2.5  text-sm text-gray-900 focus:outline-none`}
             value={values.confPassword}
             onChange={handleChange}
             onBlur={handleBlur}
@@ -179,7 +179,7 @@ export default function RegisterForm() {
         <div>
           <label
             htmlFor="address"
-            className="mb-2 block text-sm font-medium text-gray-900"
+            className="block text-sm font-medium text-gray-900"
           >
             Alamat
           </label>
@@ -187,7 +187,7 @@ export default function RegisterForm() {
             type="text"
             name="address"
             id="address"
-            className={`${errors.address && touched.address ? "border-red-500" : ""} block w-full border-b-[2px] border-gray-300 p-2.5 text-sm text-gray-900 focus:outline-none`}
+            className={`${errors.address && touched.address ? "border-red-500" : ""} block w-full border-b-[2px] border-gray-300 p-2.5  text-sm text-gray-900 focus:outline-none`}
             value={values.address}
             onChange={handleChange}
             onBlur={handleBlur}
@@ -201,7 +201,7 @@ export default function RegisterForm() {
         <div>
           <label
             htmlFor="phone_number"
-            className="mb-2 block text-sm font-medium text-gray-900"
+            className="block text-sm font-medium text-gray-900"
           >
             No Handphone
           </label>
@@ -209,7 +209,7 @@ export default function RegisterForm() {
             type="text"
             name="phone_number"
             id="phone_number"
-            className={`${errors.phone_number && touched.phone_number ? "border-red-500" : ""} block w-full border-b-[2px] border-gray-300 p-2.5 text-sm text-gray-900 [appearance:textfield] focus:outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none`}
+            className={`${errors.phone_number && touched.phone_number ? "border-red-500" : ""} block w-full border-b-[2px] border-gray-300 p-2.5  text-sm text-gray-900 [appearance:textfield] focus:outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none`}
             placeholder="Masukan no handphone anda"
             value={values.phone_number}
             onChange={handleChange}
@@ -220,42 +220,21 @@ export default function RegisterForm() {
             <p className="text-sm text-red-500">{errors.phone_number}</p>
           )}
         </div>
-        <div className="flex items-start">
-          <div className="flex h-5 items-center">
-            <input
-              id="terms"
-              aria-describedby="terms"
-              type="checkbox"
-              className="focus:ring-3 focus:ring-primary-300 h-4 w-4 rounded border border-gray-300 bg-gray-50"
-              required
-            />
-          </div>
-          <div className="ml-3 text-sm">
-            <label htmlFor="terms" className="font-light text-gray-500">
-              I accept the{" "}
-              <a
-                className="text-primary-600 font-medium hover:underline"
-                href="#"
-              >
-                Terms and Conditions
-              </a>
-            </label>
-          </div>
-        </div>
         <button
           type="submit"
           disabled={isSubmitting}
-          className="bg-primary-600 hover:bg-primary-700 focus:ring-primary-300 w-full rounded-lg bg-blue-900 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-950 focus:outline-none focus:ring-4"
+          className="bg-primary-600 hover:bg-primary-700 focus:ring-primary-300 w-full rounded-lg bg-blue-900 px-5 py-2.5  text-center text-sm font-medium text-white hover:bg-blue-950 focus:outline-none focus:ring-4"
         >
           Buat akun
         </button>
         <p className="text-sm font-light text-gray-500">
-          Already have an account?{" "}
-          <Link scroll={false}
+          Sudah punya akun?{" "}
+          <Link
+            scroll={false}
             href="/login"
             className="text-primary-600 font-medium hover:underline"
           >
-            Login here
+            Login di sini
           </Link>
         </p>
       </form>

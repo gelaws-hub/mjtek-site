@@ -412,7 +412,7 @@ export const requestResetPassword = async (req: Request, res: Response) => {
       });
 
       // Kirim email reset password
-      const resetLink = `${process.env.CORS_ALLOWED_ORIGINS}/reset-password?token=${resetToken}`;
+      const resetLink = `${getOriginFromRequest(req)}/reset-password?token=${resetToken}`;
       await sendResetPasswordEmail(user.email, resetLink);
     }
 

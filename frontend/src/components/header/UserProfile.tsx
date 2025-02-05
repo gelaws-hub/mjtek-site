@@ -21,7 +21,7 @@ export default function UserProfile() {
   const handleViewFavorite = (e: React.FormEvent) => {
     e.preventDefault();
     if (userData?.id) {
-      router.push(`/favorite?user=${encodeURIComponent(userData?.id)}`);
+      router.push(`/favorite`);
     }
   };
 

@@ -67,8 +67,8 @@ export default function ForgetPassword() {
   });
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100">
-      <div className="w-full max-w-md space-y-8 bg-white p-6 shadow-md">
+    <div className="flex min-h-screen items-center justify-center">
+      <div className="w-full max-w-md space-y-8 bg-white p-6 shadow-md rounded-lg">
         <h1 className="text-xl font-bold text-gray-800">Lupa Password?</h1>
         <p className="text-sm text-gray-600">Masukkan email Anda untuk menerima link reset password.</p>
         {success && <p className="text-sm font-medium text-green-600">{success}</p>}
@@ -105,6 +105,13 @@ export default function ForgetPassword() {
             {isSubmitting ? <LoadingAuth /> : "Kirim Link Reset"}
           </Button>
         </form>
+      </div>
+      <div className="fixed -z-10 h-screen w-screen">
+        <img
+          src="/auth-bg.jpg"
+          alt="bg"
+          className="h-full w-full object-cover"
+        />
       </div>
     </div>
   );
