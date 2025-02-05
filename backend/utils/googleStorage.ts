@@ -34,3 +34,12 @@ export const uploadFileToGoogleCloud = async (fileBuffer: Buffer, fileName: stri
     stream.end(fileBuffer);
   });
 };
+
+export const deleteFileFromGoogleCloud = async (filePath: string) => {
+  try {
+    await storage.bucket(bucketName).file(filePath).delete();
+    console.log(`File deleted: ${filePath}`);
+  } catch (error) {
+    console.error("Error deleting file from GCS:", error);
+  }
+};

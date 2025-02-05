@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import multer from "multer";
 import path from "path";
-import { uploadFileToGoogleCloud } from "../../utils/googleStorage";
+import { uploadFileToGoogleCloud, deleteFileFromGoogleCloud } from "../../utils/googleStorage";
 import prisma from "../../utils/database";
 
 // Set up multer to handle file uploads in memory (for Google Cloud Storage)
@@ -31,13 +31,21 @@ export const uploadTransactionProof = async (req: Request, res: Response) => {
         return res.status(404).json({ error: "Transaction not found." });
       }
 
-      // Generate the file name for Google Cloud Storage
+      // Delete previous proof if it exists
+      if (transaction.payment_proof) {
+        const previousFilePath = transaction.payment_proof.split("/").pop(); // Extract file name
+        if (previousFilePath) {
+          await deleteFileFromGoogleCloud(`payment_proof/${previousFilePath}`);
+        }
+      }
+
+      // Generate the new file name for Google Cloud Storage
       const fileName = `payment_proof/${transactionId}-${Date.now()}${path.extname(req.file.originalname)}`;
 
-      // Upload the file to Google Cloud Storage using the utility function
+      // Upload the new file to Google Cloud Storage
       const fileUrl = await uploadFileToGoogleCloud(req.file.buffer, fileName, req.file.mimetype);
 
-      // Save the new file URL to the database
+      // Update the transaction record with the new proof URL
       const updatedTransaction = await prisma.transaction.update({
         where: { id: transactionId },
         data: {
