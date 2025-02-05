@@ -1,7 +1,7 @@
 "use client";
 import { usePathname } from "next/navigation";
 
-const hideHeaderPaths = ["/login", "/register", "/admin"];
+const hideHeaderPaths = ["/login", "/register", "/admin", "/forgetPassword"];
 export default function Footer() {
   const pathname = usePathname();
   if (hideHeaderPaths.some((path) => pathname?.startsWith(path))) return null;
