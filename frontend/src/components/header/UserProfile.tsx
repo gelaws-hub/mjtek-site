@@ -11,12 +11,14 @@ import useCurrentUser from "@/app/(authentication)/auth/useCurrentUser";
 import UserCard from "../userCard";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import useUserData from "@/hooks/useUserData";
+import { errorToast } from "../toast/reactToastify";
 
 export default function UserProfile() {
   const [openUserInfo, setOpenUserInfo] = useState(false);
   // const { isAuthenticated } = useCheckSession();
   const { userData } = useUserData();
   const router = useRouter();
+  const [logoutLoading, setLogoutLoading] = useState(false);
 
   const handleViewFavorite = (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,6 +33,7 @@ export default function UserProfile() {
   };
 
   const handleLogout = async () => {
+    setLogoutLoading(true);
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/logout`,
@@ -42,15 +45,20 @@ export default function UserProfile() {
 
       if (response.ok) {
         Cookies.remove("accessToken");
+        setLogoutLoading(false);
         window.location.reload();
       }
-      if(!response.ok){
+      if (!response.ok) {
         const errorData = await response.json();
+        errorToast("Terjadi error saat logout", "top-left");
         console.error(errorData);
+        setLogoutLoading(false);
       }
     } catch (error) {
       console.error(error);
+      setLogoutLoading(false);
     }
+    setLogoutLoading(false);
   };
 
   return (
@@ -101,6 +109,7 @@ export default function UserProfile() {
         <UserCard
           userData={userData}
           onLogout={handleLogout}
+          logoutLoading={logoutLoading}
           btnTrigger={
             <button className="" onClick={toggleUserInfo}>
               <div className="flex cursor-pointer items-center justify-center rounded-xl hover:bg-blue-900 hover:bg-opacity-10 md:mr-10 md:justify-start md:gap-2 md:px-3 md:py-1">
