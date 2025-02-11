@@ -1,4 +1,4 @@
-
+-- 1
 INSERT INTO `sub_category` (`id`, `sub_category_name`) VALUES
 (2, 'AMD'),
 (1, 'Intel'),
@@ -18,6 +18,7 @@ INSERT INTO `media` (`file_type`, `id`, `product_id`, `source`) VALUES
 ('image', 102, 7, 'https://images.tokopedia.net/img/cache/900/VqbcmM/2024/1/22/74e6f5cb-0e9e-4360-ae35-2a9ca7a277b4.jpg'),
 ('image', 103, 7, 'https://images.tokopedia.net/img/cache/900/VqbcmM/2021/2/4/fb2e43a4-95e7-4db5-be81-ff0c6430adcd.jpg');
 
+--2
 INSERT INTO `category` (`id`, `category_name`) VALUES
 (8, 'Casing'),
 (1, 'CPU'),
@@ -30,6 +31,7 @@ INSERT INTO `category` (`id`, `category_name`) VALUES
 (6, 'SSD'),
 (3, 'VGA');
 
+--3
 INSERT INTO `brand` (`brand_name`, `id`) VALUES
 ('AMD', 2),
 ('Asus', 4),

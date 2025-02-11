@@ -1,13 +1,13 @@
-/*
-  Warnings:
+-- /*
+--   Warnings:
 
-  - You are about to drop the column `faEnable` on the `user` table. All the data in the column will be lost.
-  - You are about to drop the column `faSecret` on the `user` table. All the data in the column will be lost.
-  - You are about to drop the `userrefreshtoken` table. If the table is not empty, all the data it contains will be lost.
+--   - You are about to drop the column `faEnable` on the `user` table. All the data in the column will be lost.
+--   - You are about to drop the column `faSecret` on the `user` table. All the data in the column will be lost.
+--   - You are about to drop the `userrefreshtoken` table. If the table is not empty, all the data it contains will be lost.
 
-*/
+-- */
 -- DropForeignKey
-ALTER TABLE `userrefreshtoken` DROP FOREIGN KEY `userRefreshToken_userId_fkey`;
+ALTER TABLE `userRefreshToken` DROP FOREIGN KEY `userRefreshToken_userId_fkey`;
 
 -- AlterTable
 ALTER TABLE `user` DROP COLUMN `faEnable`,
@@ -16,7 +16,7 @@ ALTER TABLE `user` DROP COLUMN `faEnable`,
     ADD COLUMN `fa_secret` VARCHAR(191) NULL;
 
 -- DropTable
-DROP TABLE `userrefreshtoken`;
+DROP TABLE `userRefreshToken`;
 
 -- CreateTable
 CREATE TABLE `user_refresh_token` (

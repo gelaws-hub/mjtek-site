@@ -80,6 +80,7 @@ const getOriginFromRequest = (req: Request) => {
 };
 
 // Register user
+// TODO make default user role, if role table  is empty
 export const registerUser = async (req: Request, res: Response) => {
   const { name, email, password, address, phone_number } = req.body;
 
