@@ -56,18 +56,23 @@ export default function UserCard({
     country: "",
   });
 
-  const handleProfilePictureChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleProfilePictureChange = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     if (!event.target.files || event.target.files.length === 0) return;
     const file = event.target.files[0];
     const formData = new FormData();
     formData.append("profile_pic", file);
     setLoading(true);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/${userData.id}/upload-profile-picture`, {
-        method: "POST",
-        credentials: "include",
-        body: formData,
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/user/${userData.id}/upload-profile-picture`,
+        {
+          method: "POST",
+          credentials: "include",
+          body: formData,
+        },
+      );
       if (response.ok) {
         toast.success("Foto profil berhasil diunggah!");
         window.location.reload();
@@ -82,11 +87,17 @@ export default function UserCard({
     }
   };
 
-  const handleInputChange = (field: keyof typeof tempUserData, value: string) => {
+  const handleInputChange = (
+    field: keyof typeof tempUserData,
+    value: string,
+  ) => {
     setTempUserData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleAddressChange = (field: keyof typeof tempAddress, value: string) => {
+  const handleAddressChange = (
+    field: keyof typeof tempAddress,
+    value: string,
+  ) => {
     setTempAddress((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -97,12 +108,15 @@ export default function UserCard({
     }
     setLoading(true);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/${userData.id}/edit-profile`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ [field]: tempUserData[field] }),
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/user/${userData.id}/edit-profile`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ [field]: tempUserData[field] }),
+        },
+      );
       if (response.ok) {
         toast.success("Data berhasil diperbarui!");
         setEditMode((prev) => ({ ...prev, [field]: false }));
@@ -125,12 +139,17 @@ export default function UserCard({
     }
     setLoading(true);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/${userData.id}/edit-profile`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ address: `${street}, ${city}, ${state}, ${postalCode}, ${country}` }),
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/user/${userData.id}/edit-profile`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            address: `${street}, ${city}, ${state}, ${postalCode}, ${country}`,
+          }),
+        },
+      );
       if (response.ok) {
         toast.success("Alamat berhasil diperbarui!");
         setEditMode((prev) => ({ ...prev, address: false }));
@@ -148,20 +167,51 @@ export default function UserCard({
   const handleChangePassword = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/change-password`, {
-        method: "POST",
-        credentials: "include",
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/change-password`,
+        {
+          method: "POST",
+          credentials: "include",
+        },
+      );
       if (response.ok) {
         toast.success("Email untuk ganti password telah dikirim!");
       } else {
         const errorResponse = await response.json();
-        toast.error(errorResponse.message || "Gagal mengirim email ganti password.");
+        toast.error(
+          errorResponse.message || "Gagal mengirim email ganti password.",
+        );
       }
     } catch (error: any) {
       toast.error("Terjadi kesalahan. Silakan coba lagi.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/logout`,
+        {
+          method: "POST",
+          credentials: "include", // Important for cookies
+        },
+      );
+
+      if (response.ok) {
+        // Call the onLogout prop if provided
+        if (onLogout) {
+          onLogout();
+        }
+        // Redirect to login page or home page
+        window.location.href = "/login";
+      } else {
+        toast.error("Failed to logout");
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast.error("An error occurred while logging out");
     }
   };
 
@@ -196,21 +246,30 @@ export default function UserCard({
           <div className="space-y-4">
             {["name", "phone_number"].map((field) => (
               <div key={field} className="flex items-center justify-between">
-                <span className="text-muted-foreground capitalize">{field.replace("_", " ")}</span>
+                <span className="text-muted-foreground capitalize">
+                  {field.replace("_", " ")}
+                </span>
                 <div className="flex items-center gap-2">
                   {editMode[field as keyof typeof tempUserData] ? (
                     <>
                       <input
                         type="text"
                         value={tempUserData[field as keyof typeof tempUserData]}
-                        onChange={(e) => handleInputChange(field as keyof typeof tempUserData, e.target.value)}
-                        className="border rounded px-2 py-1"
+                        onChange={(e) =>
+                          handleInputChange(
+                            field as keyof typeof tempUserData,
+                            e.target.value,
+                          )
+                        }
+                        className="rounded border px-2 py-1"
                         placeholder={field.replace("_", " ")}
                       />
                       <Button
                         variant="link"
                         className="h-auto p-0 text-primary"
-                        onClick={() => saveChanges(field as keyof typeof tempUserData)}
+                        onClick={() =>
+                          saveChanges(field as keyof typeof tempUserData)
+                        }
                         disabled={loading}
                       >
                         Simpan
@@ -218,18 +277,24 @@ export default function UserCard({
                       <Button
                         variant="link"
                         className="h-auto p-0 text-primary"
-                        onClick={() => setEditMode((prev) => ({ ...prev, [field]: false }))}
+                        onClick={() =>
+                          setEditMode((prev) => ({ ...prev, [field]: false }))
+                        }
                       >
                         Batal
                       </Button>
                     </>
                   ) : (
                     <>
-                      <span>{tempUserData[field as keyof typeof tempUserData]}</span>
+                      <span>
+                        {tempUserData[field as keyof typeof tempUserData]}
+                      </span>
                       <Button
                         variant="link"
                         className="h-auto p-0 text-primary"
-                        onClick={() => setEditMode((prev) => ({ ...prev, [field]: true }))}
+                        onClick={() =>
+                          setEditMode((prev) => ({ ...prev, [field]: true }))
+                        }
                       >
                         Ganti
                       </Button>
@@ -241,36 +306,49 @@ export default function UserCard({
             <div>
               <span className="text-muted-foreground">Alamat</span>
               {editMode.address ? (
-                <div className="space-y-2 mt-2">
-                  {["street", "city", "state", "postalCode", "country"].map((field) => (
-                    <input
-                      key={field}
-                      type="text"
-                      value={tempAddress[field as keyof typeof tempAddress]}
-                      onChange={(e) => handleAddressChange(field as keyof typeof tempAddress, e.target.value)}
-                      className="border w-full rounded px-2 py-1"
-                      placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
-                    />
-                  ))}
+                <div className="mt-2 space-y-2">
+                  {["street", "city", "state", "postalCode", "country"].map(
+                    (field) => (
+                      <input
+                        key={field}
+                        type="text"
+                        value={tempAddress[field as keyof typeof tempAddress]}
+                        onChange={(e) =>
+                          handleAddressChange(
+                            field as keyof typeof tempAddress,
+                            e.target.value,
+                          )
+                        }
+                        className="w-full rounded border px-2 py-1"
+                        placeholder={
+                          field.charAt(0).toUpperCase() + field.slice(1)
+                        }
+                      />
+                    ),
+                  )}
                   <div className="flex gap-2">
                     <Button onClick={saveAddressChanges} disabled={loading}>
                       Simpan
                     </Button>
                     <Button
                       variant="outline"
-                      onClick={() => setEditMode((prev) => ({ ...prev, address: false }))}
+                      onClick={() =>
+                        setEditMode((prev) => ({ ...prev, address: false }))
+                      }
                     >
                       Batal
                     </Button>
                   </div>
                 </div>
               ) : (
-                <div className="flex justify-between items-center">
+                <div className="flex items-center justify-between">
                   <span>{tempUserData.address}</span>
                   <Button
                     variant="link"
                     className="h-auto p-0 text-primary"
-                    onClick={() => setEditMode((prev) => ({ ...prev, address: true }))}
+                    onClick={() =>
+                      setEditMode((prev) => ({ ...prev, address: true }))
+                    }
                   >
                     Ganti
                   </Button>
@@ -291,7 +369,7 @@ export default function UserCard({
             >
               {loading ? "Processing..." : "Ganti Password"}
             </Button>
-            <Button onClick={onLogout} variant="outline" className="w-full">
+            <Button onClick={handleLogout} variant="outline" className="w-full">
               Logout
             </Button>
           </div>

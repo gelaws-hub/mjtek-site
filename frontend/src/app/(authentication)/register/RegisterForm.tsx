@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useFormik } from "formik";
 import { object, string, ref } from "yup";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner"; // Add this import at the top
 
 export default function RegisterForm() {
   const router = useRouter();
@@ -42,22 +43,32 @@ export default function RegisterForm() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(values),
+          body: JSON.stringify({
+            name: values.name,
+            email: values.email,
+            password: values.password,
+            address: values.address,
+            phone_number: values.phone_number,
+          }),
         },
       );
 
+      const data = await response.json();
+
       if (response.ok) {
-        const data = await response.json();
+        toast.success("Registration successful!");
         console.log(data);
         router.push("/login");
       } else {
-        const errorData = await response.json();
-        console.error(errorData);
+        toast.error(data.message || "Registration failed");
+        console.error("Registration error:", data);
       }
     } catch (error) {
-      console.error(error);
+      console.error("Registration error", error);
+      toast.error("An error occurred during registration");
     }
-    actions.resetForm();
+    actions.setSubmitting(false);
+    // actions.resetForm();
   };
 
   const {

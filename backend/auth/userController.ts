@@ -29,7 +29,8 @@ const isProduction = process.env.NODE_ENV === "production";
 // Middleware untuk validasi token
 export const ensureAuthenticated: RequestHandler = async (req, res, next) => {
   // Get the token from the cookies
-  const token = req.cookies.accessToken || req.headers.authorization?.split(' ')[1];
+  const token =
+    req.cookies.accessToken || req.headers.authorization?.split(" ")[1];
 
   // If no token is found in cookies, return 401 Unauthorized
   if (!token) {
@@ -44,7 +45,9 @@ export const ensureAuthenticated: RequestHandler = async (req, res, next) => {
     });
 
     if (!user?.is_active) {
-      return res.status(403).json({ message: 'Please activate your account first' });
+      return res
+        .status(403)
+        .json({ message: "Please activate your account first" });
     }
     // Attach the user data to the request
     (req as any).user = {
@@ -69,14 +72,14 @@ export const ensureAuthenticated: RequestHandler = async (req, res, next) => {
 };
 
 const getOriginFromRequest = (req: Request) => {
-  const referer = req.get('Referer');  // Get the referer header
+  const referer = req.get("Referer"); // Get the referer header
   if (referer) {
-    // The referer is something like `https://example.com/some/path`, 
+    // The referer is something like `https://example.com/some/path`,
     // so we want to extract just the origin (e.g., https://example.com)
     const origin = new URL(referer).origin;
     return origin;
   }
-  return '';  // Default if no referer is provided
+  return ""; // Default if no referer is provided
 };
 
 // Register user
@@ -94,11 +97,11 @@ export const registerUser = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "User already exists" });
     }
 
+    // Generate activation token
+    const activation_token = crypto.randomBytes(32).toString("hex");
+
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Generate activation token
-    const activationToken = crypto.randomBytes(32).toString('hex');
 
     // Buat user
     const user = await prisma.user.create({
@@ -108,12 +111,11 @@ export const registerUser = async (req: Request, res: Response) => {
         password: hashedPassword,
         address,
         phone_number,
-        activation_token: activationToken,
-        reset_password_token: null,
+        activation_token,
+        // reset_password_token: null,
         is_active: false,
         role_name: "buyer", // Set default role sebagai user biasa(pembeli)
-        profile_pic:
-          "/image.png",
+        profile_pic: "/image.png",
       },
     });
 
@@ -123,21 +125,52 @@ export const registerUser = async (req: Request, res: Response) => {
       address: user.address,
       phone_number: user.phone_number,
       role_name: user.role_name,
-    }
+    };
 
     // Kirim email aktivasi
-    const activationLink = `${getOriginFromRequest(req)}/activate?token=${activationToken}`;
-    console.log("activation link: ", activationLink);
-    await sendActivationEmail(email, activationLink);
+    const activationLink = `${getOriginFromRequest(
+      req
+    )}/activate?token=${activation_token}`;
+
+    console.log("Activation Link:", activationLink); // For debugging
+    // await sendActivationEmail(email, activationLink);
+
+    try {
+      await sendActivationEmail(email, activationLink);
+    } catch (emailError) {
+      console.error("Email sending failed:", emailError);
+      // Delete the created user if email sending fails
+      await prisma.user.delete({
+        where: { id: user.id },
+      });
+      return res.status(500).json({
+        message: "Failed to send activation email",
+      });
+    }
 
     res.status(201).json({
-      message: 'User registered successfully',
-      userCreated,
+      message:
+        "Registration successful! Please check your email for activation.",
+      userCreated: {
+        name: user.name,
+        email: user.email,
+      },
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Registration error:", error);
+    res.status(500).json({
+      message: "Server error during registration",
+      error: error instanceof Error ? error.message : String(error),
+    });
   }
+  //   res.status(201).json({
+  //     message: "User registered successfully",
+  //     userCreated,
+  //   });
+  // } catch (error) {
+  //   console.error(error);
+  //   res.status(500).json({ message: "Server error" });
+  // }
 };
 
 //Aktivasi Akun
@@ -150,7 +183,9 @@ export const activateUser = async (req: Request, res: Response) => {
     });
 
     if (!user) {
-      return res.status(400).json({ message: 'Invalid or expired activation token' });
+      return res
+        .status(400)
+        .json({ message: "Invalid or expired activation token" });
     }
 
     // Aktifkan akun
@@ -158,16 +193,15 @@ export const activateUser = async (req: Request, res: Response) => {
       where: { id: user.id },
       data: {
         is_active: true,
-        activation_token: null,  // Hapus token setelah aktivasi
+        activation_token: null, // Hapus token setelah aktivasi
       },
     });
 
-    res.status(200).json({ message: 'Account activated successfully' });
+    res.status(200).json({ message: "Account activated successfully" });
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: "Server error" });
   }
 };
-
 
 // Login user
 export const login = async (req: Request, res: Response) => {
@@ -193,71 +227,72 @@ export const login = async (req: Request, res: Response) => {
     }
 
     if (!user.is_active) {
-      return res.status(403).json({ message: "Please activate your account first" });
+      return res
+        .status(403)
+        .json({ message: "Please activate your account first" });
     }
 
-      const accessToken = jwt.sign(
-        {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role_name: user.role_name,
-        },
-        process.env.ACCESS_TOKEN_SECRET!,
-        {
-          subject: "accessApi",
-          expiresIn: process.env.REFRESH_TOKEN_TIME,
-        }
-      );
-
-      const refreshToken = jwt.sign(
-        {
-          userId: user.id,
-          name: user.name,
-          email: user.email,
-          role_name: user.role_name,
-        },
-        process.env.REFRESH_TOKEN_SECRET!,
-        {
-          subject: "refreshToken",
-          expiresIn: process.env.REFRESH_TOKEN_TIME,
-        }
-      );
-
-      await prisma.user_refresh_token.create({
-        data: {
-          refresh_token: refreshToken,
-          user_id: user.id,
-        },
-      });
-
-      res.cookie("accessToken", accessToken, {
-        httpOnly: false, // Prevent client-side access
-        secure: isProduction, // Use HTTPS in production
-        sameSite: isProduction ? "none" : "strict", // Prevent CSRF attacks
-        // sameSite: "none",
-        // secure: true,
-        maxAge: 86400 * 1000, // 1 day expiration
-      });
-
-      res.cookie("refreshToken", refreshToken, {
-        httpOnly: true, // Prevent client-side access
-        // secure: isProduction, // Use HTTPS in production
-        // sameSite: isProduction ? "none" : "strict", // Prevent CSRF attacks
-        sameSite: "none",
-        secure: true,
-        maxAge: 86400 * 1000, // 1 day expiration
-      });
-
-      return res.status(200).json({
+    const accessToken = jwt.sign(
+      {
         id: user.id,
         name: user.name,
         email: user.email,
         role_name: user.role_name,
-        accessToken: accessToken, 
-        // refreshToken, this should never be delivered to client
-      });
-    
+      },
+      process.env.ACCESS_TOKEN_SECRET!,
+      {
+        subject: "accessApi",
+        expiresIn: process.env.REFRESH_TOKEN_TIME,
+      }
+    );
+
+    const refreshToken = jwt.sign(
+      {
+        userId: user.id,
+        name: user.name,
+        email: user.email,
+        role_name: user.role_name,
+      },
+      process.env.REFRESH_TOKEN_SECRET!,
+      {
+        subject: "refreshToken",
+        expiresIn: process.env.REFRESH_TOKEN_TIME,
+      }
+    );
+
+    await prisma.user_refresh_token.create({
+      data: {
+        refresh_token: refreshToken,
+        user_id: user.id,
+      },
+    });
+
+    res.cookie("accessToken", accessToken, {
+      httpOnly: false, // Prevent client-side access
+      secure: isProduction, // Use HTTPS in production
+      sameSite: isProduction ? "none" : "strict", // Prevent CSRF attacks
+      // sameSite: "none",
+      // secure: true,
+      maxAge: 86400 * 1000, // 1 day expiration
+    });
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true, // Prevent client-side access
+      // secure: isProduction, // Use HTTPS in production
+      // sameSite: isProduction ? "none" : "strict", // Prevent CSRF attacks
+      sameSite: "none",
+      secure: true,
+      maxAge: 86400 * 1000, // 1 day expiration
+    });
+
+    return res.status(200).json({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role_name: user.role_name,
+      accessToken: accessToken,
+      // refreshToken, this should never be delivered to client
+    });
   } catch (error: any) {
     return res.status(500).json({ message: error.message });
   }
@@ -413,7 +448,9 @@ export const requestResetPassword = async (req: Request, res: Response) => {
       });
 
       // Kirim email reset password
-      const resetLink = `${getOriginFromRequest(req)}/reset-password?token=${resetToken}`;
+      const resetLink = `${getOriginFromRequest(
+        req
+      )}/reset-password?token=${resetToken}`;
       await sendResetPasswordEmail(user.email, resetLink);
     }
 
@@ -439,7 +476,7 @@ export const validateResetPasswordToken = async (token: string) => {
   });
 
   if (!user) {
-    throw new Error('Invalid or expired reset token');
+    throw new Error("Invalid or expired reset token");
   }
 
   return user;
@@ -453,7 +490,7 @@ export const resetPassword = async (req: Request, res: Response) => {
     if (!token || !newPassword) {
       return res
         .status(400)
-        .json({ message: 'Token and new password are required.' });
+        .json({ message: "Token and new password are required." });
     }
 
     // Validasi token
@@ -472,13 +509,13 @@ export const resetPassword = async (req: Request, res: Response) => {
       },
     });
 
-    res.status(200).json({ message: 'Password berhasil diubah.' });
+    res.status(200).json({ message: "Password berhasil diubah." });
   } catch (error: any) {
-    console.error('Reset password error:', error.message);
+    console.error("Reset password error:", error.message);
 
     res.status(500).json({
       message:
-        error.message || 'Terjadi kesalahan server saat mengubah password.',
+        error.message || "Terjadi kesalahan server saat mengubah password.",
     });
   }
 };
@@ -509,7 +546,9 @@ export const requestChangePassword: RequestHandler = async (req, res) => {
     });
 
     // Kirim email
-    const resetLink = `${getOriginFromRequest(req)}/reset-password?token=${resetToken}`;
+    const resetLink = `${getOriginFromRequest(
+      req
+    )}/reset-password?token=${resetToken}`;
     await sendResetPasswordEmail(user.email, resetLink);
 
     return res.status(200).json({ message: "Password reset email sent." });
@@ -536,7 +575,9 @@ export const authorize = (roles: string[]) => {
       });
 
       if (!user || !roles.includes(user.role_name)) {
-        console.log(`User ${userId} has role ${user?.role_name}, access denied`);
+        console.log(
+          `User ${userId} has role ${user?.role_name}, access denied`
+        );
         return res.status(403).json({ message: "Access denied" });
       }
 
