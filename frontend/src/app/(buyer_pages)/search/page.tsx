@@ -97,18 +97,18 @@ function SearchResultsComponent() {
           <h3 className="text-md md:text-xl font-semibold mb-2">Kategori</h3>
           <ul className="text-xs md:text-sm px-1">
             {categories.map((category) => (
-              <li key={category.id} className="flex items-center mb-2 truncate">
+              <li key={category.id} className="flex items-center mb-2 hover:bg-gray-300 px-2 rounded-md py-1">
                 <input
                   type="checkbox"
                   id={`category-${category.id}`}
                   value={category.id}
                   checked={selectedCategories.includes(category.id)}
                   onChange={() => handleCategoryChange(category.id)}
-                  className="mr-1 w-2 rounded-full h-2 bg-blue-900"
+                  className="mr-1 rounded-full bg-blue-900 cursor-pointer"
                 />
                 <label
                   htmlFor={`category-${category.id}`}
-                  className="cursor-pointer"
+                  className="truncate pr-2 cursor-pointer"
                 >
                   {category.category_name}
                 </label>
