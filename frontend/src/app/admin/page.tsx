@@ -1,6 +1,6 @@
 "use client";
 import dynamic from "next/dynamic";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import ChartOne from "@/components/tailadmin/Charts/ChartOne";
 import ChartTwo from "@/components/tailadmin/Charts/ChartTwo";
 import TableOne from "@/components/tailadmin/Tables/TableOne";
@@ -41,6 +41,55 @@ interface TopBuyers {
   persentase_pendapatan: string;
 }
 
+const formatIDR = (value: string) => {
+  return Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(parseInt(value, 10));
+};
+
+const calculateRate = (current: number, previous: number) => {
+  if (previous <= 0) {
+    return "100%";
+  }
+  if (current && previous === 0) {
+    return "0%";
+  }
+  return `${((current / previous) * 100 - 100).toFixed(2)} %`;
+};
+
+const formatIndoType = (type: string) => {
+  switch (type) {
+    case "day":
+      return "Hari";
+    case "week":
+      return "Minggu";
+    case "month":
+      return "Bulan";
+    default:
+      return "";
+  }
+};
+
+const translateStatus = (status: string) => {
+  switch (status) {
+    case "checking":
+      return "Diperiksa";
+    case "processing":
+      return "Diproses";
+    case "shipping":
+      return "Dikirim";
+    case "dispute":
+      return "Dikomplain";
+    case "finished":
+      return "Selesai";
+    default:
+      return status;
+  }
+};
+
 const AdminDashboard: React.FC = () => {
   const [sales, setSales] = useState<Sales[]>([
     { time: "Jan", total_income: "0" },
@@ -71,6 +120,20 @@ const AdminDashboard: React.FC = () => {
   });
 
   const router = useRouter();
+
+  const memoizedTotal = useMemo(
+    () => formatIDR(sales[range - 1]?.total_income || "0"),
+    [sales, range],
+  );
+
+  const memoizedRate = useMemo(
+    () =>
+      calculateRate(
+        Number(sales[range - 1]?.total_income) || 0,
+        Number(sales[range - 2]?.total_income) || 0,
+      ),
+    [sales, range],
+  );
 
   const updateQueryParams = (range: number, type: string) => {
     const query = new URLSearchParams();
@@ -143,55 +206,6 @@ const AdminDashboard: React.FC = () => {
     fetchSales();
   }, [range, type]);
 
-  const formatIDR = (value: string) => {
-    return Intl.NumberFormat("id-ID", {
-      style: "currency",
-      currency: "IDR",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(parseInt(value, 10));
-  };
-
-  const calculateRate = (current: number, previous: number) => {
-    if (previous <= 0) {
-      return "100%";
-    }
-    if (current && previous === 0) {
-      return "0%";
-    }
-    return `${((current / previous) * 100 - 100).toFixed(2)} %`;
-  };
-
-  const formatIndoType = (type: string) => {
-    switch (type) {
-      case "day":
-        return "Hari";
-      case "week":
-        return "Minggu";
-      case "month":
-        return "Bulan";
-      default:
-        return "";
-    }
-  };
-
-  const translateStatus = (status: string) => {
-    switch (status) {
-      case "checking":
-        return "Diperiksa";
-      case "processing":
-        return "Diproses";
-      case "shipping":
-        return "Dikirim";
-      case "dispute":
-        return "Dikomplain";
-      case "finished":
-        return "Selesai";
-      default:
-        return status;
-    }
-  };
-
   return (
     <>
       <DefaultLayout>
@@ -224,11 +238,8 @@ const AdminDashboard: React.FC = () => {
           <CardDataStats
             className="col-span-1 lg:col-span-2 xl:col-span-3"
             title={`${sales[range - 1]?.time}`}
-            total={`${formatIDR(sales[range - 1]?.total_income || "0")}`}
-            rate={calculateRate(
-              Number(sales[range - 1]?.total_income) || 0,
-              Number(sales[range - 2]?.total_income) || 0,
-            )}
+            total={memoizedTotal}
+            rate={memoizedRate}
             levelUp={
               Number(sales[range - 1]?.total_income) >
               Number(sales[range - 2]?.total_income)
