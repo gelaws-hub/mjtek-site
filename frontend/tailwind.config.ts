@@ -18,6 +18,8 @@ const config: Config = {
       xsm: "425px",
       "3xl": "2000px",
       ...defaultTheme.screens,
+      "sr-only":
+        "position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;",
     },
     extend: {
       colors: {

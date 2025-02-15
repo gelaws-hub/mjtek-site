@@ -110,7 +110,7 @@ function ProductTables() {
 
   return (
     <>
-      <form className="relative flex w-full gap-4 rounded-sm border border-stroke bg-white p-2 shadow-default dark:border-strokedark dark:bg-boxdark mb-2">
+      {/* <form className="relative mb-2 flex w-full gap-4 rounded-sm border border-stroke bg-white p-2 shadow-default dark:border-strokedark dark:bg-boxdark">
         <input
           id="search"
           type="text"
@@ -122,7 +122,24 @@ function ProductTables() {
         <Search01Icon
           width={18}
           height={18}
-          className="absolute left-4 top-1/2 -translate-y-1/2 text-inherit focus:ring-0 focus:outline-none"
+          className="absolute left-4 top-1/2 -translate-y-1/2 text-inherit focus:outline-none focus:ring-0"
+        />
+      </form> */}
+      <form className="relative mb-2 flex w-full gap-4 rounded-sm border border-stroke bg-white p-2 shadow-default dark:border-strokedark dark:bg-boxdark">
+        <input
+          id="search"
+          type="text"
+          value={search}
+          onChange={(e) => handleChangeSearch(e.target.value)}
+          className="w-full rounded-lg bg-inherit py-1 pl-9 pr-2"
+          placeholder="Cari produk..."
+          aria-label="Cari produk"
+        />
+        <Search01Icon
+          width={18}
+          height={18}
+          className="absolute left-4 top-1/2 -translate-y-1/2 text-inherit focus:outline-none focus:ring-0"
+          aria-hidden="true"
         />
       </form>
       {currentPage > totalPages ? (
@@ -130,7 +147,26 @@ function ProductTables() {
           <p>Halaman yang anda cari tidak ada, </p>
           <span>
             &nbsp;
-            <Link scroll={false} className="text-blue-500" href={`/admin/products?page=1`}>
+            {/* <Link
+              scroll={false}
+              className="text-blue-500"
+              // href={`/admin/products?page=1`}
+              href={`/admin/products`}
+            >
+              kembali ke halaman awal
+            </Link> */}
+            <Link
+              scroll={false}
+              className="text-blue-500 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              href="/admin/products"
+              onClick={(e) => {
+                e.preventDefault();
+                setSearch(""); // Clear search
+                router.push("/admin/products"); // Reset URL
+                router.refresh(); // Refresh data
+              }}
+              aria-label="Kembali ke halaman awal dan reset pencarian"
+            >
               kembali ke halaman awal
             </Link>
           </span>{" "}
@@ -213,11 +249,14 @@ function ProductTables() {
                         <button
                           className="rounded-md bg-primary p-1 text-white hover:bg-opacity-80"
                           onClick={() => setSelectedProduct(product)}
+                          aria-label={`Edit ${product.product_name}`}
+                          role="button"
                         >
                           <PencilEdit02Icon
                             color="#fff"
                             width={16}
                             height={16}
+                            aria-hidden="true"
                           />
                         </button>
                         <DeleteAlert
@@ -228,11 +267,14 @@ function ProductTables() {
                           <button
                             className="rounded-md bg-red p-1 text-white hover:bg-opacity-80"
                             onClick={() => handleDeleteButton(product)}
+                            aria-label={`Hapus ${product.product_name}`}
+                            role="button"
                           >
                             <DeletePutBackIcon
                               color="#fff"
                               width={16}
                               height={16}
+                              aria-hidden="true"
                             />
                           </button>
                         </DeleteAlert>
@@ -262,11 +304,13 @@ function ProductTables() {
                   currentPage > 1 ? currentPage - 1 : currentPage,
                 )
               }
+              aria-label="Halaman sebelumnya"
+              disabled={currentPage <= 1}
             >
               Prev
             </Button>
-            <span>
-              {currentPage} dari {totalPages}
+            <span role="status" aria-live="polite">
+              Halaman {currentPage} dari {totalPages}
             </span>
             <Button
               className="text-white"
@@ -275,23 +319,40 @@ function ProductTables() {
                   currentPage < totalPages ? currentPage + 1 : currentPage,
                 )
               }
+              aria-label="Halaman berikutnya"
+              disabled={currentPage >= totalPages}
             >
               Next
             </Button>
           </div>
           <ul className="mt-4 flex items-center justify-center gap-4">
             {limitOptions.map((option) => (
-              <li
-                key={option}
-                className={`cursor-pointer text-inherit ${
-                  limit === option ? "font-semibold text-primary underline" : ""
-                }`}
-              >
+              // <li
+              //   key={option}
+              //   className={`cursor-pointer text-inherit ${
+              //     limit === option ? "font-semibold text-primary underline" : ""
+              //   }`}
+              // >
+              //   <button
+              //     onClick={(e) => {
+              //       e.preventDefault();
+              //       handleLimitChange(option);
+              //     }}
+              //   >
+              //     {option}
+              <li key={option}>
                 <button
                   onClick={(e) => {
                     e.preventDefault();
                     handleLimitChange(option);
                   }}
+                  className={`cursor-pointer text-inherit ${
+                    limit === option
+                      ? "font-semibold text-primary underline"
+                      : ""
+                  }`}
+                  aria-label={`Tampilkan ${option} item per halaman`}
+                  aria-current={limit === option ? "true" : undefined}
                 >
                   {option}
                 </button>

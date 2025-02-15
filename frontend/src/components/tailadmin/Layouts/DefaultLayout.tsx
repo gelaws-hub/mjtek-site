@@ -5,6 +5,16 @@ import Header from "@/components/tailadmin/Header";
 import { menuGroups } from "../Sidebar/SidebarMenu";
 import { usePathname } from "next/navigation";
 
+// Static route-to-title mapping
+const ROUTE_TITLES: Record<string, string> = {
+  "/admin": "Dashboard",
+  "/admin/products": "Produk",
+  "/admin/transactions": "Transaksi",
+  "/admin/buyers": "Pelanggan",
+  "/admin/admins": "Admin",
+  // Add more routes as needed
+};
+
 export default function DefaultLayout({
   children,
   pageTitle = "", // Add pageTitle prop with default value
@@ -15,31 +25,32 @@ export default function DefaultLayout({
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Create a memoized route-to-label mapping
-  const routeLabelMap = useMemo(() => {
-    const map = new Map<string, string>();
+  // // Create a memoized route-to-label mapping
+  // const routeLabelMap = useMemo(() => {
+  //   const map = new Map<string, string>();
 
-    const addRouteLabel = (items: any[]) => {
-      items.forEach((item) => {
-        if (item.route && item.label) {
-          map.set(item.route, item.label);
-        }
-        if (item.children) {
-          addRouteLabel(item.children);
-        }
-      });
-    };
+  //   const addRouteLabel = (items: any[]) => {
+  //     items.forEach((item) => {
+  //       if (item.route && item.label) {
+  //         map.set(item.route, item.label);
+  //       }
+  //       if (item.children) {
+  //         addRouteLabel(item.children);
+  //       }
+  //     });
+  //   };
 
-    menuGroups.forEach((group) => {
-      addRouteLabel(group.menuItems);
-    });
+  //   menuGroups.forEach((group) => {
+  //     addRouteLabel(group.menuItems);
+  //   });
 
-    return map;
-  }, []); // Empty dependency array since menuGroups is static
+  //   return map;
+  // }, []); // Empty dependency array since menuGroups is static
 
-  const getCurrentPageTitle = () => {
-    return routeLabelMap.get(pathname) || "Dashboard";
-  };
+  // const getCurrentPageTitle = () => {
+  //   return routeLabelMap.get(pathname) || "Dashboard";
+  // };
+  const getCurrentPageTitle = () => ROUTE_TITLES[pathname] || "Dashboard";
 
   return (
     <>
