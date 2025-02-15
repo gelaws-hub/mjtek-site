@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import Sidebar from "@/components/tailadmin/Sidebar";
 import Header from "@/components/tailadmin/Header";
 import { menuGroups } from "../Sidebar/SidebarMenu";
@@ -15,15 +15,30 @@ export default function DefaultLayout({
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const getCurrentPageTitle = () => {
-    for (const group of menuGroups) {
-      for (const item of group.menuItems) {
-        if (item.route === pathname) {
-          return item.label;
+  // Create a memoized route-to-label mapping
+  const routeLabelMap = useMemo(() => {
+    const map = new Map<string, string>();
+
+    const addRouteLabel = (items: any[]) => {
+      items.forEach((item) => {
+        if (item.route && item.label) {
+          map.set(item.route, item.label);
         }
-      }
-    }
-    return "Dashboard"; // Default title
+        if (item.children) {
+          addRouteLabel(item.children);
+        }
+      });
+    };
+
+    menuGroups.forEach((group) => {
+      addRouteLabel(group.menuItems);
+    });
+
+    return map;
+  }, []); // Empty dependency array since menuGroups is static
+
+  const getCurrentPageTitle = () => {
+    return routeLabelMap.get(pathname) || "Dashboard";
   };
 
   return (
