@@ -24,7 +24,7 @@ const DropdownUser = () => {
         </span>
 
         <span className="h-12 w-12 rounded-full">
-          <img
+          <Image
             width={112}
             height={112}
             src={"/image.png"}
@@ -83,7 +83,7 @@ const DropdownUser = () => {
                     fill=""
                   />
                 </svg>
-                My Profile
+                Profile
               </Link>
             </li>
             <li>

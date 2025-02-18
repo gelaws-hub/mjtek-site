@@ -245,7 +245,7 @@ function ProductTables() {
                       </td>
 
                       {/* Actions Column */}
-                      <td className="flex items-center justify-center gap-1 text-xs text-white md:text-sm">
+                      {/* <td className="flex items-center justify-center gap-1 text-xs text-white md:text-sm">
                         <button
                           className="rounded-md bg-primary p-1 text-white hover:bg-opacity-80"
                           onClick={() => setSelectedProduct(product)}
@@ -258,6 +258,7 @@ function ProductTables() {
                             height={16}
                             aria-hidden="true"
                           />
+                          <span>Edit</span>
                         </button>
                         <DeleteAlert
                           actionComponent={<span>Hapus</span>}
@@ -276,6 +277,43 @@ function ProductTables() {
                               height={16}
                               aria-hidden="true"
                             />
+                            <span>Hapus</span>
+                          </button>
+                        </DeleteAlert>
+                      </td> */}
+                      <td className="flex flex-col items-center justify-center gap-2 py-2 text-xs text-white md:text-sm">
+                        <button
+                          className="flex min-w-[100px] items-center justify-center gap-2 rounded-md bg-primary px-3 py-2 text-white hover:bg-opacity-80"
+                          onClick={() => setSelectedProduct(product)}
+                          aria-label={`Edit ${product.product_name}`}
+                          role="button"
+                        >
+                          <PencilEdit02Icon
+                            color="#fff"
+                            width={16}
+                            height={16}
+                            aria-hidden="true"
+                          />
+                          <span>Edit</span>
+                        </button>
+                        <DeleteAlert
+                          actionComponent={<span>Hapus</span>}
+                          action={handleDelete}
+                          deleteMessage={`Apakah anda yakin akan menghapus <strong>${product.product_name}</strong> ?`}
+                        >
+                          <button
+                            className="flex min-w-[100px] items-center justify-center gap-2 rounded-md bg-red px-3 py-2 text-white hover:bg-opacity-80"
+                            onClick={() => handleDeleteButton(product)}
+                            aria-label={`Hapus ${product.product_name}`}
+                            role="button"
+                          >
+                            <DeletePutBackIcon
+                              color="#fff"
+                              width={16}
+                              height={16}
+                              aria-hidden="true"
+                            />
+                            <span>Hapus</span>
                           </button>
                         </DeleteAlert>
                       </td>
