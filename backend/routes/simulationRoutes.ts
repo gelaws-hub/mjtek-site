@@ -39,7 +39,6 @@ const simulationRoutes = express.Router();
 // Socket routes
 simulationRoutes.get("/socket", getAllSockets);
 simulationRoutes.get("/socket/:id", getSocketById);
-// simulationRoutes.post("/socket", createSocket);
 simulationRoutes.put("/socket/:id", updateSocket);
 simulationRoutes.delete("/socket/:id", deleteSocket);
 simulationRoutes.post("/socket", createMultipleSockets);
