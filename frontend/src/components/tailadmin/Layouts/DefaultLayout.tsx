@@ -4,6 +4,8 @@ import Sidebar from "@/components/tailadmin/Sidebar";
 import Header from "@/components/tailadmin/Header";
 import { menuGroups } from "../Sidebar/SidebarMenu";
 import { usePathname } from "next/navigation";
+import { jwtDecode } from "jwt-decode";
+import Cookies from "js-cookie";
 
 // Static route-to-title mapping
 const ROUTE_TITLES: Record<string, string> = {
@@ -15,6 +17,10 @@ const ROUTE_TITLES: Record<string, string> = {
   // Add more routes as needed
 };
 
+interface JwtPayload {
+  role_name: string;
+}
+
 export default function DefaultLayout({
   children,
   pageTitle = "", // Add pageTitle prop with default value
@@ -25,31 +31,20 @@ export default function DefaultLayout({
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // // Create a memoized route-to-label mapping
-  // const routeLabelMap = useMemo(() => {
-  //   const map = new Map<string, string>();
+  const token = Cookies.get("accessToken");
+  let role = "";
+  if (token) {
+    try {
+      const decoded = jwtDecode<JwtPayload>(token);
+      role = decoded.role_name.toLowerCase();
+      console.log("Decoded role:", role);
+    } catch (error) {
+      console.error("Unable to decode token:", error);
+    }
+  } else {
+    console.warn("No accessToken found in cookies.");
+  }
 
-  //   const addRouteLabel = (items: any[]) => {
-  //     items.forEach((item) => {
-  //       if (item.route && item.label) {
-  //         map.set(item.route, item.label);
-  //       }
-  //       if (item.children) {
-  //         addRouteLabel(item.children);
-  //       }
-  //     });
-  //   };
-
-  //   menuGroups.forEach((group) => {
-  //     addRouteLabel(group.menuItems);
-  //   });
-
-  //   return map;
-  // }, []); // Empty dependency array since menuGroups is static
-
-  // const getCurrentPageTitle = () => {
-  //   return routeLabelMap.get(pathname) || "Dashboard";
-  // };
   const getCurrentPageTitle = () => ROUTE_TITLES[pathname] || "Dashboard";
 
   return (

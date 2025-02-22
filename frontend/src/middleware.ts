@@ -4,32 +4,40 @@ import { jwtDecode } from "jwt-decode";
 
 export function middleware(req: NextRequest) {
   const token = req.cookies.get("accessToken")?.value;
-
-  const roleRoutes = {
-    buyer: [
-      /^\/cart(\/.*)?$/,
-      /^\/favorite(\/.*)?$/,
-      /^\/transactions(\/.*)?$/,
-    ],
-    admin: [/^\/admin(\/.*)?$/],
-  };
-
   const pathname = req.nextUrl.pathname;
 
   if (token) {
     try {
       const payload = jwtDecode(token) as any;
       const role = payload.role_name;
-
       console.log(`accessing ${pathname} as ${role}`, payload);
 
-      const allowedRoutes = roleRoutes[role as "buyer" | "admin"];
-      const isAuthorized = allowedRoutes?.some((route) => route.test(pathname));
-
-      if (isAuthorized) {
-        return NextResponse.next();
+      // Handle admin and owner roles together
+      if (role === "admin" || role === "owner") {
+        if (pathname.startsWith("/admin")) {
+          return NextResponse.next();
+        }
+        // Redirect admin/owner to the admin area if they're accessing a non-admin route
+        return NextResponse.redirect(new URL("/admin", req.url));
       }
 
+      // For buyers, only allow specific routes
+      if (role === "buyer") {
+        const buyerAllowedRoutes = [
+          /^\/cart(\/.*)?$/,
+          /^\/favorite(\/.*)?$/,
+          /^\/transactions(\/.*)?$/,
+        ];
+        const isAuthorized = buyerAllowedRoutes.some((route) =>
+          route.test(pathname),
+        );
+        if (isAuthorized) {
+          return NextResponse.next();
+        }
+        return NextResponse.redirect(new URL("/unauthorized", req.url));
+      }
+
+      // Default to unauthorized for any other role
       return NextResponse.redirect(new URL("/unauthorized", req.url));
     } catch (err) {
       console.error("JWT Verification failed:", err);

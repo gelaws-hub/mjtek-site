@@ -175,7 +175,7 @@ export default function TransactionPage() {
 
   const statuses = {
     all: undefined,
-    checking: "menunggu konfirmasi",
+    checking: "Menunggu Konfirmasi",
     processing: "Diproses",
     shipping: "Dikirim",
     dispute: "Dikomplain",
@@ -214,12 +214,12 @@ export default function TransactionPage() {
         </div>
         {/* Status Filter Navbar */}
         <div className="w-full overflow-x-auto py-2 scrollbar-none">
-          <div className="flex items-center md:justify-center gap-4">
+          <div className="flex items-center gap-4 md:justify-center">
             {Object.keys(statuses).map((key) => (
               <button
                 key={key}
                 onClick={() => handleStatusFilter(key)}
-                className={`rounded-full px-4 h-9 whitespace-nowrap bg-none py-1 ${(!statusQueryParam && key === "all") || (statusQueryParam && key === statusQueryParam) ? "text-white bg-blue-900 dark:bg-blue-600" : "text"}`}
+                className={`h-9 whitespace-nowrap rounded-full bg-none px-4 py-1 ${(!statusQueryParam && key === "all") || (statusQueryParam && key === statusQueryParam) ? "bg-blue-900 text-white dark:bg-blue-600" : "text"}`}
               >
                 {statuses[key as keyof typeof statuses] === undefined
                   ? "Semua"
