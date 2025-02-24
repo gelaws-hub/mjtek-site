@@ -1,6 +1,6 @@
 "use client";
 import dynamic from "next/dynamic";
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, Suspense } from "react";
 import ChartOne from "@/components/tailadmin/Charts/ChartOne";
 import ChartTwo from "@/components/tailadmin/Charts/ChartTwo";
 import TableOne from "@/components/tailadmin/Tables/TableOne";
