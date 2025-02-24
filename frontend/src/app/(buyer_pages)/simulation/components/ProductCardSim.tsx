@@ -73,14 +73,14 @@ export default function ProductCardSim({
             }).format(product.price)}
           </p>
         </div>
-        <Link
+        {/* <Link
           onClick={(e) => e.stopPropagation()}
           className="pointer-events-auto link flex w-full items-center justify-around rounded-lg bg-blue-900 py-2 text-sm text-white"
           href={productUrl}
         >
           Lihat Produk{" "}
           <ArrowRight className="link-hover:translate-x-1 h-5 w-5 duration-300 ease-in-out" />
-        </Link>
+        </Link> */}
       </div>
     </div>
   );
