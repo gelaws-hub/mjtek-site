@@ -7,7 +7,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import UserProfile from "./UserProfile";
 
-const hideHeaderPaths = ["/login", "/register", "/admin", "/forgetPassword"]; //Header won't be visible on these paths
+const hideHeaderPaths = ["/login", "/register", "/admin", "/forgetPassword", "/reset-password"]; //Header won't be visible on these paths
 
 export default function Header() {
 
