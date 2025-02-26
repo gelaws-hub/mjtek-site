@@ -81,6 +81,7 @@
 
 import { cn } from "@/lib/utils";
 import React, { ReactNode, memo } from "react";
+import { CardSkeleton } from "../ui/skeletons";
 
 interface CardDataStatsProps {
   title: string;

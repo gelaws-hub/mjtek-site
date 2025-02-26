@@ -21,14 +21,21 @@ interface Sales {
   total_income: string;
 }
 
-function ChartOne({ sales, title, className }: { sales: Sales[], title?: string, className?: string }) {
-
+function ChartOne({
+  sales,
+  title,
+  className,
+}: {
+  sales: Sales[];
+  title?: string;
+  className?: string;
+}) {
   const series = [
     {
       name: title,
       data: sales.map((sale) => parseInt(sale.total_income, 10) / 1000000),
     },
-  ]
+  ];
 
   const options: ApexOptions = {
     legend: {
@@ -122,13 +129,22 @@ function ChartOne({ sales, title, className }: { sales: Sales[], title?: string,
   };
 
   return (
-    <div className={cn("col-span-12 rounded-sm border border-stroke bg-white px-5 pb-5 pt-7.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:col-span-8", className)}>
+    <div
+      className={cn(
+        "col-span-12 rounded-sm border border-stroke bg-white px-5 pb-5 pt-7.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:col-span-8",
+        className,
+      )}
+    >
       <div className="flex flex-wrap items-start justify-between gap-3 sm:flex-nowrap">
         <div className="flex w-full flex-wrap gap-3 sm:gap-5">
-          <div className="flex min-w-47.5 w-full">
+          <div className="flex w-full min-w-47.5">
             <div className="w-full">
-              <h3 className="text-xl font-semibold text-black dark:text-white">{title}</h3>
-              <p className="text-sm font-medium">{sales[0].time} - {sales[sales.length - 1].time}</p>
+              <h3 className="text-xl font-semibold text-black dark:text-white">
+                {title}
+              </h3>
+              <p className="text-sm font-medium">
+                {sales[0].time} - {sales[sales.length - 1].time}
+              </p>
             </div>
           </div>
         </div>

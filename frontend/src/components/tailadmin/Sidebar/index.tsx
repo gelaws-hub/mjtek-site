@@ -50,11 +50,11 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
         }`}
       >
         {/* SIDEBAR HEADER */}
-        <div className="flex items-center justify-between gap-2 px-6 py-5.5 lg:py-6.5">
+        <div className="flex items-center justify-between px-4 py-5.5 lg:px-6 lg:py-6.5">
           <Link
             scroll={false}
             href="/admin"
-            className="flex items-center gap-2"
+            className="flex flex-1 items-center gap-2.5"
           >
             <img
               width={32}
@@ -63,7 +63,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               alt="Logo"
               className="rounded-lg dark:fill-white"
             />
-            <h2 className="text-lg font-semibold text-white">MJ teknologi</h2>
+            <h2 className="text-2xl font-semibold text-white">MJ Teknologi</h2>
           </Link>
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
