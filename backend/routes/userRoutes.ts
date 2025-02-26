@@ -13,7 +13,6 @@ import {
     validateSession
 } from '../auth/userController';
 
-import { createRole, getAllRoles, getRoleById, updateRole, deleteRole } from '../auth/roleController';
 import { getUsers } from '../auth/BuyerController';
 
 const userRoutes = express.Router();
@@ -45,16 +44,10 @@ userRoutes.get('/users', ensureAuthenticated, authorize(["admin", "owner"]), get
 userRoutes.post('/logout', ensureAuthenticated, logoutUser);
 
 // EXAMPLE ROUTE WITH ROLE-BASED AUTHORIZATION (Add roles based on your app's needs)
-// Only accessible to users with role_id 1 (admin)
+// Only accessible to users with admin role
 userRoutes.get('/admin', ensureAuthenticated, authorize(["admin"]), (req, res) => {
   res.json({ message: 'Admin route accessed!' });
 });
-
-userRoutes.post('/role', createRole);
-userRoutes.get('/role', getAllRoles);
-userRoutes.get('/role/:id', getRoleById);
-userRoutes.put('/role/:id', updateRole);
-userRoutes.delete('/role/:id', deleteRole);
 
 userRoutes.get("/validate-session", ensureAuthenticated, validateSession);
 
