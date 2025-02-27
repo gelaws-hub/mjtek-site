@@ -9,22 +9,9 @@ const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const { userData } = useUserData();
 
-  const handleLogout = async () => {
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/logout`, {
-        method: "POST",
-        credentials: "include",
-      });
-
-      if (response.ok) {
-        Cookies.remove("accessToken");
-        window.location.reload(); // Reload page to reset application state
-      } else {
-        console.error("Failed to logout");
-      }
-    } catch (error) {
-      console.error("Error during logout:", error);
-    }
+  const handleLogout = () => {
+    Cookies.remove("your-cookie-name"); // Clear the cookie
+    // Add any additional logout logic here
   };
 
   return (
