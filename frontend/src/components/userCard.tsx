@@ -26,10 +26,12 @@ export default function UserCard({
   btnTrigger,
   userData,
   onLogout,
+  logoutLoading,
 }: {
   btnTrigger: React.ReactNode;
   userData: UserData;
   onLogout?: () => void;
+  logoutLoading?: boolean;
 }) {
   const [loading, setLoading] = useState(false);
   const [editMode, setEditMode] = useState<{
@@ -102,7 +104,7 @@ export default function UserCard({
   };
 
   const saveChanges = async (field: keyof typeof tempUserData) => {
-    if (!tempUserData[field].trim()) {
+    if (!tempUserData[field]?.trim()) {
       toast.error("Input tidak boleh kosong.");
       return;
     }
@@ -218,7 +220,7 @@ export default function UserCard({
   return (
     <Dialog>
       <DialogTrigger asChild>{btnTrigger}</DialogTrigger>
-      <DialogContent className="w-[90%] max-w-md rounded-md bg-inherit">
+      <DialogContent className="w-[90%] max-w-md rounded-md bg-inherit" >
         <DialogHeader>
           <DialogTitle>Biodata Diri</DialogTitle>
         </DialogHeader>
@@ -230,7 +232,7 @@ export default function UserCard({
                 <User className="h-16 w-16" />
               </AvatarFallback>
             </Avatar>
-            <Button asChild variant="outline" className="w-full max-w-[200px]">
+            {/* <Button asChild variant="outline" className="w-full max-w-[200px]">
               <label htmlFor="upload-photo">
                 {loading ? "Uploading..." : "Choose Photo"}
                 <input
@@ -241,7 +243,7 @@ export default function UserCard({
                   onChange={handleProfilePictureChange}
                 />
               </label>
-            </Button>
+            </Button> */}
           </div>
           <div className="space-y-4">
             {["name", "phone_number"].map((field) => (
@@ -369,8 +371,8 @@ export default function UserCard({
             >
               {loading ? "Processing..." : "Ganti Password"}
             </Button>
-            <Button onClick={handleLogout} variant="outline" className="w-full">
-              Logout
+            <Button onClick={onLogout} variant="outline" className="w-full" disabled={logoutLoading}>
+              {logoutLoading ? "Loading..." : "Logout"}
             </Button>
           </div>
         </div>
