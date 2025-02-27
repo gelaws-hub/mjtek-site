@@ -1,22 +1,46 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useMemo } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 import SidebarItem from "@/components/tailadmin/Sidebar/SidebarItem";
 import ClickOutside from "@/components/tailadmin/ClickOutside";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { menuGroups } from "./SidebarMenu";
+import Cookies from "js-cookie";
+import { jwtDecode } from "jwt-decode";
 
 interface SidebarProps {
   sidebarOpen: boolean;
   setSidebarOpen: (arg: boolean) => void;
 }
 
+interface JwtPayload {
+  role_name: string;
+}
+
 const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const pathname = usePathname();
   const [pageName, setPageName] = useLocalStorage("selectedMenu", "dashboard");
+
+  const token = Cookies.get("accessToken");
+  let role = "";
+
+  if (token) {
+    try {
+      const decoded = jwtDecode<JwtPayload>(token);
+      role = decoded.role_name.toLowerCase();
+    } catch (error) {
+      console.error("Unable to decode token:", error);
+    }
+  }
+
+  // Filter menuGroups if the role is "admin"
+  const filteredMenuGroups = useMemo(() => {
+    return role !== "owner"
+      ? menuGroups.filter((group) => group.name !== "Owner Menu")
+      : menuGroups;
+  }, [role]);
 
   return (
     <ClickOutside onClick={() => setSidebarOpen(false)}>
@@ -25,9 +49,13 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        {/* <!-- SIDEBAR HEADER --> */}
-        <div className="flex items-center justify-between gap-2 px-6 py-5.5 lg:py-6.5">
-          <Link scroll={false} href="/admin" className="flex items-center gap-2">
+        {/* SIDEBAR HEADER */}
+        <div className="flex items-center justify-between px-4 py-5.5 lg:px-6 lg:py-6.5">
+          <Link
+            scroll={false}
+            href="/admin"
+            className="flex flex-1 items-center gap-2.5"
+          >
             <img
               width={32}
               height={32}
@@ -35,9 +63,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               alt="Logo"
               className="rounded-lg dark:fill-white"
             />
-            <h2 className="text-lg text-white font-semibold">
-              MJ teknologi
-            </h2>
+            <h2 className="text-2xl font-semibold text-white">MJ Teknologi</h2>
           </Link>
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -59,12 +85,12 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
             </svg>
           </button>
         </div>
-        {/* <!-- SIDEBAR HEADER --> */}
+        {/* SIDEBAR HEADER */}
 
         <div className="no-scrollbar flex flex-col overflow-y-auto duration-300 ease-linear">
-          {/* <!-- Sidebar Menu --> */}
+          {/* Sidebar Menu */}
           <nav className="mt-5 px-4 py-4 lg:mt-9 lg:px-6">
-            {menuGroups.map((group, groupIndex) => (
+            {filteredMenuGroups.map((group, groupIndex) => (
               <div key={groupIndex}>
                 <h3 className="mb-4 ml-4 text-sm font-semibold text-bodydark2">
                   {group.name}
@@ -83,7 +109,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               </div>
             ))}
           </nav>
-          {/* <!-- Sidebar Menu --> */}
+          {/* Sidebar Menu */}
         </div>
       </aside>
     </ClickOutside>

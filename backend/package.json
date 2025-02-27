@@ -42,10 +42,12 @@
     "prisma": "^6.0.1",
     "qrcode": "^1.5.4",
     "short-unique-id": "^5.2.0",
-    "ts-node": "^10.9.2",
     "tsc": "^2.0.4",
     "typescript": "^5.5.2",
     "uuid": "^10.0.0"
   },
-  "description": "A Backend App For MJ Teknologi Semarang"
+  "description": "A Backend App For MJ Teknologi Semarang",
+  "devDependencies": {
+    "ts-node": "^10.9.2"
+  }
 }

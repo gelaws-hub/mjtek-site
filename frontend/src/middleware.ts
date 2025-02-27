@@ -40,9 +40,10 @@ export function middleware(req: NextRequest) {
     const roleRoutes = {
       buyer: [/^\/cart(\/.*)?$/, /^\/favorite(\/.*)?$/, /^\/transactions(\/.*)?$/],
       admin: [/^\/admin(\/.*)?$/],
+      owner: [/^\/admin(\/.*)?$/], // Allow owners to access admin routes
     };
 
-    const allowedRoutes = roleRoutes[role as "buyer" | "admin"];
+    const allowedRoutes = roleRoutes[role as "buyer" | "admin" | "owner"];
     const isAuthorized = allowedRoutes?.some((route) => route.test(pathname));
 
     if (isAuthorized) {

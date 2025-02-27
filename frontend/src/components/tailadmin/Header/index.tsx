@@ -56,13 +56,17 @@ const Header = (props: {
           </button>
           {/* <!-- Hamburger Toggle BTN --> */}
 
-          <Link scroll={false} className="block flex-shrink-0 lg:hidden" href="/">
+          <Link
+            scroll={false}
+            className="block flex-shrink-0 lg:hidden"
+            href="/"
+          >
             <img
               width={32}
               height={32}
               src={"/logo_mjtek.png"}
               alt="Logo"
-              className="dark:fill-white rounded-lg"
+              className="rounded-lg dark:fill-white"
             />
           </Link>
         </div>
@@ -110,11 +114,11 @@ const Header = (props: {
             {/* <!-- Dark Mode Toggler --> */}
 
             {/* <!-- Notification Menu Area --> */}
-            <DropdownNotification />
+            {/* <DropdownNotification /> */}
             {/* <!-- Notification Menu Area --> */}
 
             {/* <!-- Chat Notification Area --> */}
-            <DropdownMessage />
+            {/* <DropdownMessage /> */}
             {/* <!-- Chat Notification Area --> */}
           </ul>
 
