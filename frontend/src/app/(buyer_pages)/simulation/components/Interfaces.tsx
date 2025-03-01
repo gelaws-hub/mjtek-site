@@ -38,6 +38,7 @@ export interface SimMeta {
 
 export interface SimData {
   CPU: null | Product;
+  Cooling: null | Product;
   Mobo: null | Product;
   Ram: null | Product;
   Vga: null | Product;

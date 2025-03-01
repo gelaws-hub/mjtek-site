@@ -42,6 +42,7 @@ export default function MainComponentSim({
 
   const [selectedComponents, setSelectedComponents] = useState<SimData>({
     CPU: null as Product | null,
+    Cooling: null as Product | null,
     Mobo: null as Product | null,
     Ram: null as Product | null,
     Vga: null as Product | null,
@@ -173,6 +174,7 @@ export default function MainComponentSim({
   const handleConfirmReset = () => {
     setSelectedComponents({
       CPU: null,
+      Cooling: null,
       Mobo: null,
       Ram: null,
       Vga: null,
@@ -369,6 +371,22 @@ export default function MainComponentSim({
                     handleComponentChange("CPU", product)
                   }
                   onDelete={() => handleComponentChange("CPU", null)}
+                />
+              </div>
+              {/* Cooling */}
+              <div className="">
+                <h3 className="text-sm font-semibold text-gray-700 md:mb-2 md:text-lg">
+                  Pilih Cooling CPU
+                </h3>
+                <ComponentSelection
+                  initialProduct={selectedComponents.Cooling}
+                  categoryId="15"
+                  socketId={selectedComponents.SocketId}
+                  ramTypeId=""
+                  onAddToSimulation={(product) =>
+                    handleComponentChange("Cooling", product)
+                  }
+                  onDelete={() => handleComponentChange("Cooling", null)}
                 />
               </div>
               {/* Motherboard */}
