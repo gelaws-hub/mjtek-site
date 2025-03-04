@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { errorToast, successToast } from "../toast/reactToastify";
 import { Button } from "../ui/button";
+import { useRouter } from "next/navigation";
 
 export default function AddToCartButton({
   product_id,
@@ -14,6 +15,7 @@ export default function AddToCartButton({
   className?: string;
 }) {
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const toCart = async (product_id: string, quantity = 1) => {
     setIsLoading(true);
@@ -29,6 +31,12 @@ export default function AddToCartButton({
         }),
         credentials: "include",
       });
+
+      if(response.status === 401) {
+        errorToast("Anda harus login terlebih dahulu", "top-left");
+        setIsLoading(false);
+        return;
+      }
 
       if (response.status >= 400 && response.status < 500) {
         errorToast("Produk tidak memiliki stok yang cukup", "top-left");
