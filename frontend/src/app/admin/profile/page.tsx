@@ -1,9 +1,7 @@
 'use client';
 
 import Breadcrumb from "@/components/tailadmin/Breadcrumbs/Breadcrumb";
-import Image from "next/image";
 import DefaultLayout from "@/components/tailadmin/Layouts/DefaultLayout";
-import Link from "next/link";
 import { useState } from "react";
 import useUserData from "@/hooks/useUserData";
 import { toast } from "react-toastify";
@@ -11,39 +9,6 @@ import { toast } from "react-toastify";
 const Profile = () => {
   const { userData } = useUserData();
   const [loading, setLoading] = useState(false);
-  const [editMode, setEditMode] = useState(false);
-  const [newName, setNewName] = useState("");
-
-  const handleEditName = async () => {
-    if (!newName.trim()) {
-      toast.error("Name cannot be empty");
-      return;
-    }
-    setLoading(true);
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/profile/user/${userData?.id}/edit-profile`, {
-        method: "PUT",
-        headers: { 
-          "Content-Type": "application/json"
-        },
-        credentials: "include",
-        body: JSON.stringify({ name: newName }),
-      });
-
-      if (response.ok) {
-        toast.success("Name updated successfully");
-        setEditMode(false);
-        window.location.reload();
-      } else {
-        const errorData = await response.json();
-        toast.error(errorData.message || "Failed to update name");
-      }
-    } catch (error) {
-      toast.error("An error occurred. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleChangePassword = async () => {
     setLoading(true);
@@ -87,59 +52,13 @@ const Profile = () => {
               </div>
             </div>
             <div className="mt-4">
-              {editMode ? (
-                <div className="flex items-center justify-center gap-2">
-                  <input
-                    type="text"
-                    value={newName}
-                    onChange={(e) => setNewName(e.target.value)}
-                    className="rounded border px-2 py-1"
-                    placeholder="Enter new name"
-                  />
-                  <button
-                    onClick={handleEditName}
-                    disabled={loading}
-                    className="rounded bg-primary px-3 py-1 text-white hover:bg-opacity-90"
-                  >
-                    {loading ? "Saving..." : "Save"}
-                  </button>
-                  <button
-                    onClick={() => setEditMode(false)}
-                    className="rounded border px-3 py-1 hover:bg-gray-100"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              ) : (
-                <div className="flex items-center justify-center gap-2">
-                  <h3 className="mb-1.5 text-2xl font-semibold text-black dark:text-white">
-                    {userData?.name}
-                  </h3>
-                  <button
-                    onClick={() => {
-                      setNewName(userData?.name || "");
-                      setEditMode(true);
-                    }}
-                    className="rounded-full p-1 hover:bg-gray-100"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
-                    </svg>
-                  </button>
-                </div>
-              )}
-              <p className="font-medium">{userData?.role_name}</p>
-              <div className="mt-4 flex justify-center">
+              <div className="flex flex-col items-center justify-center gap-2">
+                <h3 className="mb-1.5 text-2xl font-semibold text-black dark:text-white">
+                  {userData?.name}
+                </h3>
+                <p className="font-medium text-black dark:text-white">{userData?.role_name}</p>
+              </div>
+              <div className="mt-6">
                 <button
                   onClick={handleChangePassword}
                   disabled={loading}
