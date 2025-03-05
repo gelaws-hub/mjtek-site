@@ -8,10 +8,32 @@ import Cookies from "js-cookie"; // Import js-cookie
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const { userData } = useUserData();
+  const [loading, setLoading] = useState(false);
 
-  const handleLogout = () => {
-    Cookies.remove("your-cookie-name"); // Clear the cookie
-    // Add any additional logout logic here
+  const handleLogout = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/logout`,
+        {
+          method: "POST",
+          credentials: "include",
+        }
+      );
+
+      if (response.ok) {
+        Cookies.remove("accessToken");
+        window.location.reload();
+      }
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Error logging out:", errorData);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -92,7 +114,7 @@ const DropdownUser = () => {
                 My Profile
               </Link>
             </li>
-            <li>
+            {/* <li>
               <Link
                 scroll={false}
                 href="#"
@@ -113,8 +135,8 @@ const DropdownUser = () => {
                 </svg>
                 My Contacts
               </Link>
-            </li>
-            <li>
+            </li> */}
+            {/* <li>
               <Link
                 scroll={false}
                 href="/settings"
@@ -139,11 +161,12 @@ const DropdownUser = () => {
                 </svg>
                 Account Settings
               </Link>
-            </li>
+            </li> */}
           </ul>
           <button
-            onClick={handleLogout} // Add onClick handler
-            className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
+            onClick={handleLogout}
+            disabled={loading}
+            className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base disabled:opacity-50"
           >
             <svg
               className="fill-current"
@@ -162,7 +185,7 @@ const DropdownUser = () => {
                 fill=""
               />
             </svg>
-            Log Out
+            {loading ? "Logging out..." : "Log Out"}
           </button>
         </div>
       )}
