@@ -21,7 +21,6 @@ const tempNavItems = [
   { id: 7, category_name: "HDD" },
   { id: 8, category_name: "Casing" },
   { id: 9, category_name: "PSU" },
-  { id: 10, category_name: "PC Ready" },
   { id: 11, category_name: "Peripheral" },
   { id: 12, category_name: "Komputer Rakitan" },
   { id: 13, category_name: "Laptop" },
