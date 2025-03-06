@@ -48,9 +48,9 @@ userRoutes.post('/change-password', ensureAuthenticated, requestChangePassword);
 // LOGOUT USER (Protected route - user must be authenticated)
 userRoutes.post('/logout', ensureAuthenticated, logoutUser);
 
-// EXAMPLE ROUTE WITH ROLE-BASED AUTHORIZATION (Add roles based on your app's needs)
-// Only accessible to users with role_id 1 (admin)
-userRoutes.get('/admin', ensureAuthenticated, authorize(["admin"]), (req, res) => {
+// EXAMPLE ROUTE WITH ROLE-BASED AUTHORIZATION
+// Accessible to both admin and owner roles
+userRoutes.get('/admin', ensureAuthenticated, authorize(["admin", "owner"]), (req, res) => {
   res.json({ message: 'Admin route accessed!' });
 });
 

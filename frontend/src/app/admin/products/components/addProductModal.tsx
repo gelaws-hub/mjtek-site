@@ -15,11 +15,32 @@ interface AddProductModalProps {
   onClose: () => void;
 }
 
+interface Category {
+  id: number;
+  category_name: string;
+}
+
+interface SubCategory {
+  id: number;
+  sub_category_name: string;
+}
+
+interface Brand {
+  id: number;
+  brand_name: string;
+}
+
+interface ProductInfo {
+  categories: Category[];
+  subCategories: SubCategory[];
+  brands: Brand[];
+}
+
 export default function AddProductModal({
   isOpen,
   onClose,
 }: AddProductModalProps) {
-  const [productInfo, setProductInfo] = useState({
+  const [productInfo, setProductInfo] = useState<ProductInfo>({
     categories: [],
     subCategories: [],
     brands: [],
@@ -140,6 +161,119 @@ export default function AddProductModal({
       theme: "light",
       transition: Bounce,
     });
+
+  const handleCreateNewCategory = async (categoryName: string) => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/category`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ category_name: categoryName }),
+          credentials: "include",
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to create category");
+      }
+
+      const newCategory = await response.json();
+      
+      // Update local state with new category
+      setProductInfo(prev => ({
+        ...prev,
+        categories: [...prev.categories, newCategory.data],
+      }));
+
+      // Select the newly created category
+      handleCombobox("categoryId", newCategory.data.id.toString());
+      
+      toast.success("Category created successfully!", {
+        position: "bottom-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
+    } catch (error) {
+      console.error("Error creating category:", error);
+      toast.error("Failed to create category!", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        transition: Bounce,
+      });
+    }
+  };
+
+  const handleEditCategory = async (option: any) => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/category/${option.value}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ category_name: option.label }),
+          credentials: "include",
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to update category");
+      }
+
+      const updatedCategory = await response.json();
+      
+      // Update local state with edited category
+      setProductInfo(prev => ({
+        ...prev,
+        categories: prev.categories.map((cat: any) =>
+          cat.id.toString() === option.value
+            ? { ...cat, category_name: option.label }
+            : cat
+        ),
+      }));
+
+      toast.success("Category updated successfully!", {
+        position: "bottom-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
+    } catch (error) {
+      console.error("Error updating category:", error);
+      toast.error("Failed to update category!", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        transition: Bounce,
+      });
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -286,6 +420,8 @@ export default function AddProductModal({
                     label: category.category_name,
                     value: category.id.toString(),
                   }))}
+                  onAddNew={handleCreateNewCategory}
+                  onEdit={handleEditCategory}
                 />
               </div>
               <div>

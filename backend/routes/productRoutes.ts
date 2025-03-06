@@ -19,10 +19,10 @@ productRoutes.get("/sim-product", searchSimProducts);
 productRoutes.get("/product/:id", getProductById);
 
 // Admin only routes
-productRoutes.post("/product", ensureAuthenticated, authorize(["admin"]), createFullDetailProduct);
-productRoutes.put("/product/:id", ensureAuthenticated, authorize(["admin"]), updateProduct);
-productRoutes.patch("/product/:id", ensureAuthenticated, authorize(["admin"]), partialUpdateProduct);
-productRoutes.delete("/product/:id", ensureAuthenticated, authorize(["admin"]), deleteProduct);
+productRoutes.post("/product", ensureAuthenticated, authorize(["admin", "owner"]), createFullDetailProduct);
+productRoutes.put("/product/:id", ensureAuthenticated, authorize(["admin", "owner"]), updateProduct);
+productRoutes.patch("/product/:id", ensureAuthenticated, authorize(["admin", "owner"]), partialUpdateProduct);
+productRoutes.delete("/product/:id", ensureAuthenticated, authorize(["admin", "owner"]), deleteProduct);
 productRoutes.get("/admin-products", ensureAuthenticated, authorize(["admin", "owner"]), getAllProducts);
 productRoutes.post("/admin-products", ensureAuthenticated, authorize(["admin", "owner"]), bulkCreateProducts);
 
