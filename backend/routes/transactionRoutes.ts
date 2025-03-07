@@ -12,7 +12,7 @@ import { cancelTransaction, createTransaction, getAllTransactionsFromUser, getTr
 
 import { authorize, ensureAuthenticated } from "../auth/userController";
 import { getAllTransactions } from "../controllers/transaksi/searchTransactionController";
-import { uploadTransactionProof } from "../controllers/transaksi/uploadPaymentProof";
+import { uploadTransactionProof, getTransactionProof } from "../controllers/transaksi/uploadPaymentProof";
 import { getUserAddress, updateUserAddress } from "../controllers/transaksi/addressController";
 
 const transaksiRoutes = express.Router();
