@@ -13,9 +13,13 @@ import { cancelTransaction, createTransaction, getAllTransactionsFromUser, getTr
 import { authorize, ensureAuthenticated } from "../auth/userController";
 import { getAllTransactions } from "../controllers/transaksi/searchTransactionController";
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { uploadTransactionProof, getTransactionProof } from "../controllers/transaksi/uploadPaymentProof";
 =======
 import { uploadTransactionProof } from "../controllers/transaksi/uploadPaymentProof";
+=======
+import { uploadTransactionProof, getTransactionProof } from "../controllers/transaksi/uploadPaymentProof";
+>>>>>>> 5677430 (Update transactionRoutes.ts)
 import { getUserAddress, updateUserAddress } from "../controllers/transaksi/addressController";
 >>>>>>> f0a5597 (add transaction address controller)
 
