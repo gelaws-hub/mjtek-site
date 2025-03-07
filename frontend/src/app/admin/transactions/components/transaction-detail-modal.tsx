@@ -101,6 +101,41 @@ export default function TransactionDetailModal({
               {formatPrice(transaction.total_price)}
             </span>
           </p>
+
+          {/* Payment Proof Section */}
+          {transaction.payment_proof && (
+            <div className="mt-4 border-t pt-4">
+              <h3 className="mb-2 text-lg font-semibold">Bukti Pembayaran</h3>
+              <div className="flex flex-col space-y-4">
+                <div className="w-full max-h-[400px] overflow-hidden rounded-lg border">
+                  {transaction.payment_proof.match(/\.(jpg|jpeg|png|gif)$/i) ? (
+                    <img
+                      src={transaction.payment_proof}
+                      alt="Bukti Pembayaran"
+                      className="w-full h-full object-contain"
+                      style={{ maxHeight: '400px' }}
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center h-[200px] bg-gray-100 dark:bg-gray-800">
+                      <p className="text-gray-500">Dokumen Bukti Pembayaran</p>
+                    </div>
+                  )}
+                </div>
+                <div className="flex justify-end">
+                  <a
+                    href={transaction.payment_proof}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+                  >
+                    {transaction.payment_proof.match(/\.(jpg|jpeg|png|gif)$/i) 
+                      ? 'Buka Gambar di Tab Baru' 
+                      : 'Unduh Bukti Pembayaran'}
+                  </a>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Buttons */}

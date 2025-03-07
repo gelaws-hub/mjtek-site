@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import multer from "multer";
 import path from "path";
-import { uploadFileToGoogleCloud, deleteFileFromGoogleCloud } from "../../utils/googleStorage";
+import { uploadFileToGoogleCloud, deleteFileFromGoogleCloud, getFileFromGoogleCloud } from "../../utils/googleStorage";
 import prisma from "../../utils/database";
 
 // Set up multer to handle file uploads in memory (for Google Cloud Storage)
@@ -63,4 +63,60 @@ export const uploadTransactionProof = async (req: Request, res: Response) => {
       res.status(500).json({ error: "Failed to upload transaction proof." });
     }
   });
+};
+
+export const getTransactionProof = async (req: Request, res: Response) => {
+  try {
+    const transactionId = req.params.transactionId;
+
+    const transaction = await prisma.transaction.findUnique({
+      where: { id: transactionId },
+      select: {
+        id: true,
+        payment_proof: true,
+        status_id: true,
+      }
+    });
+
+    if (!transaction) {
+      return res.status(404).json({ error: "Transaction not found." });
+    }
+
+    if (!transaction.payment_proof) {
+      return res.status(404).json({ error: "No payment proof found for this transaction." });
+    }
+
+    // Extract filename from the full URL
+    const filename = transaction.payment_proof.split('/').pop();
+    if (!filename) {
+      return res.status(404).json({ error: "Invalid payment proof URL." });
+    }
+
+    try {
+      // Use the full path including the payment_proof directory
+      const filePath = `payment_proof/${filename}`;
+      const fileBuffer = await getFileFromGoogleCloud(filePath);
+      
+      // Get the file extension from the filename
+      const ext = path.extname(filename);
+      
+      // Set appropriate content type based on file extension
+      const contentType = ext.toLowerCase() === '.pdf' ? 'application/pdf' : 
+                         ext.toLowerCase() === '.png' ? 'image/png' :
+                         ext.toLowerCase() === '.jpg' || ext.toLowerCase() === '.jpeg' ? 'image/jpeg' :
+                         'application/octet-stream';
+      
+      res.setHeader('Content-Type', contentType);
+      res.setHeader('Content-Disposition', `inline; filename="payment_proof_${transactionId}${ext}"`);
+      
+      // Send the file
+      res.send(fileBuffer);
+    } catch (error) {
+      console.error("Error downloading file:", error);
+      return res.status(404).json({ error: "File not found in storage." });
+    }
+  } catch (error: any) {
+    console.error("Error retrieving payment proof:", error);
+    res.status(500).json({ error: "Failed to retrieve payment proof." });
+  }
 };

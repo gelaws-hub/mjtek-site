@@ -22,6 +22,7 @@ export type Transaction = {
     end_time: string | null;
     status: TransactionStatus;
     products: Product[];
+    payment_proof: string | null;
   };
   
 export interface TransactionStatus {
