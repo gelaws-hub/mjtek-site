@@ -86,14 +86,16 @@ export const getTransactionProof = async (req: Request, res: Response) => {
       return res.status(404).json({ error: "No payment proof found for this transaction." });
     }
 
-    // Extract filename from the full URL or path
-    const filename = transaction.payment_proof.split('/').pop();
-    if (!filename) {
-      return res.status(404).json({ error: "Invalid payment proof URL." });
-    }
-
     try {
-      // Get the file from Google Cloud Storage
+      // Extract filename from the Google Cloud Storage URL
+      const urlParts = transaction.payment_proof.split('/');
+      const filename = urlParts[urlParts.length - 1]; // Get the last part of the URL
+
+      if (!filename) {
+        return res.status(404).json({ error: "Invalid payment proof URL." });
+      }
+
+      // The file path in Google Cloud Storage should be just 'payment_proof/filename'
       const filePath = `payment_proof/${filename}`;
       const fileBuffer = await getFileFromGoogleCloud(filePath);
       
@@ -108,6 +110,7 @@ export const getTransactionProof = async (req: Request, res: Response) => {
       // Set response headers
       res.setHeader('Content-Type', contentType);
       res.setHeader('Content-Disposition', `inline; filename="payment_proof_${transactionId}${ext}"`);
+      res.setHeader('Cache-Control', 'public, max-age=31536000'); // Cache for 1 year
       
       // Send the file
       return res.send(fileBuffer);

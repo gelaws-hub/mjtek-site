@@ -10,6 +10,7 @@ import {
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import InvoicePDF from "@/components/transaction/invoicePdf";
 import Link from "next/link";
+import { useState } from "react";
 
 interface TransactionDetailModalProps {
   transaction: Transaction;
@@ -20,6 +21,8 @@ export default function TransactionDetailModal({
   transaction,
   onClose,
 }: TransactionDetailModalProps) {
+  const [isImageLoading, setIsImageLoading] = useState(true);
+
   const formatPrice = (price: string | number) => {
     return new Intl.NumberFormat("id-ID", {
       style: "currency",
@@ -39,7 +42,7 @@ export default function TransactionDetailModal({
 
   // Function to get the payment proof URL using the transaction ID
   const getProofUrl = (transactionId: string) => {
-    return `/api/admin/transaction-proof/${transactionId}`;
+    return `${process.env.NEXT_PUBLIC_API_URL}/admin/transaction-proof/${transactionId}`;
   };
 
   return (
@@ -112,19 +115,28 @@ export default function TransactionDetailModal({
             <div className="mt-4 border-t pt-4">
               <h3 className="mb-2 text-lg font-semibold">Bukti Pembayaran</h3>
               <div className="flex flex-col space-y-4">
-                <div className="w-full max-h-[400px] overflow-hidden rounded-lg border">
+                <div className="w-full max-h-[400px] overflow-hidden rounded-lg border relative">
                   {transaction.payment_proof.match(/\.(jpg|jpeg|png|gif)$/i) ? (
-                    <img
-                      src={getProofUrl(transaction.id)}
-                      alt="Bukti Pembayaran"
-                      className="w-full h-full object-contain"
-                      style={{ maxHeight: '400px' }}
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.onerror = null;
-                        target.src = '/images/placeholder-image.png';
-                      }}
-                    />
+                    <>
+                      {isImageLoading && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-800">
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white"></div>
+                        </div>
+                      )}
+                      <img
+                        src={getProofUrl(transaction.id)}
+                        alt="Bukti Pembayaran"
+                        className="w-full h-full object-contain"
+                        style={{ maxHeight: '400px' }}
+                        onLoad={() => setIsImageLoading(false)}
+                        onError={(e) => {
+                          setIsImageLoading(false);
+                          const target = e.target as HTMLImageElement;
+                          target.onerror = null;
+                          target.src = '/images/placeholder-image.png';
+                        }}
+                      />
+                    </>
                   ) : (
                     <div className="flex items-center justify-center h-[200px] bg-gray-100 dark:bg-gray-800">
                       <p className="text-gray-500">Dokumen Bukti Pembayaran</p>
