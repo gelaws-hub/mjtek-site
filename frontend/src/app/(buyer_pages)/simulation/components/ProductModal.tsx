@@ -190,7 +190,7 @@ export default function ProductModal({
               disabled={currentPage >= responseData.totalPages}
               onClick={() => handlePageChange(currentPage + 1)}
             >
-              Prev
+              Next
             </Button>
           </DialogFooter>
         )}
