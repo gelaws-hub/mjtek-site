@@ -118,7 +118,7 @@ export default function CategoryPage() {
         </Button>
         <span>{pageParam} dari {data?.totalPages}</span>
         <Button onClick={() => changeParams(Number(pageParam) + 1)} disabled={products.length < 10}>
-          Prev
+          Next
         </Button>
       </div>
     </div>
