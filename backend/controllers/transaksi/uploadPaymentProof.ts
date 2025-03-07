@@ -69,12 +69,12 @@ export const getTransactionProof = async (req: Request, res: Response) => {
   try {
     const transactionId = req.params.transactionId;
 
+    // Get the transaction and verify it exists
     const transaction = await prisma.transaction.findUnique({
       where: { id: transactionId },
       select: {
         id: true,
         payment_proof: true,
-        status_id: true,
       }
     });
 
@@ -86,37 +86,37 @@ export const getTransactionProof = async (req: Request, res: Response) => {
       return res.status(404).json({ error: "No payment proof found for this transaction." });
     }
 
-    // Extract filename from the full URL
+    // Extract filename from the full URL or path
     const filename = transaction.payment_proof.split('/').pop();
     if (!filename) {
       return res.status(404).json({ error: "Invalid payment proof URL." });
     }
 
     try {
-      // Use the full path including the payment_proof directory
+      // Get the file from Google Cloud Storage
       const filePath = `payment_proof/${filename}`;
       const fileBuffer = await getFileFromGoogleCloud(filePath);
       
-      // Get the file extension from the filename
-      const ext = path.extname(filename);
+      // Set content type based on file extension
+      const ext = path.extname(filename).toLowerCase();
+      const contentType = 
+        ext === '.pdf' ? 'application/pdf' :
+        ext === '.png' ? 'image/png' :
+        ext === '.jpg' || ext === '.jpeg' ? 'image/jpeg' :
+        'application/octet-stream';
       
-      // Set appropriate content type based on file extension
-      const contentType = ext.toLowerCase() === '.pdf' ? 'application/pdf' : 
-                         ext.toLowerCase() === '.png' ? 'image/png' :
-                         ext.toLowerCase() === '.jpg' || ext.toLowerCase() === '.jpeg' ? 'image/jpeg' :
-                         'application/octet-stream';
-      
+      // Set response headers
       res.setHeader('Content-Type', contentType);
       res.setHeader('Content-Disposition', `inline; filename="payment_proof_${transactionId}${ext}"`);
       
       // Send the file
-      res.send(fileBuffer);
+      return res.send(fileBuffer);
     } catch (error) {
-      console.error("Error downloading file:", error);
+      console.error("Error retrieving file from storage:", error);
       return res.status(404).json({ error: "File not found in storage." });
     }
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error retrieving payment proof:", error);
-    res.status(500).json({ error: "Failed to retrieve payment proof." });
+    return res.status(500).json({ error: "Failed to retrieve payment proof." });
   }
 };
