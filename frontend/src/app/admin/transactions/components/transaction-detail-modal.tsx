@@ -37,6 +37,11 @@ export default function TransactionDetailModal({
     });
   };
 
+  // Function to get the payment proof URL using the transaction ID
+  const getProofUrl = (transactionId: string) => {
+    return `/api/admin/transaction-proof/${transactionId}`;
+  };
+
   return (
     <Dialog open={true} onOpenChange={onClose}>
       <DialogContent className="z-[999] max-w-[90%] rounded-lg bg-white dark:bg-boxdark dark:text-white md:max-w-[620px]">
@@ -110,10 +115,15 @@ export default function TransactionDetailModal({
                 <div className="w-full max-h-[400px] overflow-hidden rounded-lg border">
                   {transaction.payment_proof.match(/\.(jpg|jpeg|png|gif)$/i) ? (
                     <img
-                      src={transaction.payment_proof}
+                      src={getProofUrl(transaction.id)}
                       alt="Bukti Pembayaran"
                       className="w-full h-full object-contain"
                       style={{ maxHeight: '400px' }}
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.onerror = null;
+                        target.src = '/images/placeholder-image.png';
+                      }}
                     />
                   ) : (
                     <div className="flex items-center justify-center h-[200px] bg-gray-100 dark:bg-gray-800">
@@ -123,7 +133,7 @@ export default function TransactionDetailModal({
                 </div>
                 <div className="flex justify-end">
                   <a
-                    href={transaction.payment_proof}
+                    href={getProofUrl(transaction.id)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
