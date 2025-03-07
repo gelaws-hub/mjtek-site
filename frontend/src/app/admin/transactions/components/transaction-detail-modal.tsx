@@ -110,7 +110,7 @@ export default function TransactionDetailModal({
                 <div className="w-full max-h-[400px] overflow-hidden rounded-lg border">
                   {transaction.payment_proof.match(/\.(jpg|jpeg|png|gif)$/i) ? (
                     <img
-                      src={`${process.env.NEXT_PUBLIC_API_URL}/admin/transaction-proof/${transaction.id}`}
+                      src={transaction.payment_proof}
                       alt="Bukti Pembayaran"
                       className="w-full h-full object-contain"
                       style={{ maxHeight: '400px' }}
@@ -123,7 +123,7 @@ export default function TransactionDetailModal({
                 </div>
                 <div className="flex justify-end">
                   <a
-                    href={`${process.env.NEXT_PUBLIC_API_URL}/admin/transaction-proof/${transaction.id}`}
+                    href={transaction.payment_proof}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
