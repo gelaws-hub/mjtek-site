@@ -8,7 +8,8 @@ import CartFooter from "./components/cartFooter";
 import { ProductCardItemProps } from "@/components/product/ProductInterface";
 import { ProductRecommendation } from "@/components/product/ProductRecommendation";
 import { errorToast, successToast } from "@/components/toast/reactToastify";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { ConfirmAddressDialog } from "./components/Dialog";
 
 export default function CartPage() {
   const [cartItems, setCartItems] = useState<CartItemType[]>([]);
@@ -262,52 +263,57 @@ export default function CartPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <CartHeader
-        totalItems={totalItems}
-        totalWeight={totalWeight}
-        onDeleteAll={() => handleDelete()}
-      />
-      {cartItems.length !== 0 && (
-        <div className="mb-1 border-b p-2">
-          <label className="flex cursor-pointer items-center">
-            <input
-              type="checkbox"
-              checked={cartItems.every((item) => item.is_selected)}
-              onChange={(e) => handleCheckAll(e.target.checked)}
-              className="m-1 h-3 w-3 cursor-pointer rounded border-gray-300 text-blue-600 focus:ring-1 focus:ring-blue-500"
+    <>
+      <div className="flex min-h-screen flex-col">
+        <CartHeader
+          totalItems={totalItems}
+          totalWeight={totalWeight}
+          onDeleteAll={() => handleDelete()}
+        />
+        {cartItems.length !== 0 && (
+          <div className="mb-1 border-b p-2">
+            <label className="flex cursor-pointer items-center">
+              <input
+                type="checkbox"
+                checked={cartItems.every((item) => item.is_selected)}
+                onChange={(e) => handleCheckAll(e.target.checked)}
+                className="m-1 h-3 w-3 cursor-pointer rounded border-gray-300 text-blue-600 focus:ring-1 focus:ring-blue-500"
+              />
+              Check semua
+            </label>
+          </div>
+        )}
+        <div className="flex-grow p-4">
+          {cartItems.map((item) => (
+            <CartItem
+              key={item.product_id}
+              item={item}
+              onQuantityChange={handleQuantityChange}
+              onCheckItem={handleCheckItem}
+              onDeleteItem={() => handleDelete}
+              onAddToFavorite={handleAddToFavorite}
+              isLoading={isLoading}
             />
-            Check semua
-          </label>
+          ))}
         </div>
-      )}
-      <div className="flex-grow p-4">
-        {cartItems.map((item) => (
-          <CartItem
-            key={item.product_id}
-            item={item}
-            onQuantityChange={handleQuantityChange}
-            onCheckItem={handleCheckItem}
-            onDeleteItem={() => handleDelete}
-            onAddToFavorite={handleAddToFavorite}
-            isLoading={isLoading}
+        {/* Product Recommendations */}
+        <div className="mt-12 space-y-4">
+          <h2 className="mb-4 text-2xl font-bold">
+            Rekomendasi Produk lainnya
+          </h2>
+          <ProductRecommendation
+            products={recommendedProducts}
+            afterAddToCart={setRefresh}
+            loading={reccomendationLoading}
           />
-        ))}
-      </div>
-      {/* Product Recommendations */}
-      <div className="mt-12 space-y-4">
-        <h2 className="mb-4 text-2xl font-bold">Rekomendasi Produk lainnya</h2>
-        <ProductRecommendation
-          products={recommendedProducts}
-          afterAddToCart={setRefresh}
-          loading={reccomendationLoading}
+        </div>
+        <CartFooter
+          onCheckout={handleCheckout}
+          totalPrice={checkedTotalPrice}
+          totalItems={checkedTotalItems}
         />
       </div>
-      <CartFooter
-        onCheckout={handleCheckout}
-        totalPrice={checkedTotalPrice}
-        totalItems={checkedTotalItems}
-      />
-    </div>
+      <ConfirmAddressDialog open={true} setOpen={() => {}} data={null} />
+    </>
   );
 }

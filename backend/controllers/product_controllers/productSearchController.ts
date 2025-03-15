@@ -68,13 +68,13 @@ export const getAllProducts = async (req: Request, res: Response) => {
       const [titleMatches, descriptionMatches, totalTitleCount, totalDescriptionCount] = await Promise.all([
         prisma.product.findMany({
           where: {
-            AND: [titleConditions, categoryFilter, compatibilityFilters, { is_deleted: false }],
+            AND: [titleConditions, categoryFilter, compatibilityFilters, { is_deleted: false }, { stock: { gt: 0 } }],
           },
           skip,
           take: limit,
           orderBy: [
+            { createdTime: "desc" },
             { stock: "desc" },
-            { createdTime: "desc" }, 
           ],
           include: {
             category: true,
@@ -93,11 +93,15 @@ export const getAllProducts = async (req: Request, res: Response) => {
               categoryFilter,
               compatibilityFilters,
               { is_deleted: false },
+              { stock: { gt: 0 } },
             ],
           },
           skip,
           take: limit,
-          orderBy: { id: "asc" },
+          orderBy: [
+            { createdTime: "desc" }, 
+            { stock: "desc" },
+          ],
           include: {
             category: true,
             sub_category: true,
@@ -109,7 +113,7 @@ export const getAllProducts = async (req: Request, res: Response) => {
         }),
         prisma.product.count({
           where: {
-            AND: [titleConditions, categoryFilter, compatibilityFilters, { is_deleted: false }],
+            AND: [titleConditions, categoryFilter, compatibilityFilters, { is_deleted: false }, { stock: { gt: 0 } }],
           },
         }),
         prisma.product.count({
@@ -120,6 +124,7 @@ export const getAllProducts = async (req: Request, res: Response) => {
               categoryFilter,
               compatibilityFilters,
               { is_deleted: false },
+              { stock: { gt: 0 } },
             ],
           },
         }),
@@ -131,8 +136,11 @@ export const getAllProducts = async (req: Request, res: Response) => {
       products = await prisma.product.findMany({
         skip,
         take: limit,
-        orderBy: { id: "asc" },
-        where: { ...categoryFilter, ...compatibilityFilters, is_deleted: false },
+        orderBy: [
+          { createdTime: "desc" },
+          { stock: "desc" },
+        ],
+        where: { ...categoryFilter, ...compatibilityFilters, is_deleted: false, stock: { gt: 0 } },
         include: {
           category: true,
           sub_category: true,
@@ -144,7 +152,7 @@ export const getAllProducts = async (req: Request, res: Response) => {
       });
 
       totalCount = await prisma.product.count({
-        where: { ...categoryFilter, ...compatibilityFilters, is_deleted: false },
+        where: { ...categoryFilter, ...compatibilityFilters, is_deleted: false, stock: { gt: 0 } },
       });
     }
 
