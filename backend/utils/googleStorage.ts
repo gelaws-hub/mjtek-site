@@ -43,3 +43,20 @@ export const deleteFileFromGoogleCloud = async (filePath: string) => {
     console.error("Error deleting file from GCS:", error);
   }
 };
+
+export const getFileFromGoogleCloud = async (filePath: string): Promise<Buffer> => {
+  try {
+    const file = bucket.file(filePath);
+    const [exists] = await file.exists();
+    
+    if (!exists) {
+      throw new Error('File not found in storage');
+    }
+
+    const [fileContents] = await file.download();
+    return fileContents;
+  } catch (error) {
+    console.error("Error retrieving file from GCS:", error);
+    throw error;
+  }
+};
