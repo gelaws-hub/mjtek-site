@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { Transaction } from "./types";
+import path from "path";
 import {
   Dialog,
   DialogContent,
@@ -42,7 +43,8 @@ export default function TransactionDetailModal({
 
   // Function to get the payment proof URL using the transaction ID
   const getProofUrl = (transactionId: string) => {
-    return `${process.env.NEXT_PUBLIC_API_URL}/admin/transaction-proof/${transactionId}`;
+    // The payment proof is now stored with just the transaction ID as filename
+    return `https://storage.googleapis.com/mjtek-upload-storage/payment_proof/${transactionId}${transaction.payment_proof ? path.extname(transaction.payment_proof) : '.png'}`;
   };
 
   return (
@@ -116,32 +118,24 @@ export default function TransactionDetailModal({
               <h3 className="mb-2 text-lg font-semibold">Bukti Pembayaran</h3>
               <div className="flex flex-col space-y-4">
                 <div className="w-full max-h-[400px] overflow-hidden rounded-lg border relative">
-                  {transaction.payment_proof.match(/\.(jpg|jpeg|png|gif)$/i) ? (
-                    <>
-                      {isImageLoading && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-800">
-                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white"></div>
-                        </div>
-                      )}
-                      <img
-                        src={getProofUrl(transaction.id)}
-                        alt="Bukti Pembayaran"
-                        className="w-full h-full object-contain"
-                        style={{ maxHeight: '400px' }}
-                        onLoad={() => setIsImageLoading(false)}
-                        onError={(e) => {
-                          setIsImageLoading(false);
-                          const target = e.target as HTMLImageElement;
-                          target.onerror = null;
-                          target.src = '/images/placeholder-image.png';
-                        }}
-                      />
-                    </>
-                  ) : (
-                    <div className="flex items-center justify-center h-[200px] bg-gray-100 dark:bg-gray-800">
-                      <p className="text-gray-500">Dokumen Bukti Pembayaran</p>
+                  {isImageLoading && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-800">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white"></div>
                     </div>
                   )}
+                  <img
+                    src={getProofUrl(transaction.id)}
+                    alt="Bukti Pembayaran"
+                    className="w-full h-full object-contain"
+                    style={{ maxHeight: '400px' }}
+                    onLoad={() => setIsImageLoading(false)}
+                    onError={(e) => {
+                      setIsImageLoading(false);
+                      const target = e.target as HTMLImageElement;
+                      target.onerror = null;
+                      target.src = '/images/placeholder-image.png';
+                    }}
+                  />
                 </div>
                 <div className="flex justify-end">
                   <a
@@ -150,9 +144,7 @@ export default function TransactionDetailModal({
                     rel="noopener noreferrer"
                     className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
                   >
-                    {transaction.payment_proof.match(/\.(jpg|jpeg|png|gif)$/i) 
-                      ? 'Buka Gambar di Tab Baru' 
-                      : 'Unduh Bukti Pembayaran'}
+                    Buka Gambar di Tab Baru
                   </a>
                 </div>
               </div>
