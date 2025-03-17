@@ -39,8 +39,8 @@ export const uploadTransactionProof = async (req: Request, res: Response) => {
         }
       }
 
-      // Generate the new file name for Google Cloud Storage
-      const fileName = `payment_proof/${transactionId}-${Date.now()}${path.extname(req.file.originalname)}`;
+      // Generate the new file name for Google Cloud Storage - simplified to just use transactionId
+      const fileName = `payment_proof/${transactionId}${path.extname(req.file.originalname)}`;
 
       // Upload the new file to Google Cloud Storage
       const fileUrl = await uploadFileToGoogleCloud(req.file.buffer, fileName, req.file.mimetype);
@@ -87,20 +87,35 @@ export const getTransactionProof = async (req: Request, res: Response) => {
     }
 
     try {
-      // Extract filename from the Google Cloud Storage URL
-      const urlParts = transaction.payment_proof.split('/');
-      const filename = urlParts[urlParts.length - 1]; // Get the last part of the URL
+      // Handle direct Google Cloud Storage URLs
+      if (transaction.payment_proof.startsWith('https://storage.googleapis.com/')) {
+        return res.redirect(transaction.payment_proof);
+      }
 
-      if (!filename) {
+      // Get filename from payment_proof URL/path
+      const paymentProofFilename = transaction.payment_proof.split('/').pop();
+      
+      if (!paymentProofFilename) {
         return res.status(404).json({ error: "Invalid payment proof URL." });
       }
 
-      // The file path in Google Cloud Storage should be just 'payment_proof/filename'
-      const filePath = `payment_proof/${filename}`;
+      // Verify that the filename contains the transaction ID
+      if (!paymentProofFilename.startsWith(transactionId)) {
+        console.error('Payment proof filename does not match transaction ID:', {
+          transactionId,
+          filename: paymentProofFilename
+        });
+        return res.status(404).json({ error: "Payment proof does not match transaction." });
+      }
+
+      // Get file from Google Cloud Storage
+      const filePath = `payment_proof/${paymentProofFilename}`;
+      console.log('Fetching file:', filePath);
+      
       const fileBuffer = await getFileFromGoogleCloud(filePath);
       
       // Set content type based on file extension
-      const ext = path.extname(filename).toLowerCase();
+      const ext = path.extname(paymentProofFilename).toLowerCase();
       const contentType = 
         ext === '.pdf' ? 'application/pdf' :
         ext === '.png' ? 'image/png' :
@@ -110,12 +125,15 @@ export const getTransactionProof = async (req: Request, res: Response) => {
       // Set response headers
       res.setHeader('Content-Type', contentType);
       res.setHeader('Content-Disposition', `inline; filename="payment_proof_${transactionId}${ext}"`);
-      res.setHeader('Cache-Control', 'public, max-age=31536000'); // Cache for 1 year
+      res.setHeader('Cache-Control', 'public, max-age=31536000');
       
-      // Send the file
       return res.send(fileBuffer);
     } catch (error) {
       console.error("Error retrieving file from storage:", error);
+      // Fallback to direct URL if available
+      if (transaction.payment_proof.startsWith('https://storage.googleapis.com/')) {
+        return res.redirect(transaction.payment_proof);
+      }
       return res.status(404).json({ error: "File not found in storage." });
     }
   } catch (error) {
