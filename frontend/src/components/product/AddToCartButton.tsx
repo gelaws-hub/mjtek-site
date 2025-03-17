@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { errorToast, successToast } from "../toast/reactToastify";
 import { Button } from "../ui/button";
+import { useRouter } from "next/navigation";
+import { LogInIcon } from "lucide-react";
 
 export default function AddToCartButton({
   product_id,
@@ -14,6 +16,7 @@ export default function AddToCartButton({
   className?: string;
 }) {
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const toCart = async (product_id: string, quantity = 1) => {
     setIsLoading(true);
@@ -30,6 +33,24 @@ export default function AddToCartButton({
         credentials: "include",
       });
 
+      const path = window.location.pathname;
+      if (response.status === 401) {
+        errorToast(
+          <div>
+            <p>Anda harus login terlebih dahulu</p>
+            <button
+              onClick={() => router.push(`/login?callbackUrl=${path}`)}
+              className="btn mt-2 flex w-full justify-between items-center border border-white text-white rounded-md px-2 py-1 hover:text-red hover:bg-white"
+            >
+              Login <LogInIcon className="w-4 h-4 ml-2" />
+            </button>
+          </div>,
+          "top-left",
+        );
+        setIsLoading(false);
+        return;
+      }
+
       if (response.status >= 400 && response.status < 500) {
         errorToast("Produk tidak memiliki stok yang cukup", "top-left");
         setIsLoading(false);
@@ -38,7 +59,10 @@ export default function AddToCartButton({
 
       const data = await response.json();
       setIsLoading(false);
-      successToast(`${data.product_name} berhasil ditambahkan ke keranjang`, "top-left");
+      successToast(
+        `${data.product_name} berhasil ditambahkan ke keranjang`,
+        "top-left",
+      );
       if (afterAddToCart) {
         afterAddToCart((prev) => !prev);
       }

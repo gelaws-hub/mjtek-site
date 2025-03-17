@@ -13,6 +13,7 @@ import { cancelTransaction, createTransaction, getAllTransactionsFromUser, getTr
 import { authorize, ensureAuthenticated } from "../auth/userController";
 import { getAllTransactions } from "../controllers/transaksi/searchTransactionController";
 import { uploadTransactionProof, getTransactionProof } from "../controllers/transaksi/uploadPaymentProof";
+import { getUserAddress, updateUserAddress } from "../controllers/transaksi/addressController";
 
 const transaksiRoutes = express.Router();
 
@@ -35,10 +36,6 @@ transaksiRoutes.get('/transaction/:transactionId', ensureAuthenticated, authoriz
 transaksiRoutes.post('/transaction', ensureAuthenticated, authorize(["buyer"]), createTransaction);
 transaksiRoutes.patch('/transaction/:transactionId', ensureAuthenticated, authorize(["buyer"]), cancelTransaction);
 transaksiRoutes.patch('/transaction-proof/:transactionId', ensureAuthenticated, authorize(["buyer"]), uploadTransactionProof);
-
-// Address routes
-transaksiRoutes.get('/user/address', ensureAuthenticated, authorize(["buyer"]), getUserAddress);
-transaksiRoutes.patch('/user/address', ensureAuthenticated, authorize(["buyer"]), updateUserAddress);
 
 // Admin Transaksi routes
 transaksiRoutes.patch('/admin/transaction/:transactionId', ensureAuthenticated, authorize(["admin", "owner"]), updateTransactionStatus);
