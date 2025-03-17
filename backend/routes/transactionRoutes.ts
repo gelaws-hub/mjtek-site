@@ -16,6 +16,7 @@ import { getAllTransactions } from "../controllers/transaksi/searchTransactionCo
 <<<<<<< HEAD
 import { uploadTransactionProof, getTransactionProof } from "../controllers/transaksi/uploadPaymentProof";
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 import { uploadTransactionProof } from "../controllers/transaksi/uploadPaymentProof";
 =======
@@ -25,6 +26,8 @@ import { getUserAddress, updateUserAddress } from "../controllers/transaksi/addr
 >>>>>>> f0a5597 (add transaction address controller)
 =======
 >>>>>>> 0b2479e (Update transactionRoutes.ts)
+=======
+>>>>>>> 0b2479e2b5f4f039dd69877be517e3eb3bf0b0e3
 
 const transaksiRoutes = express.Router();
 
