@@ -12,22 +12,8 @@ import { cancelTransaction, createTransaction, getAllTransactionsFromUser, getTr
 
 import { authorize, ensureAuthenticated } from "../auth/userController";
 import { getAllTransactions } from "../controllers/transaksi/searchTransactionController";
-<<<<<<< HEAD
-<<<<<<< HEAD
 import { uploadTransactionProof, getTransactionProof } from "../controllers/transaksi/uploadPaymentProof";
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-import { uploadTransactionProof } from "../controllers/transaksi/uploadPaymentProof";
-=======
-import { uploadTransactionProof, getTransactionProof } from "../controllers/transaksi/uploadPaymentProof";
->>>>>>> 5677430 (Update transactionRoutes.ts)
 import { getUserAddress, updateUserAddress } from "../controllers/transaksi/addressController";
->>>>>>> f0a5597 (add transaction address controller)
-=======
->>>>>>> 0b2479e (Update transactionRoutes.ts)
-=======
->>>>>>> 0b2479e2b5f4f039dd69877be517e3eb3bf0b0e3
 
 const transaksiRoutes = express.Router();
 
