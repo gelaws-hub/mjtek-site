@@ -15,6 +15,7 @@ import { getAllTransactions } from "../controllers/transaksi/searchTransactionCo
 <<<<<<< HEAD
 <<<<<<< HEAD
 import { uploadTransactionProof, getTransactionProof } from "../controllers/transaksi/uploadPaymentProof";
+<<<<<<< HEAD
 =======
 import { uploadTransactionProof } from "../controllers/transaksi/uploadPaymentProof";
 =======
@@ -22,6 +23,8 @@ import { uploadTransactionProof, getTransactionProof } from "../controllers/tran
 >>>>>>> 5677430 (Update transactionRoutes.ts)
 import { getUserAddress, updateUserAddress } from "../controllers/transaksi/addressController";
 >>>>>>> f0a5597 (add transaction address controller)
+=======
+>>>>>>> 0b2479e (Update transactionRoutes.ts)
 
 const transaksiRoutes = express.Router();
 
@@ -44,10 +47,6 @@ transaksiRoutes.get('/transaction/:transactionId', ensureAuthenticated, authoriz
 transaksiRoutes.post('/transaction', ensureAuthenticated, authorize(["buyer"]), createTransaction);
 transaksiRoutes.patch('/transaction/:transactionId', ensureAuthenticated, authorize(["buyer"]), cancelTransaction);
 transaksiRoutes.patch('/transaction-proof/:transactionId', ensureAuthenticated, authorize(["buyer"]), uploadTransactionProof);
-
-// Address routes
-transaksiRoutes.get('/user/address', ensureAuthenticated, authorize(["buyer"]), getUserAddress);
-transaksiRoutes.patch('/user/address', ensureAuthenticated, authorize(["buyer"]), updateUserAddress);
 
 // Admin Transaksi routes
 transaksiRoutes.patch('/admin/transaction/:transactionId', ensureAuthenticated, authorize(["admin", "owner"]), updateTransactionStatus);
